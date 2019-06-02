@@ -1,3 +1,2 @@
 __deprecated__
-defconfig.old
-.config.old
+*.old
