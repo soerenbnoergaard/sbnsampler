@@ -3,7 +3,6 @@
 ## Build steps:
 
     git submodule update --init
-    cd buildroot/
     make
 
 ## Links:

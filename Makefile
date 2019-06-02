@@ -3,7 +3,7 @@
 # Q = @
 Q = 
 
-BUILDROOT_MAKE_ARGS = BR2_EXTERNAL_SBN_TREE_PATH=../buildroot-external
+BUILDROOT_MAKE_ARGS = BR2_EXTERNAL_SBN_TREE_PATH=../external
 
 all: buildroot
 
@@ -15,8 +15,8 @@ menuconfig:
 
 patch:
 	$(Q)echo Patching package directory
-	$(Q)cp -r buildroot-external/package buildroot/
-	$(Q)cp -r buildroot-external/package/rpi-firmware/config.txt buildroot/output/images/rpi-firmware/config.txt
+	$(Q)cp -r external/package buildroot/
+	$(Q)cp -r external/package/rpi-firmware/config.txt buildroot/output/images/rpi-firmware/config.txt
 
 flash:
 	$(Q)sudo -k dd if=buildroot/output/images/sdcard.img of=/dev/mmcblk0 bs=4M
