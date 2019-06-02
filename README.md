@@ -15,6 +15,8 @@ Perhaps look at SnapOS as a staring point - here the audio seems to be working o
 
 It is already structured like a buildroot-external tree.
 
+Try to trace udev calls and see if this helps.
+
 ### DAC not found
 
 The solution to the hifiberry-dac not working might be that the overlay is not installed correctly, as shown here:
