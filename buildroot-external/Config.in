@@ -1,0 +1,4 @@
+# Example
+menu "buildroot-packages [external repo]"
+  #source "$BR2_EXTERNAL_SBN_TREE_PATH/package/rpi-firmware-overwrite/Config.in"
+endmenu
