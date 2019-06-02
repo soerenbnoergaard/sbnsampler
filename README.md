@@ -4,7 +4,7 @@
 
     git submodule update --init
     cd buildroot/
-    make ../defconfig
+    make
 
 ## Links:
 
