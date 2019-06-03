@@ -8,14 +8,17 @@
 
 ## (Temporary) manual steps
 
-1. Add the following to the `/boot/config.txt`:
+1. Add the lines below to `/boot/config.txt`:
+
+2. Copy the content of `buildroot/output/build/rpi-firmware-*/boot/overlays/` to `/boot/overlays/`.
+
+
+`/boot/config.txt`:
 
     enable_uart=1
     dtparam=i2c_arm=on
     dtparam=spi=on
     dtoverlay=hifiberry-dac
-
-2. Copy the content of `buildroot/output/build/rpi-firmware-*/boot/overlays/` to `/boot/overlays/`.
 
 ## Notes and TODOs
 
