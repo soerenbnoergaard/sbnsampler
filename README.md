@@ -4,19 +4,20 @@
 
     git submodule update --init
     make
+    make flash
 
-## How I got the DAC working
+## (Temporary) manual steps
 
-Add the following to the `config.txt`:
+1. Add the following to the `/boot/config.txt`:
 
     enable_uart=1
     dtparam=i2c_arm=on
     dtparam=spi=on
     dtoverlay=hifiberry-dac
 
-Copied the overlays folder to `/boot/overlays/` (compiled with the `rpi-firmware` package).
+2. Copy the content of `buildroot/output/build/rpi-firmware-*/boot/overlays/` to `/boot/overlays/`.
 
-## Notes
+## Notes and TODOs
 
 ### Updating config.txt on boot
 
