@@ -20,7 +20,7 @@ patch:
 	$(Q)cp -r external/package/rpi-firmware/config.txt buildroot/output/images/rpi-firmware/config.txt
 
 flash:
-	$(Q)sudo -k dd if=buildroot/output/images/sdcard.img of=/dev/mmcblk0
+	$(Q)sudo -k dd bs=4M if=buildroot/output/images/sdcard.img of=/dev/mmcblk0
 
 clean:
 	$(Q)echo Doing nothing
