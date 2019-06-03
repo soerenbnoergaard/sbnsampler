@@ -5,23 +5,18 @@
     git submodule update --init
     make
 
-## Notes-to-self
+## How I got the DAC working
 
-### A better place to start
+Add the following to the `config.txt`:
 
-Perhaps look at SnapOS as a staring point - here the audio seems to be working out-of-the-box:
+    enable_uart=1
+    dtparam=i2c_arm=on
+    dtparam=spi=on
+    dtoverlay=hifiberry-dac
 
-- <https://github.com/badaix/snapos/tree/master/buildroot-external>
+Copied the overlays folder to `/boot/overlays/` (compiled with the `rpi-firmware` package).
 
-It is already structured like a buildroot-external tree.
-
-Try to trace udev calls and see if this helps.
-
-### DAC not found
-
-The solution to the hifiberry-dac not working might be that the overlay is not installed correctly, as shown here:
-
-- <https://forums.pimoroni.com/t/raspberry-pi-zero-w-buildroot-pimoroni-phat-dac/6093>
+## Notes
 
 ### Updating config.txt on boot
 
