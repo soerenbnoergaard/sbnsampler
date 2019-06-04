@@ -2,11 +2,13 @@
 
 TARGET = sbnsampler
 SOURCES = main.c
-OBJECTS = $(SOURCES:.c=.o)
+WAVEFILES = sound/piano_c4.wav
+OBJECTS = $(SOURCES:.c=.o) $(WAVEFILES:.wav=.o)
 LIBS = -lasound
 
-BUILDROOT_TOPDIR = ../buildroot/
-CC = $(BUILDROOT_TOPDIR)/output/host/usr/bin/arm-linux-gcc
+BIN_DIR = ../buildroot/output/host/usr/bin
+CC = $(BIN_DIR)/arm-linux-gcc
+LD = $(BIN_DIR)/arm-linux-ld
 RM = rm -rf
 
 Q = @
@@ -22,10 +24,13 @@ cleanall: clean
 	$(Q)$(RM) $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(Q)echo "    LD $(TARGET)"
+	$(Q)echo "    LD  $(TARGET)"
 	$(Q)$(CC) -o $@ $(LIBS) $(OBJECTS)
 
 %.o: %.c
-	$(Q)echo "    CC $<"
+	$(Q)echo "    CC  $<"
 	$(Q)$(CC) -o $@ -c $<
 
+%.o: %.wav
+	$(Q)echo "    WAV $<"
+	$(Q)$(LD) -r -b binary -o $@ $<

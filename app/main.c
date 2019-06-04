@@ -3,11 +3,14 @@
 #include <stdint.h>
 #include <alsa/asoundlib.h>
 
+#include "samplebank.h"
+
 // Types ///////////////////////////////////////////////////////////////////////
 
 // Defines, macros, and constants //////////////////////////////////////////////
 
 #define SAMPLE_RATE_Hz 44100
+#define BUFFER_SIZE 128
 
 // Globals /////////////////////////////////////////////////////////////////////
 
@@ -16,11 +19,7 @@ static snd_pcm_hw_params_t *hw_params;
 
 // Functions ///////////////////////////////////////////////////////////////////
 
-// Interrupts //////////////////////////////////////////////////////////////////
-
-// Main ////////////////////////////////////////////////////////////////////////
-
-int dac_init(const char *interface)
+int32_t dac_init(const char *interface)
 {
     int32_t err;
     int32_t sample_rate_Hz = SAMPLE_RATE_Hz;
@@ -62,7 +61,7 @@ int dac_init(const char *interface)
         return 1;
     }
 
-    if ((err = snd_pcm_hw_params_set_channels(playback_handle, hw_params, 2)) < 0) {
+    if ((err = snd_pcm_hw_params_set_channels(playback_handle, hw_params, 1)) < 0) {
         fprintf(stderr, "cannot set channel count (%s)\n",
                  snd_strerror(err));
         return 1;
@@ -85,21 +84,24 @@ int dac_init(const char *interface)
     return 0;
 }
 
-int dac_close(void)
+int32_t dac_close(void)
 {
     return snd_pcm_close(playback_handle);
 }
 
-int main()
-{
-    int err;
-    int i;
-    int16_t buf[128];
+// Interrupts //////////////////////////////////////////////////////////////////
 
-    // Fill something into the buffer
-    for (i = 0; i < 128; i++) {
-        buf[i] = 32767 * (2*(i%2) - 1);
-    }
+// Main ////////////////////////////////////////////////////////////////////////
+
+int32_t main()
+{
+    int32_t err;
+    int32_t i;
+    int32_t n;
+    int16_t buffer[BUFFER_SIZE];
+
+    int16_t *x;
+    int32_t x_length;
 
     // Initialize DAC
     err = dac_init("default");
@@ -107,8 +109,18 @@ int main()
         return 1;
 
     // Play sound
-    for (i = 0; i < 1000; ++i) {
-        if ((err = snd_pcm_writei(playback_handle, buf, 128)) != 128) {
+    x = sample.start;
+    x_length = sample.end - sample.start;
+
+    for (i = 0; i < x_length - BUFFER_SIZE; i += BUFFER_SIZE) {
+
+        // Fill buffer
+        for (n = 0; n < BUFFER_SIZE; n++) {
+            buffer[n] = x[i+n];
+        }
+
+        // Output to DAC
+        if ((err = snd_pcm_writei(playback_handle, buffer, BUFFER_SIZE)) != BUFFER_SIZE) {
             fprintf(stderr, "write to audio interface failed (%s)\n",
                      snd_strerror(err));
             return 1;
