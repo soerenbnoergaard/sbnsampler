@@ -3,6 +3,7 @@
 TARGET = sbnsampler
 SOURCES = main.c
 OBJECTS = $(SOURCES:.c=.o)
+LIBS = -lasound
 
 BUILDROOT_TOPDIR = ../buildroot/
 CC = $(BUILDROOT_TOPDIR)/output/host/usr/bin/arm-linux-gcc
@@ -22,7 +23,7 @@ cleanall: clean
 
 $(TARGET): $(OBJECTS)
 	$(Q)echo "    LD $(TARGET)"
-	$(Q)$(CC) -o $@ $(OBJECTS)
+	$(Q)$(CC) -o $@ $(LIBS) $(OBJECTS)
 
 %.o: %.c
 	$(Q)echo "    CC $<"
