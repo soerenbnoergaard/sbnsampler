@@ -2,20 +2,27 @@
 #define SAMPLEBANK_H
 
 #include <stdint.h>
+#include <stdlib.h>
+#include "file_helpers.h"
 
-#define expand_sample(name)
-
-extern const uint8_t _binary_sound_piano_c4_wav_start[];
-extern const uint8_t _binary_sound_piano_c4_wav_end[];
+// Types ///////////////////////////////////////////////////////////////////////
 
 typedef struct {
-    uint16_t *start;
-    uint16_t *end;
+    int16_t *data;
+    size_t length;
 } sample_t;
 
-sample_t sample = {
-    .start = (((int16_t *)&_binary_sound_piano_c4_wav_start) + 44),
-    .end = ((int16_t *)&_binary_sound_piano_c4_wav_end)
-};
+// Defines, macros, and constants //////////////////////////////////////////////
+
+#define NUM_SAMPLES 1
+
+// Globals /////////////////////////////////////////////////////////////////////
+
+extern sample_t samplebank[NUM_SAMPLES];
+
+// Functions ///////////////////////////////////////////////////////////////////
+
+int32_t samplebank_init();
+
 
 #endif

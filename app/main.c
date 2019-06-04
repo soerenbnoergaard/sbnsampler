@@ -105,12 +105,21 @@ int32_t main()
 
     // Initialize DAC
     err = dac_init("default");
-    if (err != 0)
+    if (err != 0) {
+        fprintf(stderr, "Error initializin DAC");
         return 1;
+    }
+
+    // Initialize sample bank
+    err = samplebank_init();
+    if (err != 0) {
+        fprintf(stderr, "Error initializin Sample Bank");
+        return 1;
+    }
 
     // Play sound
-    x = sample.start;
-    x_length = sample.end - sample.start;
+    x = samplebank[0].data;
+    x_length = samplebank[0].length;
 
     for (i = 0; i < x_length - BUFFER_SIZE; i += BUFFER_SIZE) {
 
@@ -129,8 +138,10 @@ int32_t main()
 
     // Close DAC
     err = dac_close();
-    if (err != 0)
+    if (err != 0) {
+        fprintf(stderr, "Error closing DAC");
         return 1;
+    }
 
     return 0;
 }

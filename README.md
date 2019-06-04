@@ -15,7 +15,7 @@ Generate `sbnsampler`
 Connect to the Raspberry Pi through Minicom on the host. Follow these steps to transfer the application from the host to the target:
 
 1. On target: `rz`
-2. On host: `Ctrl-a s -> zmodem ->` navigate to `app/sbnsampler` `-> space -> enter`
+2. On host: `Ctrl-a s -> zmodem ->` navigate to `app/sbnsampler` `-> space -> enter` (repeat for all `.wav` files.
 3. On target: `./sbnsampler`
 
 ## Notes and TODOs

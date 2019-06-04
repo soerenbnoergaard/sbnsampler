@@ -1,9 +1,13 @@
 .PHONY: all clean cleanall
 
 TARGET = sbnsampler
-SOURCES = main.c
-WAVEFILES = sound/piano_c4.wav
-OBJECTS = $(SOURCES:.c=.o) $(WAVEFILES:.wav=.o)
+
+SOURCES = main.c \
+	  samplebank.c \
+	  file_helpers.c
+
+OBJECTS = $(SOURCES:.c=.o)
+
 LIBS = -lasound
 
 BIN_DIR = ../buildroot/output/host/usr/bin
@@ -31,6 +35,3 @@ $(TARGET): $(OBJECTS)
 	$(Q)echo "    CC  $<"
 	$(Q)$(CC) -o $@ -c $<
 
-%.o: %.wav
-	$(Q)echo "    WAV $<"
-	$(Q)$(LD) -r -b binary -o $@ $<
