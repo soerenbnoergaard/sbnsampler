@@ -3,6 +3,7 @@
 TARGET = sbnsampler
 
 SOURCES = main.c \
+	  dac.c \
 	  samplebank.c \
 	  file_helpers.c
 
