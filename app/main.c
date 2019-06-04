@@ -89,6 +89,19 @@ int32_t dac_close(void)
     return snd_pcm_close(playback_handle);
 }
 
+int32_t dac_write(int16_t *buffer)
+{
+    int32_t err;
+
+    if ((err = snd_pcm_writei(playback_handle, buffer, BUFFER_SIZE)) != BUFFER_SIZE) {
+        fprintf(stderr, "write to audio interface failed (%s)\n",
+                 snd_strerror(err));
+        return 1;
+    }
+
+    return 0;
+}
+
 // Interrupts //////////////////////////////////////////////////////////////////
 
 // Main ////////////////////////////////////////////////////////////////////////
@@ -101,47 +114,49 @@ int32_t main()
     int16_t buffer[BUFFER_SIZE];
 
     int16_t *x;
-    int32_t x_length;
-
-    // Initialize DAC
-    err = dac_init("default");
-    if (err != 0) {
-        fprintf(stderr, "Error initializin DAC");
-        return 1;
-    }
+    int32_t length;
 
     // Initialize sample bank
     err = samplebank_init();
     if (err != 0) {
-        fprintf(stderr, "Error initializin Sample Bank");
+        fprintf(stderr, "Error initializin Sample Bank\n");
+        return 1;
+    }
+
+    // Initialize DAC
+    err = dac_init("default");
+    if (err != 0) {
+        fprintf(stderr, "Error initializin DAC\n");
         return 1;
     }
 
     // Play sound
     x = samplebank[0].data;
-    x_length = samplebank[0].length;
+    length = samplebank[0].length;
 
-    for (i = 0; i < x_length - BUFFER_SIZE; i += BUFFER_SIZE) {
-
+    for (i = 0; i < length - BUFFER_SIZE; i += BUFFER_SIZE) {
         // Fill buffer
         for (n = 0; n < BUFFER_SIZE; n++) {
             buffer[n] = x[i+n];
         }
 
         // Output to DAC
-        if ((err = snd_pcm_writei(playback_handle, buffer, BUFFER_SIZE)) != BUFFER_SIZE) {
-            fprintf(stderr, "write to audio interface failed (%s)\n",
-                     snd_strerror(err));
-            return 1;
+        err = dac_write(buffer);
+        if (err != 0) {
+            fprintf(stderr, "Error during playback...\n");
+            goto clean_exit;
         }
     }
 
+clean_exit:
     // Close DAC
     err = dac_close();
     if (err != 0) {
-        fprintf(stderr, "Error closing DAC");
+        fprintf(stderr, "Error closing DAC\n");
         return 1;
     }
+
+    // TODO: Consider freeing the sound bank here.
 
     return 0;
 }
