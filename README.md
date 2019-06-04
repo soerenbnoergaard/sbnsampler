@@ -3,37 +3,12 @@
 ## Build steps:
 
     git submodule update --init
-    make
-    make flash
-
-## (Temporary) manual steps
-
-1. Add the lines below to `/boot/config.txt`.
-2. Copy the content of `buildroot/output/build/rpi-firmware-*/boot/overlays/` to `/boot/overlays/`.
-
-Lines added to `/boot/config.txt`:
-
-    enable_uart=1
-    dtparam=i2c_arm=on
-    dtparam=spi=on
-    dtoverlay=hifiberry-dac
+    make buildroot
+    make sdcard
 
 ## Notes and TODOs
 
-### Updating config.txt on boot
-
-These may be installed using a custom `post-image.sh` script, I expect, also updating the `config.txt` file. See the procedure here:
-
-- <https://github.com/badaix/snapos/tree/master/buildroot-external>
-
-I think these lines must be added to the config.txt:
-
-    enable_uart=1
-    dtoverlay=hifiberry-dac
-
-### Loading the correct modules after boot
-
-I think these will be needed for the project:
+I think this will be needed for merging MIDI streams.
 
     modprobe snd-virmidi
 
