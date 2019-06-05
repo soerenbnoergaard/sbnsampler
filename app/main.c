@@ -28,28 +28,28 @@ typedef struct {
 
 voice_t voices[NUM_VOICES] = {
     {
-        .active = true,
+        .active = false,
         .x = &samplebank[0],
         .n = 0,
         .m = 0,
         .ppf = &ppf0,
     },
     {
-        .active = true,
+        .active = false,
         .x = &samplebank[0],
         .n = 0,
         .m = 0,
         .ppf = &ppf5,
     },
     {
-        .active = true,
+        .active = false,
         .x = &samplebank[0],
         .n = 0,
         .m = 0,
         .ppf = &ppf8,
     },
     {
-        .active = true,
+        .active = false,
         .x = &samplebank[0],
         .n = 0,
         .m = 0,
@@ -71,6 +71,8 @@ int16_t get_transposed_sample(voice_t *v)
 
     // Return zero if the voice is inactive
     if (v->active == false) {
+        v->n = 0;
+        v->m = 0;
         return 0;
     }
 
@@ -79,8 +81,6 @@ int16_t get_transposed_sample(voice_t *v)
 
     if (v->n >= v->x->length - 1) {
         v->active = false;
-        v->n = 0;
-        v->m = 0;
         return 0;
     }
 
@@ -103,7 +103,6 @@ int16_t get_transposed_sample(voice_t *v)
 
     // Update output buffer index
     v->m += 1;
-
     return (int16_t)y;
 }
 
@@ -116,6 +115,15 @@ int32_t handle_midi(void)
 
     if (err == 0) {
         printf("%02x %02x %02x\n", m.status, m.data[0], m.data[1]);
+
+        if (m.status == 0x90) {
+            if (m.data[0] == 0x30) {
+                voices[0].active = true;
+                voices[1].active = true;
+                voices[2].active = true;
+                voices[3].active = true;
+            }
+        }
     }
 
     return err;
@@ -147,11 +155,6 @@ void loop()
             v = &voices[i];
             y += get_transposed_sample(v);
             num_active_voices += (v->active != 0);
-        }
-
-        // Exit criteria
-        if (num_active_voices == 0) {
-            return;
         }
 
         // Write output do DAC

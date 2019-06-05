@@ -3,7 +3,6 @@
 #include <alsa/asoundlib.h>
 
 static snd_rawmidi_t* midi_in = NULL;
-static int32_t state = 0;
 
 int32_t midi_init(void)
 {
@@ -28,6 +27,8 @@ int32_t midi_get(midi_message_t *m)
 {
     int32_t err;
     uint8_t buffer;
+    static int32_t state = 0;
+    static midi_message_t active_message;
 
     if ((err = snd_rawmidi_read(midi_in, &buffer, 1)) < 0) {
         return 1;
@@ -40,23 +41,26 @@ int32_t midi_get(midi_message_t *m)
 
     switch (state) {
     case 0:
-        m->status = buffer;
+        active_message.status = buffer;
         state = 1;
         err = 1;
+        break;
 
     case 1:
-        m->data[0] = buffer;
+        active_message.data[0] = buffer;
         state = 2;
         err = 1;
         break;
 
     case 2:
-        m->data[1] = buffer;
+        active_message.data[1] = buffer;
         state = 3;
         err = 0;
+        *m = active_message;
         break;
 
     default:
+        err = 1;
         break;
     }
 
