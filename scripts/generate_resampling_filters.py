@@ -67,7 +67,7 @@ if __name__ == "__main__":
         f.write("#define PPF_NUM_TABS {:d}\n".format(N))
         f.write("""
 typedef struct {
-    const float *h; // Polyphase filter coefficients
+    float *h; // Polyphase filter coefficients
     uint32_t h_length; // Length of coefficients array
     uint32_t L; // Interpolation rate
     uint32_t M; // Decimation rate
@@ -77,8 +77,8 @@ typedef struct {
             h = generate_polyfilter_coefficients(L, M, N)
 
             f.write("""
-const float ppf_h{n:d}[] = {{ {h:s} }};
-const ppf_t ppf{n:d} = {{
+float ppf_h{n:d}[] = {{ {h:s} }};
+ppf_t ppf{n:d} = {{
     .h = ppf_h{n:d},
     .h_length = {h_length:d},
     .L = {L:d},
@@ -91,12 +91,5 @@ const ppf_t ppf{n:d} = {{
     L = L,
     M = M,
 ))
-
-            # f.write("const float h{:d}[] = {:s}\n".format(
-            #     n,
-            #     "{" + ", ".join([str(X) for X in h]) + "};"
-            # ))
-            # f.write("uint32_t L{:d} = {:d};\n".format(n, L))
-            # f.write("uint32_t M{:d} = {:d};\n".format(n, M))
         f.write("#endif\n")
 

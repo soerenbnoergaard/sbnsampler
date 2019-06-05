@@ -9,7 +9,9 @@
 // Types ///////////////////////////////////////////////////////////////////////
 
 typedef struct {
-    int16_t x[PPF_NUM_TABS]; // Input delay line
+    sample_t *x; // Input sample buffer
+    uint32_t n; // Index into sample buffer
+    ppf_t *ppf; // Poly-phase filter
 } voice_t;
 
 // Defines, macros, and constants //////////////////////////////////////////////
@@ -19,46 +21,71 @@ typedef struct {
 
 // Globals /////////////////////////////////////////////////////////////////////
 
+voice_t voices[] = {
+    {
+        .x = &samplebank[0],
+        .n = 0,
+        .ppf = &ppf1,
+    },
+    {
+        .x = &samplebank[0],
+        .n = 0,
+        .ppf = &ppf12,
+    },
+};
+
 // Functions ///////////////////////////////////////////////////////////////////
 
-void resampler(int16_t *x, uint32_t length) 
+void resampler() 
 {
     // Variable names after Lyons - Understanding Digital Signal Processing.
 
-    float y;
+    // Output buffer
     int16_t buffer[BUFFER_SIZE];
     int32_t buffer_idx = 0;
 
+    float y;
     int32_t m; // Output sample index, e.g. y[m]
-    int32_t n; // Input sample index, e.g. x[n]
     int32_t k; // Sub-filter coefficient selector
     int32_t l; // Delay-line index
 
     uint32_t N = PPF_NUM_TABS;
-    const ppf_t ppf = ppf4;
 
-    for (m = 0; m < length; m++) {
+    // Expand active voice
+    voice_t *v = &voices[1];
+
+    for (m = 0; m < v->x->length; m++) {
         buffer_idx = (m % BUFFER_SIZE);
 
-        n = (m*ppf.M) / ppf.L;
-        k = (m*ppf.M) % ppf.L;
+        //
+        // Polyphase re-sampling filter
+        //
 
-        if (n > length) {
-            fprintf(stderr, "Not enough input samples\n");
-            return;
-        }
+        v->n = (m * v->ppf->M) / v->ppf->L;
+        k    = (m * v->ppf->M) % v->ppf->L;
 
         y = 0;
 
         for (l = 0; l < N; l++) {
-            // Skip unknown input samples
-            if (n - l < 0) {
+            // Skip unknown input sample values
+            if (v->n - l < 0) {
                 continue;
             }
 
-            // Poly-phase filter
-            y += ppf.L * ppf.h[l*ppf.L + k] * (float)x[n - l];
+            y += 
+                v->ppf->L *                  // Scaling factor
+                v->ppf->h[l*v->ppf->L + k] * // Filter coefficient
+                (float)v->x->data[v->n - l]; // Input sample
         }
+
+        //
+        // Other tasks
+        //
+
+
+        //
+        // Output buffer
+        //
 
         buffer[buffer_idx] = (int16_t)y;
 
@@ -100,7 +127,7 @@ int32_t main(void)
     x = samplebank[0].data;
     length = samplebank[0].length;
 
-    resampler(x, length);
+    resampler();
 
 clean_exit:
     // Close DAC
