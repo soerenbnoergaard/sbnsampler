@@ -3,6 +3,7 @@
 #include <alsa/asoundlib.h>
 
 static snd_rawmidi_t* midi_in = NULL;
+static int32_t state = 0;
 
 int32_t midi_init(void)
 {
@@ -10,7 +11,7 @@ int32_t midi_init(void)
     const char* interface = "hw:1,0,0";  // see alsarawportlist.c example program
     int32_t err;
 
-    if ((err = snd_rawmidi_open(&midi_in, NULL, interface, SND_RAWMIDI_SYNC)) < 0) {
+    if ((err = snd_rawmidi_open(&midi_in, NULL, interface, SND_RAWMIDI_NONBLOCK)) < 0) {
         fprintf(stderr, "Problem opening MIDI input: %s\n", snd_strerror(err));
         return 1;
     }
@@ -23,38 +24,42 @@ int32_t midi_close(void)
     return 0;          // so might be a good idea to erase it after closing.
 }
 
-midi_message_t midi_get(void)
+int32_t midi_get(midi_message_t *m)
 {
     int32_t err;
-    int32_t state;
     uint8_t buffer;
-    midi_message_t m;
 
-    state = 0;
-
-    while (state < 3) {
-        if ((err = snd_rawmidi_read(midi_in, &buffer, 1)) < 0) {
-            fprintf(stderr, "Problem reading MIDI input: %s\n", snd_strerror(err));
-        }
-
-        switch (state) {
-        case 0:
-            if (buffer & 0x80) {
-                m.status = buffer;
-                state = 1;
-            }
-            break;
-        case 1:
-            m.data[0] = buffer;
-            state = 2;
-            break;
-        case 2:
-            m.data[1] = buffer;
-            state = 3;
-        default:
-            break;
-        }
+    if ((err = snd_rawmidi_read(midi_in, &buffer, 1)) < 0) {
+        /* fprintf(stderr, "Problem reading MIDI input: %s\n", snd_strerror(err)); */
+        return 1;
     }
 
-    return m;
+    // A status message is received if the MSB is set
+    if (buffer & 0x80) {
+        state = 0;
+    }
+
+    switch (state) {
+    case 0:
+        m->status = buffer;
+        state = 1;
+        err = 1;
+
+    case 1:
+        m->data[0] = buffer;
+        state = 2;
+        err = 1;
+        break;
+
+    case 2:
+        m->data[1] = buffer;
+        state = 3;
+        err = 0;
+        break;
+
+    default:
+        break;
+    }
+
+    return err;
 }

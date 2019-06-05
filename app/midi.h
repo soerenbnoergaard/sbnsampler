@@ -10,6 +10,6 @@ typedef struct {
 
 int32_t midi_init(void);
 int32_t midi_close(void);
-midi_message_t midi_get(void);
+int32_t midi_get(midi_message_t *m);
 
 #endif

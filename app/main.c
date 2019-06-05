@@ -136,10 +136,16 @@ void loop()
 
 int32_t test(void)
 {
+    int32_t err;
     midi_message_t m;
-    m = midi_get();
 
-    printf("%02x %02x %02x\n", m.status, m.data[0], m.data[1]);
+    while (1) {
+        err = midi_get(&m);
+
+        if (err == 0) {
+            printf("%02x %02x %02x\n", m.status, m.data[0], m.data[1]);
+        }
+    }
 }
 
 // Interrupts //////////////////////////////////////////////////////////////////
