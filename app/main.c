@@ -8,6 +8,10 @@
 
 // Types ///////////////////////////////////////////////////////////////////////
 
+typedef struct {
+    int16_t x[PPF_NUM_TABS]; // Input delay line
+} voice_t;
+
 // Defines, macros, and constants //////////////////////////////////////////////
 
 #define SAMPLE_RATE_Hz 44100
@@ -19,27 +23,25 @@
 
 void resampler(int16_t *x, uint32_t length) 
 {
+    // Variable names after Lyons - Understanding Digital Signal Processing.
+
     float y;
     int16_t buffer[BUFFER_SIZE];
     int32_t buffer_idx = 0;
 
-    int32_t m;
-    int32_t k;
-    int32_t n;
-    int32_t l;
+    int32_t m; // Output sample index, e.g. y[m]
+    int32_t n; // Input sample index, e.g. x[n]
+    int32_t k; // Sub-filter coefficient selector
+    int32_t l; // Delay-line index
 
-    uint32_t N = SUBFILTER_LENGTH;
-
-    const float *h = h4;
-    uint32_t h_length = (sizeof(h4)/sizeof(float));
-    uint32_t L = L4;
-    uint32_t M = M4;
+    uint32_t N = PPF_NUM_TABS;
+    const ppf_t ppf = ppf4;
 
     for (m = 0; m < length; m++) {
         buffer_idx = (m % BUFFER_SIZE);
 
-        n = (m*M) / L;
-        k = (m*M) % L;
+        n = (m*ppf.M) / ppf.L;
+        k = (m*ppf.M) % ppf.L;
 
         if (n > length) {
             fprintf(stderr, "Not enough input samples\n");
@@ -55,11 +57,8 @@ void resampler(int16_t *x, uint32_t length)
             }
 
             // Poly-phase filter
-            y += L * h[l*L + k] * (float)x[n - l];
+            y += ppf.L * ppf.h[l*ppf.L + k] * (float)x[n - l];
         }
-
-        // Add the input sample to the output, to hear the interval
-        y = (y/2) + (x[m]/2);
 
         buffer[buffer_idx] = (int16_t)y;
 
@@ -102,20 +101,6 @@ int32_t main(void)
     length = samplebank[0].length;
 
     resampler(x, length);
-
-    /* for (i = 0; i < length - BUFFER_SIZE; i += BUFFER_SIZE) { */
-    /*     // Fill buffer */
-    /*     for (n = 0; n < BUFFER_SIZE; n++) { */
-    /*         buffer[n] = x[i+n]; */
-    /*     } */
-    /*  */
-    /*     // Output to DAC */
-    /*     err = dac_write(buffer, BUFFER_SIZE); */
-    /*     if (err != 0) { */
-    /*         fprintf(stderr, "Error during playback...\n"); */
-    /*         goto clean_exit; */
-    /*     } */
-    /* } */
 
 clean_exit:
     // Close DAC

@@ -64,15 +64,39 @@ if __name__ == "__main__":
     with open(output_file, "w") as f:
         f.write("#ifndef POLYFILTER_H\n")
         f.write("#define POLYFILTER_H\n")
-        f.write("#define SUBFILTER_LENGTH {:d}\n".format(N))
+        f.write("#define PPF_NUM_TABS {:d}\n".format(N))
+        f.write("""
+typedef struct {
+    const float *h; // Polyphase filter coefficients
+    uint32_t h_length; // Length of coefficients array
+    uint32_t L; // Interpolation rate
+    uint32_t M; // Decimation rate
+} ppf_t;
+""")
         for n, (L, M) in enumerate(intervals):
             h = generate_polyfilter_coefficients(L, M, N)
 
-            f.write("const float h{:d}[] = {:s}\n".format(
-                n,
-                "{" + ", ".join([str(X) for X in h]) + "};"
-            ))
-            f.write("uint32_t L{:d} = {:d};\n".format(n, L))
-            f.write("uint32_t M{:d} = {:d};\n".format(n, M))
+            f.write("""
+const float ppf_h{n:d}[] = {{ {h:s} }};
+const ppf_t ppf{n:d} = {{
+    .h = ppf_h{n:d},
+    .h_length = {h_length:d},
+    .L = {L:d},
+    .M = {M:d}
+}};
+""".format(
+    n = n,
+    h = ", ".join([str(X) for X in h]),
+    h_length = len(h),
+    L = L,
+    M = M,
+))
+
+            # f.write("const float h{:d}[] = {:s}\n".format(
+            #     n,
+            #     "{" + ", ".join([str(X) for X in h]) + "};"
+            # ))
+            # f.write("uint32_t L{:d} = {:d};\n".format(n, L))
+            # f.write("uint32_t M{:d} = {:d};\n".format(n, M))
         f.write("#endif\n")
 
