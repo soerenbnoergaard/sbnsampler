@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "dac.h"
+#include "midi.h"
 #include "samplebank.h"
 #include "polyfilter.h"
 
@@ -133,6 +134,14 @@ void loop()
     }
 }
 
+int32_t test(void)
+{
+    midi_message_t m;
+    m = midi_get();
+
+    printf("%02x %02x %02x\n", m.status, m.data[0], m.data[1]);
+}
+
 // Interrupts //////////////////////////////////////////////////////////////////
 
 // Main ////////////////////////////////////////////////////////////////////////
@@ -140,12 +149,6 @@ void loop()
 int32_t main(void)
 {
     int32_t err;
-    int32_t i;
-    int32_t n;
-    int16_t buffer[BUFFER_SIZE];
-
-    int16_t *x;
-    int32_t length;
 
     // Initialize sample bank
     err = samplebank_init();
@@ -161,17 +164,36 @@ int32_t main(void)
         return 1;
     }
 
-    // Play sound
-    x = samplebank[0].data;
-    length = samplebank[0].length;
+    // Initialize MIDI
+    err = midi_init();
+    if (err != 0) {
+        fprintf(stderr, "Error initializin MIDI\n");
+        return 1;
+    }
 
-    loop();
+    //
+    // Begin program
+    //
+
+    /* loop(); */
+    test();
+
+    //
+    // End program
+    //
 
 clean_exit:
     // Close DAC
     err = dac_close();
     if (err != 0) {
         fprintf(stderr, "Error closing DAC\n");
+        return 1;
+    }
+
+    // Close MIDI
+    err = midi_close();
+    if (err != 0) {
+        fprintf(stderr, "Error closing MIDI\n");
         return 1;
     }
 

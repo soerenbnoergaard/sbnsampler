@@ -20,6 +20,13 @@ Connect to the Raspberry Pi through Minicom on the host. Follow these steps to t
 
 ## Notes and TODOs
 
+### Getting MIDI to work
+
+Test midi:
+
+    modprobe snd-seq
+    aconnect -li
+
 I think this will be needed for merging MIDI streams.
 
     modprobe snd-virmidi

@@ -4,6 +4,7 @@ TARGET = sbnsampler
 
 SOURCES = main.c \
 	  dac.c \
+	  midi.c \
 	  samplebank.c \
 	  file_helpers.c
 
