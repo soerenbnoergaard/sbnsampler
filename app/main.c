@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "dac.h"
@@ -9,6 +10,7 @@
 // Types ///////////////////////////////////////////////////////////////////////
 
 typedef struct {
+    bool active; // Whether the voice is active or not
     sample_t *x; // Input sample buffer
     uint32_t n; // Index into sample buffer
     ppf_t *ppf; // Poly-phase filter
@@ -18,16 +20,31 @@ typedef struct {
 
 #define SAMPLE_RATE_Hz 44100
 #define BUFFER_SIZE 128
+#define NUM_VOICES 4
 
 // Globals /////////////////////////////////////////////////////////////////////
 
-voice_t voices[] = {
+voice_t voices[NUM_VOICES] = {
     {
+        .active = true,
         .x = &samplebank[0],
         .n = 0,
-        .ppf = &ppf1,
+        .ppf = &ppf0,
     },
     {
+        .active = true,
+        .x = &samplebank[0],
+        .n = 0,
+        .ppf = &ppf5,
+    },
+    {
+        .active = true,
+        .x = &samplebank[0],
+        .n = 0,
+        .ppf = &ppf8,
+    },
+    {
+        .active = true,
         .x = &samplebank[0],
         .n = 0,
         .ppf = &ppf12,
@@ -36,57 +53,78 @@ voice_t voices[] = {
 
 // Functions ///////////////////////////////////////////////////////////////////
 
-void resampler() 
+int16_t get_transposed_sample(voice_t *v, int32_t m)
 {
+    // Polyphase re-sampling filter
     // Variable names after Lyons - Understanding Digital Signal Processing.
 
+    float y;
+    int32_t k; // Sub-filter coefficient selector
+    int32_t l; // Delay-line index
+    uint32_t N = PPF_NUM_TABS;
+
+    // Return zero if the voice is inactive
+    if (v->active == false) {
+        return 0;
+    }
+
+    // Compute input buffer index (de-activate the voice if there are no more samples)
+    v->n = (m * v->ppf->M) / v->ppf->L;
+
+    if (v->n >= v->x->length - 1) {
+        v->active = false;
+        return 0;
+    }
+
+    // Compute polyphase sub-filter selector
+    k = (m * v->ppf->M) % v->ppf->L;
+
+    // Execute filter difference equation
+    y = 0;
+    for (l = 0; l < N; l++) {
+        // Skip unknown input sample values
+        if (v->n - l < 0) {
+            continue;
+        }
+
+        y += 
+            v->ppf->L / NUM_VOICES *     // Scaling factor
+            v->ppf->h[l*v->ppf->L + k] * // Filter coefficient
+            (float)v->x->data[v->n - l]; // Input sample
+    }
+
+    return (int16_t)y;
+}
+
+void loop() 
+{
     // Output buffer
     int16_t buffer[BUFFER_SIZE];
     int32_t buffer_idx = 0;
 
     float y;
     int32_t m; // Output sample index, e.g. y[m]
-    int32_t k; // Sub-filter coefficient selector
-    int32_t l; // Delay-line index
 
-    uint32_t N = PPF_NUM_TABS;
+    int32_t i;
+    voice_t *v;
 
-    // Expand active voice
-    voice_t *v = &voices[1];
+    int32_t num_active_voices;
 
-    for (m = 0; m < v->x->length; m++) {
-        buffer_idx = (m % BUFFER_SIZE);
-
-        //
-        // Polyphase re-sampling filter
-        //
-
-        v->n = (m * v->ppf->M) / v->ppf->L;
-        k    = (m * v->ppf->M) % v->ppf->L;
-
+    for (m = 0; ; m++) {
         y = 0;
+        num_active_voices = 0;
 
-        for (l = 0; l < N; l++) {
-            // Skip unknown input sample values
-            if (v->n - l < 0) {
-                continue;
-            }
-
-            y += 
-                v->ppf->L *                  // Scaling factor
-                v->ppf->h[l*v->ppf->L + k] * // Filter coefficient
-                (float)v->x->data[v->n - l]; // Input sample
+        for (i = 0; i < NUM_VOICES; i++) {
+            v = &voices[i];
+            y += get_transposed_sample(v, m);
+            num_active_voices += (v->active != 0);
         }
 
-        //
-        // Other tasks
-        //
+        if (num_active_voices == 0) {
+            return;
+        }
 
-
-        //
-        // Output buffer
-        //
-
+        buffer_idx = (m % BUFFER_SIZE);
         buffer[buffer_idx] = (int16_t)y;
 
         if (buffer_idx == BUFFER_SIZE-1) {
@@ -127,7 +165,7 @@ int32_t main(void)
     x = samplebank[0].data;
     length = samplebank[0].length;
 
-    resampler();
+    loop();
 
 clean_exit:
     // Close DAC
