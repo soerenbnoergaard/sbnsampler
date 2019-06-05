@@ -30,7 +30,6 @@ int32_t midi_get(midi_message_t *m)
     uint8_t buffer;
 
     if ((err = snd_rawmidi_read(midi_in, &buffer, 1)) < 0) {
-        /* fprintf(stderr, "Problem reading MIDI input: %s\n", snd_strerror(err)); */
         return 1;
     }
 

@@ -14,6 +14,7 @@ typedef struct {
     bool active; // Whether the voice is active or not
     sample_t *x; // Input sample buffer
     uint32_t n; // Index into sample buffer
+    uint32_t m; // Index into output buffer
     ppf_t *ppf; // Poly-phase filter
 } voice_t;
 
@@ -30,31 +31,35 @@ voice_t voices[NUM_VOICES] = {
         .active = true,
         .x = &samplebank[0],
         .n = 0,
+        .m = 0,
         .ppf = &ppf0,
     },
     {
         .active = true,
         .x = &samplebank[0],
         .n = 0,
+        .m = 0,
         .ppf = &ppf5,
     },
     {
         .active = true,
         .x = &samplebank[0],
         .n = 0,
+        .m = 0,
         .ppf = &ppf8,
     },
     {
         .active = true,
         .x = &samplebank[0],
         .n = 0,
+        .m = 0,
         .ppf = &ppf12,
     },
 };
 
 // Functions ///////////////////////////////////////////////////////////////////
 
-int16_t get_transposed_sample(voice_t *v, int32_t m)
+int16_t get_transposed_sample(voice_t *v)
 {
     // Polyphase re-sampling filter
     // Variable names after Lyons - Understanding Digital Signal Processing.
@@ -70,15 +75,17 @@ int16_t get_transposed_sample(voice_t *v, int32_t m)
     }
 
     // Compute input buffer index (de-activate the voice if there are no more samples)
-    v->n = (m * v->ppf->M) / v->ppf->L;
+    v->n = (v->m * v->ppf->M) / v->ppf->L;
 
     if (v->n >= v->x->length - 1) {
         v->active = false;
+        v->n = 0;
+        v->m = 0;
         return 0;
     }
 
     // Compute polyphase sub-filter selector
-    k = (m * v->ppf->M) % v->ppf->L;
+    k = (v->m * v->ppf->M) % v->ppf->L;
 
     // Execute filter difference equation
     y = 0;
@@ -94,7 +101,24 @@ int16_t get_transposed_sample(voice_t *v, int32_t m)
             (float)v->x->data[v->n - l]; // Input sample
     }
 
+    // Update output buffer index
+    v->m += 1;
+
     return (int16_t)y;
+}
+
+int32_t handle_midi(void)
+{
+    int32_t err;
+    midi_message_t m;
+
+    err = midi_get(&m);
+
+    if (err == 0) {
+        printf("%02x %02x %02x\n", m.status, m.data[0], m.data[1]);
+    }
+
+    return err;
 }
 
 void loop() 
@@ -104,46 +128,41 @@ void loop()
     int32_t buffer_idx = 0;
 
     float y;
-    int32_t m; // Output sample index, e.g. y[m]
 
     int32_t i;
     voice_t *v;
 
     int32_t num_active_voices;
 
-    for (m = 0; ; m++) {
+    while (1) {
+
+        // Update voices based on MIDI input
+        handle_midi(); 
+
+        // Generate audio from voices
         y = 0;
         num_active_voices = 0;
 
         for (i = 0; i < NUM_VOICES; i++) {
             v = &voices[i];
-            y += get_transposed_sample(v, m);
+            y += get_transposed_sample(v);
             num_active_voices += (v->active != 0);
         }
 
+        // Exit criteria
         if (num_active_voices == 0) {
             return;
         }
 
-        buffer_idx = (m % BUFFER_SIZE);
+        // Write output do DAC
         buffer[buffer_idx] = (int16_t)y;
 
         if (buffer_idx == BUFFER_SIZE-1) {
             dac_write(buffer, BUFFER_SIZE);
+            buffer_idx = 0;
         }
-    }
-}
-
-int32_t test(void)
-{
-    int32_t err;
-    midi_message_t m;
-
-    while (1) {
-        err = midi_get(&m);
-
-        if (err == 0) {
-            printf("%02x %02x %02x\n", m.status, m.data[0], m.data[1]);
+        else {
+            buffer_idx += 1;
         }
     }
 }
@@ -181,8 +200,7 @@ int32_t main(void)
     // Begin program
     //
 
-    /* loop(); */
-    test();
+    loop();
 
     //
     // End program
