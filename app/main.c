@@ -79,6 +79,12 @@ int16_t get_transposed_sample(voice_t *v)
     // Compute input buffer index (de-activate the voice if there are no more samples)
     v->n = (v->m * v->ppf->M) / v->ppf->L;
 
+    // FIXME: Workaround because zero-transposition does not work
+    if (v->ppf == &ppf0) {
+        v->m += 1;
+        return v->x->data[v->n];
+    }
+
     if (v->n >= v->x->length - 1) {
         v->active = false;
         return 0;
