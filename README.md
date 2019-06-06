@@ -31,6 +31,10 @@ I think this will be needed for merging MIDI streams.
 
     modprobe snd-virmidi
 
+## Alsa slides
+
+    https://elinux.org/images/8/82/Elc2011_lorriaux.pdf
+
 ## Links:
 
 - <https://embeddedartistry.com/blog/2017/5/4/raspberry-pi-compute-module-3-getting-started-with-buildroot>

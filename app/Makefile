@@ -17,6 +17,9 @@ CC = $(BIN_DIR)/arm-linux-gcc
 LD = $(BIN_DIR)/arm-linux-ld
 RM = rm -rf
 
+CCARGS = -Wall
+LDARGS = -Wall
+
 Q = @
 
 all: $(TARGET)
@@ -31,9 +34,9 @@ cleanall: clean
 
 $(TARGET): $(OBJECTS)
 	$(Q)echo "    LD  $(TARGET)"
-	$(Q)$(CC) -o $@ $(LIBS) $(OBJECTS)
+	$(Q)$(CC) $(LDARGS) -o $@ $(LIBS) $(OBJECTS)
 
 %.o: %.c
 	$(Q)echo "    CC  $<"
-	$(Q)$(CC) -o $@ -c $<
+	$(Q)$(CC) $(CCARGS) -o $@ -c $<
 

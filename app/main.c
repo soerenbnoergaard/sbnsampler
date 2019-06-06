@@ -106,6 +106,17 @@ int16_t get_transposed_sample(voice_t *v)
     return (int16_t)y;
 }
 
+int16_t get_squarewave_sample()
+{
+    static int32_t n = 0;
+    int16_t x;
+
+    x = (n < 50) * 32767;
+    n = (n + 1) % 100;
+
+    return x;
+}
+
 int32_t handle_midi(void)
 {
     int32_t err;
@@ -116,12 +127,18 @@ int32_t handle_midi(void)
     if (err == 0) {
         printf("%02x %02x %02x\n", m.status, m.data[0], m.data[1]);
 
-        if (m.status == 0x90) {
-            if (m.data[0] == 0x30) {
-                voices[0].active = true;
+        if (m.data[0] == 0x30) {
+            if (m.status == 0x90) {
+                voices[0].active = false;
                 voices[1].active = true;
-                voices[2].active = true;
-                voices[3].active = true;
+                voices[2].active = false;
+                voices[3].active = false;
+            }
+            else if (m.status == 0x80) {
+                voices[0].active = false;
+                voices[1].active = false;
+                voices[2].active = false;
+                voices[3].active = false;
             }
         }
     }
@@ -140,8 +157,6 @@ void loop()
     int32_t i;
     voice_t *v;
 
-    int32_t num_active_voices;
-
     while (1) {
 
         // Update voices based on MIDI input
@@ -149,12 +164,13 @@ void loop()
 
         // Generate audio from voices
         y = 0;
-        num_active_voices = 0;
 
         for (i = 0; i < NUM_VOICES; i++) {
             v = &voices[i];
             y += get_transposed_sample(v);
-            num_active_voices += (v->active != 0);
+
+            // if (v->active)
+            //     y += get_squarewave_sample();
         }
 
         // Write output do DAC
@@ -209,7 +225,6 @@ int32_t main(void)
     // End program
     //
 
-clean_exit:
     // Close DAC
     err = dac_close();
     if (err != 0) {

@@ -6,7 +6,11 @@ static snd_pcm_hw_params_t *hw_params;
 
 int32_t dac_init(const char *interface, uint32_t sample_rate_Hz)
 {
+    // https://users.suse.com/~mana/alsa090_howto.html#sect02
     int32_t err;
+    uint32_t channels = 1;
+    uint32_t periods = 2;
+    uint32_t periodsize = 256;
 
     if ((err = snd_pcm_open(&playback_handle, interface, SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
         fprintf(stderr, "cannot open audio device %s (%s)\n", 
@@ -45,12 +49,26 @@ int32_t dac_init(const char *interface, uint32_t sample_rate_Hz)
         return 1;
     }
 
-    if ((err = snd_pcm_hw_params_set_channels(playback_handle, hw_params, 1)) < 0) {
+    if ((err = snd_pcm_hw_params_set_channels(playback_handle, hw_params, channels)) < 0) {
         fprintf(stderr, "cannot set channel count (%s)\n",
                  snd_strerror(err));
         return 1;
     }
 
+    if ((err = snd_pcm_hw_params_set_periods(playback_handle, hw_params, periods, 0)) < 0) {
+        fprintf(stderr, "cannot set periods (%s)\n",
+                 snd_strerror(err));
+        return 1;
+    }
+
+    // latency = periodsize * periods / (rate * bytes_per_frame)
+    if ((err = snd_pcm_hw_params_set_buffer_size(playback_handle, hw_params, (periodsize * periods)>>channels)) < 0) {
+        fprintf(stderr, "cannot set buffer size (%s)\n",
+                 snd_strerror(err));
+        return 1;
+    }
+
+    // Apply all parameters
     if ((err = snd_pcm_hw_params(playback_handle, hw_params)) < 0) {
         fprintf(stderr, "cannot set parameters (%s)\n",
                  snd_strerror(err));

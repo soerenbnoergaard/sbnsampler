@@ -14,6 +14,8 @@ int32_t midi_init(void)
         fprintf(stderr, "Problem opening MIDI input: %s\n", snd_strerror(err));
         return 1;
     }
+
+    return 0;
 }
 
 int32_t midi_close(void)

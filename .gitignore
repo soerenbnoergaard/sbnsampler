@@ -2,3 +2,4 @@ __deprecated__
 *.old
 app/sbnsampler
 *.o
+.vscode/ipch
