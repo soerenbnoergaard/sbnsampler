@@ -12,7 +12,7 @@
 
 typedef struct {
     bool active; // Whether the voice is active or not
-    sample_t *x; // Input sample buffer
+    sample_t *sample; // Input sample buffer
     uint32_t n; // Index into sample buffer
     uint32_t m; // Index into output buffer
     ppf_t *ppf; // Poly-phase filter
@@ -29,28 +29,28 @@ typedef struct {
 voice_t voices[NUM_VOICES] = {
     {
         .active = false,
-        .x = &samplebank[0],
+        .sample = &samplebank[0],
         .n = 0,
         .m = 0,
         .ppf = &ppf0,
     },
     {
         .active = false,
-        .x = &samplebank[0],
+        .sample = &samplebank[0],
         .n = 0,
         .m = 0,
         .ppf = &ppf5,
     },
     {
         .active = false,
-        .x = &samplebank[0],
+        .sample = &samplebank[0],
         .n = 0,
         .m = 0,
         .ppf = &ppf8,
     },
     {
         .active = false,
-        .x = &samplebank[0],
+        .sample = &samplebank[0],
         .n = 0,
         .m = 0,
         .ppf = &ppf12,
@@ -69,29 +69,35 @@ int16_t get_transposed_sample(voice_t *v)
     int32_t l; // Delay-line index
     uint32_t N = PPF_NUM_TABS;
 
+    // Short-hand names for voice variables
+    int16_t *x = v->sample->data;
+    uint32_t n = v->n;
+    uint32_t m = v->m;
+    uint32_t M = v->ppf->M;
+    uint32_t L = v->ppf->L;
+    float *h = v->ppf->h;
+
     // Return zero if the voice is inactive
     if (v->active == false) {
-        v->n = 0;
-        v->m = 0;
-        return 0;
+        goto exit_zero_sample;
     }
 
     // Compute input buffer index (de-activate the voice if there are no more samples)
-    v->n = (v->m * v->ppf->M) / v->ppf->L;
+    n = (m * M) / L;
 
     // FIXME: Workaround because zero-transposition does not work
-    if (v->ppf == &ppf0) {
-        v->m += 1;
-        return v->x->data[v->n];
+    if ((L == 1) && (M == 1)) {
+        goto exit_no_transpose;
     }
 
-    if (v->n >= v->x->length - 1) {
+    // No more input-samples
+    if (n >= v->sample->length - 1) {
         v->active = false;
-        return 0;
+        goto exit_zero_sample;
     }
 
     // Compute polyphase sub-filter selector
-    k = (v->m * v->ppf->M) % v->ppf->L;
+    k = (m * M) % L;
 
     // Execute filter difference equation
     y = 0;
@@ -102,14 +108,27 @@ int16_t get_transposed_sample(voice_t *v)
         }
 
         y += 
-            v->ppf->L / NUM_VOICES *     // Scaling factor
-            v->ppf->h[l*v->ppf->L + k] * // Filter coefficient
-            (float)v->x->data[v->n - l]; // Input sample
+            L / NUM_VOICES * h[L*l + k] * (float)x[n - l];
     }
 
-    // Update output buffer index
-    v->m += 1;
+    // Update voice names from internal variables
+    // Increase output buffer index, `m`
+    v->m = m + 1;
+    v->n = n;
+
+    // Return resulting sample
     return (int16_t)y;
+
+exit_zero_sample:
+    v->n = 0;
+    v->m = 0;
+    return 0;
+
+exit_no_transpose:
+    v->m = m + 1;
+    v->n = n;
+    return v->sample->data[v->n];
+
 }
 
 int16_t get_squarewave_sample()
