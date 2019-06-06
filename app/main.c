@@ -34,28 +34,28 @@ voice_t voices[NUM_VOICES] = {
         .sample = &samplebank[0],
         .sample_idx = 0,
         .pff_idx = 0,
-        .ppf = &ppf0,
+        .ppf = &ppf[0],
     },
     {
         .active = false,
         .sample = &samplebank[0],
         .sample_idx = 0,
         .pff_idx = 0,
-        .ppf = &ppf5,
+        .ppf = &ppf[5],
     },
     {
         .active = false,
         .sample = &samplebank[0],
         .sample_idx = 0,
         .pff_idx = 0,
-        .ppf = &ppf8,
+        .ppf = &ppf[8],
     },
     {
         .active = false,
         .sample = &samplebank[0],
         .sample_idx = 0,
         .pff_idx = 0,
-        .ppf = &ppf12,
+        .ppf = &ppf[12],
     },
 };
 
@@ -154,12 +154,28 @@ int32_t handle_midi(void)
         printf("%02x %02x %02x\n", m.status, m.data[0], m.data[1]);
 
         if (m.data[0] == 0x30) {
-            if (m.status == 0x90) {
+            if (m.status == 0x90) 
+                voices[3].active = true;
+            else if (m.status == 0x80)
+                voices[3].active = false;
+        }
+        else if (m.data[0] == 0x34) {
+            if (m.status == 0x90) 
+                voices[2].active = true;
+            else if (m.status == 0x80)
+                voices[2].active = false;
+        }
+        else if (m.data[0] == 0x37) {
+            if (m.status == 0x90) 
+                voices[1].active = true;
+            else if (m.status == 0x80)
+                voices[1].active = false;
+        }
+        else if (m.data[0] == 0x3c) {
+            if (m.status == 0x90) 
                 voices[0].active = true;
-            }
-            else if (m.status == 0x80) {
+            else if (m.status == 0x80)
                 voices[0].active = false;
-            }
         }
     }
 

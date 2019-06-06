@@ -24,6 +24,11 @@
             "label": "Open workbooks",
             "type": "shell",
             "command": "make workbook"
+        },
+        {
+            "label": "Generate filter coefficients",
+            "type": "shell",
+            "command": "python3 scripts/generate_resampling_filters.py"
         }
     ]
 }
