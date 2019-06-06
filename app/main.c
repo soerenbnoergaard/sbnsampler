@@ -129,8 +129,8 @@ int32_t handle_midi(void)
 
         if (m.data[0] == 0x30) {
             if (m.status == 0x90) {
-                voices[0].active = false;
-                voices[1].active = true;
+                voices[0].active = true;
+                voices[1].active = false;
                 voices[2].active = false;
                 voices[3].active = false;
             }
