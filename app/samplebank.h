@@ -10,6 +10,7 @@
 typedef struct {
     int16_t *data;
     size_t length;
+    uint8_t root_note;
 } sample_t;
 
 // Defines, macros, and constants //////////////////////////////////////////////

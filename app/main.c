@@ -11,11 +11,13 @@
 // Types ///////////////////////////////////////////////////////////////////////
 
 typedef struct {
-    bool active; // Whether the voice is active or not
-    sample_t *sample; // Input sample buffer
-    uint32_t n; // Index into sample buffer
-    uint32_t m; // Index into output buffer
-    ppf_t *ppf; // Poly-phase filter
+    bool active;
+
+    sample_t *sample;
+    uint32_t sample_idx; // Input sample index `n` of the poly-phase filter.
+
+    ppf_t *ppf;
+    uint32_t pff_idx; // Output sample index `m` of the poly-phase filter.
 } voice_t;
 
 // Defines, macros, and constants //////////////////////////////////////////////
@@ -30,29 +32,29 @@ voice_t voices[NUM_VOICES] = {
     {
         .active = false,
         .sample = &samplebank[0],
-        .n = 0,
-        .m = 0,
+        .sample_idx = 0,
+        .pff_idx = 0,
         .ppf = &ppf0,
     },
     {
         .active = false,
         .sample = &samplebank[0],
-        .n = 0,
-        .m = 0,
+        .sample_idx = 0,
+        .pff_idx = 0,
         .ppf = &ppf5,
     },
     {
         .active = false,
         .sample = &samplebank[0],
-        .n = 0,
-        .m = 0,
+        .sample_idx = 0,
+        .pff_idx = 0,
         .ppf = &ppf8,
     },
     {
         .active = false,
         .sample = &samplebank[0],
-        .n = 0,
-        .m = 0,
+        .sample_idx = 0,
+        .pff_idx = 0,
         .ppf = &ppf12,
     },
 };
@@ -71,8 +73,8 @@ int16_t get_transposed_sample(voice_t *v)
 
     // Short-hand names for voice variables
     int16_t *x = v->sample->data;
-    uint32_t n = v->n;
-    uint32_t m = v->m;
+    uint32_t n = v->sample_idx;
+    uint32_t m = v->pff_idx;
     uint32_t M = v->ppf->M;
     uint32_t L = v->ppf->L;
     float *h = v->ppf->h;
@@ -103,7 +105,7 @@ int16_t get_transposed_sample(voice_t *v)
     y = 0;
     for (l = 0; l < N; l++) {
         // Skip unknown input sample values
-        if (v->n - l < 0) {
+        if (n - l < 0) {
             continue;
         }
 
@@ -113,22 +115,21 @@ int16_t get_transposed_sample(voice_t *v)
 
     // Update voice names from internal variables
     // Increase output buffer index, `m`
-    v->m = m + 1;
-    v->n = n;
+    v->sample_idx = n;
+    v->pff_idx = m + 1;
 
     // Return resulting sample
     return (int16_t)y;
 
 exit_zero_sample:
-    v->n = 0;
-    v->m = 0;
+    v->sample_idx = 0;
+    v->pff_idx = 0;
     return 0;
 
 exit_no_transpose:
-    v->m = m + 1;
-    v->n = n;
-    return v->sample->data[v->n];
-
+    v->sample_idx = n;
+    v->pff_idx = m + 1;
+    return x[n];
 }
 
 int16_t get_squarewave_sample()
@@ -155,15 +156,9 @@ int32_t handle_midi(void)
         if (m.data[0] == 0x30) {
             if (m.status == 0x90) {
                 voices[0].active = true;
-                voices[1].active = false;
-                voices[2].active = false;
-                voices[3].active = false;
             }
             else if (m.status == 0x80) {
                 voices[0].active = false;
-                voices[1].active = false;
-                voices[2].active = false;
-                voices[3].active = false;
             }
         }
     }
