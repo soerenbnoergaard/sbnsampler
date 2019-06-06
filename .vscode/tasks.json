@@ -15,15 +15,15 @@
                 "echo": true,
                 "reveal": "silent",
                 "focus": false,
-                "panel": "shared",
+                "panel": "dedicated",
                 "showReuseMessage": true,
                 "clear": false
             }
         },
         {
-            "label": "Build builrdoot",
+            "label": "Open workbooks",
             "type": "shell",
-            "command": "make"
+            "command": "make workbook"
         }
     ]
 }
