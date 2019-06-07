@@ -17,7 +17,9 @@ typedef struct {
     int32_t sample_idx; // Input sample index `n` of the poly-phase filter.
 
     ppf_t *ppf;
-    int32_t pff_idx; // Output sample index `m` of the poly-phase filter.
+    int32_t ppf_idx; // Output sample index `m` of the poly-phase filter.
+
+    int32_t note; // Midi number corresponding to the active note.
 } voice_t;
 
 // Defines, macros, and constants //////////////////////////////////////////////
@@ -28,38 +30,24 @@ typedef struct {
 
 // Globals /////////////////////////////////////////////////////////////////////
 
-voice_t voices[NUM_VOICES] = {
-    {
-        .active = false,
-        .sample = &samplebank[0],
-        .sample_idx = 0,
-        .pff_idx = 0,
-        .ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + 12],
-    },
-    {
-        .active = false,
-        .sample = &samplebank[0],
-        .sample_idx = 0,
-        .pff_idx = 0,
-        .ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + 7],
-    },
-    {
-        .active = false,
-        .sample = &samplebank[0],
-        .sample_idx = 0,
-        .pff_idx = 0,
-        .ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + 4],
-    },
-    {
-        .active = false,
-        .sample = &samplebank[0],
-        .sample_idx = 0,
-        .pff_idx = 0,
-        .ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET],
-    }
-};
+voice_t voices[NUM_VOICES];
 
 // Functions ///////////////////////////////////////////////////////////////////
+
+int32_t voices_init(void)
+{
+    int32_t n;
+    for (n = 0; n < NUM_VOICES; n++) {
+        voices[n].active = false;
+        voices[n].sample = &samplebank[0];
+        voices[n].sample_idx = 0;
+        voices[n].note = -1;
+        voices[n].ppf = &ppf[0];
+        voices[n].ppf_idx = 0;
+    }
+
+    return 0;
+}
 
 int16_t get_transposed_sample(voice_t *v)
 {
@@ -74,7 +62,7 @@ int16_t get_transposed_sample(voice_t *v)
     // Short-hand names for voice variables
     int16_t *x = v->sample->data;
     int32_t n = v->sample_idx;
-    int32_t m = v->pff_idx;
+    int32_t m = v->ppf_idx;
     int32_t M = v->ppf->M;
     int32_t L = v->ppf->L;
     float *h = v->ppf->h;
@@ -110,14 +98,14 @@ int16_t get_transposed_sample(voice_t *v)
     // Update voice names from internal variables
     // Increase output buffer index, `m`
     v->sample_idx = n;
-    v->pff_idx = m + 1;
+    v->ppf_idx = m + 1;
 
     // Return resulting sample
     return (int16_t)y;
 
 exit_zero_sample:
     v->sample_idx = 0;
-    v->pff_idx = 0;
+    v->ppf_idx = 0;
     return 0;
 }
 
@@ -132,23 +120,61 @@ int16_t get_squarewave_sample()
     return x;
 }
 
-int32_t handle_note(midi_message_t m, bool state)
+int32_t handle_note_on(midi_message_t m)
 {
-    switch (m.data[0]) {
-    case 0x30:
-        voices[3].active = state;
-        break;
-    case 0x34:
-        voices[2].active = state;
-        break;
-    case 0x37:
-        voices[1].active = state;
-        break;
-    case 0x3c:
-        voices[0].active = state;
-        break;
-    default:
-        break;
+    int32_t n;
+    voice_t *v = NULL;
+    int32_t transpose = 0;
+
+    // Find empty voice
+    for (n = 0; n < NUM_VOICES; n++) {
+        if (voices[n].note == m.data[0]) {
+            // Take over existing note
+            v = &voices[n];
+            break;
+        }
+        else if (voices[n].active == false) {
+            // Choose new voice
+            v = &voices[n];
+            break;
+        }
+    }
+
+    if (v == NULL) {
+        // No voices available
+        return 1;
+    }
+
+    // Find transposition interval
+    transpose = m.data[0] - v->sample->root_note;
+
+    // Find the necessary polyphase filter to obtain the transposition
+    if ((transpose < PPF_TRANSPOSE_MIN) || (PPF_TRANSPOSE_MAX < transpose)) {
+        fprintf(stderr, "Transposition out of range: %d\n", transpose);
+        return 1;
+    }
+
+    // Activate voice
+    v->sample = &samplebank[0];
+    v->sample_idx = 0;
+    v->ppf_idx = 0;
+    v->ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + transpose];
+    v->note = m.data[0];
+    v->active = true;
+
+    return 0;
+}
+
+int32_t handle_note_off(midi_message_t m)
+{
+    int32_t n;
+
+    // Find the active voice
+    for (n = 0; n < NUM_VOICES; n++) {
+        if (voices[n].note == m.data[0]) {
+            voices[n].active = false;
+            voices[n].note = -1;
+        }
     }
 
     return 0;
@@ -169,14 +195,14 @@ int32_t handle_midi(void)
 
     if ((m.status & 0xf0) == 0x90) {
         if (m.data[1] == 0) {
-            handle_note(m, false);
+            handle_note_off(m);
         }
         else {
-            handle_note(m, true);
+            handle_note_on(m);
         }
     }
     else if ((m.status & 0xf0) == 0x80) {
-        handle_note(m, false);
+        handle_note_off(m);
     }
 
     return 0;
@@ -248,6 +274,13 @@ int32_t main(void)
     err = midi_init();
     if (err != 0) {
         fprintf(stderr, "Error initializin MIDI\n");
+        return 1;
+    }
+
+    // Initialize Voices
+    err = voices_init();
+    if (err != 0) {
+        fprintf(stderr, "Error initializin Voices\n");
         return 1;
     }
 

@@ -3,6 +3,8 @@
 
 #define PPF_NUM_TABS 4
 #define PPF_ZERO_TRANSPOSE_OFFSET 12
+#define PPF_TRANSPOSE_MIN -12
+#define PPF_TRANSPOSE_MAX 12
 
 
 typedef struct {

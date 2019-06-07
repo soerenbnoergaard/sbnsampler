@@ -70,6 +70,8 @@ intervals = [
 ]
 
 zero_transpose_offset = intervals.index([1, 1])
+transpose_min = - zero_transpose_offset
+transpose_max = len(intervals) - 1 - zero_transpose_offset
 
 N = 4
 output_file = relative_path("../app/polyfilter.h")
@@ -84,7 +86,9 @@ for k, (L, M) in enumerate(intervals):
 s_defines = """\
 #define PPF_NUM_TABS {:d}
 #define PPF_ZERO_TRANSPOSE_OFFSET {:d}
-""".format(N, zero_transpose_offset)
+#define PPF_TRANSPOSE_MIN {:d}
+#define PPF_TRANSPOSE_MAX {:d}
+""".format(N, zero_transpose_offset, transpose_min, transpose_max)
 
 # Generate c code for coefficients
 s_coefficients = ""
