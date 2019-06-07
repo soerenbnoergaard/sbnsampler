@@ -34,28 +34,28 @@ voice_t voices[NUM_VOICES] = {
         .sample = &samplebank[0],
         .sample_idx = 0,
         .pff_idx = 0,
-        .ppf = &ppf[0],
+        .ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + 12],
     },
     {
         .active = false,
         .sample = &samplebank[0],
         .sample_idx = 0,
         .pff_idx = 0,
-        .ppf = &ppf[5],
+        .ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + 7],
     },
     {
         .active = false,
         .sample = &samplebank[0],
         .sample_idx = 0,
         .pff_idx = 0,
-        .ppf = &ppf[8],
+        .ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + 4],
     },
     {
         .active = false,
         .sample = &samplebank[0],
         .sample_idx = 0,
         .pff_idx = 0,
-        .ppf = &ppf[12],
+        .ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET],
     }
 };
 
@@ -132,48 +132,25 @@ int16_t get_squarewave_sample()
     return x;
 }
 
-int32_t handle_note_on(midi_message_t m)
+int32_t handle_note(midi_message_t m, bool state)
 {
-    puts("Note on");
     switch (m.data[0]) {
     case 0x30:
-        voices[3].active = true;
+        voices[3].active = state;
         break;
     case 0x34:
-        voices[2].active = true;
+        voices[2].active = state;
         break;
     case 0x37:
-        voices[1].active = true;
+        voices[1].active = state;
         break;
     case 0x3c:
-        voices[0].active = true;
+        voices[0].active = state;
         break;
     default:
         break;
     }
 
-    return 0;
-}
-
-int32_t handle_note_off(midi_message_t m)
-{
-    puts("Note off");
-    switch (m.data[0]) {
-    case 0x30:
-        voices[3].active = false;
-        break;
-    case 0x34:
-        voices[2].active = false;
-        break;
-    case 0x37:
-        voices[1].active = false;
-        break;
-    case 0x3c:
-        voices[0].active = false;
-        break;
-    default:
-        break;
-    }
     return 0;
 }
 
@@ -192,14 +169,14 @@ int32_t handle_midi(void)
 
     if ((m.status & 0xf0) == 0x90) {
         if (m.data[1] == 0) {
-            handle_note_off(m);
+            handle_note(m, false);
         }
         else {
-            handle_note_on(m);
+            handle_note(m, true);
         }
     }
     else if ((m.status & 0xf0) == 0x80) {
-        handle_note_off(m);
+        handle_note(m, false);
     }
 
     return 0;

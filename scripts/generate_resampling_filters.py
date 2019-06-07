@@ -19,7 +19,7 @@ def relative_path(path):
 # Main
 #
 
-template = """
+template = """\
 #ifndef POLYFILTER_H
 #define POLYFILTER_H
 
@@ -41,20 +41,35 @@ typedef struct {{
 """
 
 intervals = [
-    [1, 1],
-    [16, 15],
-    [9, 8],
-    [6, 5],
-    [5, 4],
-    [4, 3],
-    [45, 32],
-    [3, 2],
-    [8, 5],
-    [5, 3],
-    [16, 9],
-    [15, 8],
+    # Transpose down
     [2, 1],
+    [15, 8],
+    [16, 9],
+    [5, 3],
+    [8, 5],
+    [3, 2],
+    [45, 32],
+    [4, 3],
+    [5, 4],
+    [6, 5],
+    [9, 8],
+    [16, 15],
+    [1, 1], # Zero-transpose offset
+    [15, 16],
+    [8, 9],
+    [5, 6],
+    [4, 5],
+    [3, 4],
+    [32, 45],
+    [2, 3],
+    [5, 8],
+    [3, 5],
+    [9, 16],
+    [8, 15],
+    [1, 2],
 ]
+
+zero_transpose_offset = intervals.index([1, 1])
 
 N = 4
 output_file = relative_path("../app/polyfilter.h")
@@ -66,8 +81,10 @@ for k, (L, M) in enumerate(intervals):
     coefficients[k] = h
 
 # Generate c code for defines
-s_defines = """#define PPF_NUM_TABS {:d}
-# """.format(N)
+s_defines = """\
+#define PPF_NUM_TABS {:d}
+#define PPF_ZERO_TRANSPOSE_OFFSET {:d}
+""".format(N, zero_transpose_offset)
 
 # Generate c code for coefficients
 s_coefficients = ""
@@ -79,15 +96,9 @@ for k, h in enumerate(coefficients):
 
 # Generate c code for structures
 s_structures = ""
-s_structures += "ppf_t ppf[{:d}] = {{".format(len(intervals))
+s_structures += "ppf_t ppf[{:d}] = {{\n".format(len(intervals))
 for k in range(len(intervals)):
-    s_structures += """{{
-    .h = ppf_h{n:d},
-    .h_length = {h_length:d},
-    .L = {L:d},
-    .M = {M:d}
-}}{end:s}
-""".format(
+    s_structures += "    {{ .h = ppf_h{n:<5d}, .h_length = {h_length:5d}, .L = {L:5d}, .M = {M:5d} }}{end:s}\n".format(
         n = k,
         h_length = len(coefficients[k]),
         L = intervals[k][0],
