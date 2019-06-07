@@ -14,10 +14,10 @@ typedef struct {
     bool active;
 
     sample_t *sample;
-    uint32_t sample_idx; // Input sample index `n` of the poly-phase filter.
+    int32_t sample_idx; // Input sample index `n` of the poly-phase filter.
 
     ppf_t *ppf;
-    uint32_t pff_idx; // Output sample index `m` of the poly-phase filter.
+    int32_t pff_idx; // Output sample index `m` of the poly-phase filter.
 } voice_t;
 
 // Defines, macros, and constants //////////////////////////////////////////////
@@ -56,7 +56,7 @@ voice_t voices[NUM_VOICES] = {
         .sample_idx = 0,
         .pff_idx = 0,
         .ppf = &ppf[12],
-    },
+    }
 };
 
 // Functions ///////////////////////////////////////////////////////////////////
@@ -73,10 +73,10 @@ int16_t get_transposed_sample(voice_t *v)
 
     // Short-hand names for voice variables
     int16_t *x = v->sample->data;
-    uint32_t n = v->sample_idx;
-    uint32_t m = v->pff_idx;
-    uint32_t M = v->ppf->M;
-    uint32_t L = v->ppf->L;
+    int32_t n = v->sample_idx;
+    int32_t m = v->pff_idx;
+    int32_t M = v->ppf->M;
+    int32_t L = v->ppf->L;
     float *h = v->ppf->h;
 
     // Return zero if the voice is inactive
@@ -86,11 +86,6 @@ int16_t get_transposed_sample(voice_t *v)
 
     // Compute input buffer index (de-activate the voice if there are no more samples)
     n = (m * M) / L;
-
-    // FIXME: Workaround because zero-transposition does not work
-    if ((L == 1) && (M == 1)) {
-        goto exit_no_transpose;
-    }
 
     // No more input-samples
     if (n >= v->sample->length - 1) {
@@ -109,8 +104,7 @@ int16_t get_transposed_sample(voice_t *v)
             continue;
         }
 
-        y += 
-            L / NUM_VOICES * h[L*l + k] * (float)x[n - l];
+        y += (L * h[L*l + k] * (float)x[n - l]) / NUM_VOICES;
     }
 
     // Update voice names from internal variables
@@ -125,11 +119,6 @@ exit_zero_sample:
     v->sample_idx = 0;
     v->pff_idx = 0;
     return 0;
-
-exit_no_transpose:
-    v->sample_idx = n;
-    v->pff_idx = m + 1;
-    return x[n];
 }
 
 int16_t get_squarewave_sample()
@@ -143,6 +132,51 @@ int16_t get_squarewave_sample()
     return x;
 }
 
+int32_t handle_note_on(midi_message_t m)
+{
+    puts("Note on");
+    switch (m.data[0]) {
+    case 0x30:
+        voices[3].active = true;
+        break;
+    case 0x34:
+        voices[2].active = true;
+        break;
+    case 0x37:
+        voices[1].active = true;
+        break;
+    case 0x3c:
+        voices[0].active = true;
+        break;
+    default:
+        break;
+    }
+
+    return 0;
+}
+
+int32_t handle_note_off(midi_message_t m)
+{
+    puts("Note off");
+    switch (m.data[0]) {
+    case 0x30:
+        voices[3].active = false;
+        break;
+    case 0x34:
+        voices[2].active = false;
+        break;
+    case 0x37:
+        voices[1].active = false;
+        break;
+    case 0x3c:
+        voices[0].active = false;
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
+
 int32_t handle_midi(void)
 {
     int32_t err;
@@ -150,36 +184,25 @@ int32_t handle_midi(void)
 
     err = midi_get(&m);
 
-    if (err == 0) {
-        printf("%02x %02x %02x\n", m.status, m.data[0], m.data[1]);
-
-        if (m.data[0] == 0x30) {
-            if (m.status == 0x90) 
-                voices[3].active = true;
-            else if (m.status == 0x80)
-                voices[3].active = false;
-        }
-        else if (m.data[0] == 0x34) {
-            if (m.status == 0x90) 
-                voices[2].active = true;
-            else if (m.status == 0x80)
-                voices[2].active = false;
-        }
-        else if (m.data[0] == 0x37) {
-            if (m.status == 0x90) 
-                voices[1].active = true;
-            else if (m.status == 0x80)
-                voices[1].active = false;
-        }
-        else if (m.data[0] == 0x3c) {
-            if (m.status == 0x90) 
-                voices[0].active = true;
-            else if (m.status == 0x80)
-                voices[0].active = false;
-        }
+    if (err != 0) {
+        return 1;
     }
 
-    return err;
+    printf("%02x %02x %02x\n", m.status, m.data[0], m.data[1]);
+
+    if ((m.status & 0xf0) == 0x90) {
+        if (m.data[1] == 0) {
+            handle_note_off(m);
+        }
+        else {
+            handle_note_on(m);
+        }
+    }
+    else if ((m.status & 0xf0) == 0x80) {
+        handle_note_off(m);
+    }
+
+    return 0;
 }
 
 void loop() 
