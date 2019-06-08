@@ -36,6 +36,7 @@ typedef struct {
 
 // Globals /////////////////////////////////////////////////////////////////////
 
+FILE *log_h;
 voice_t voices[NUM_VOICES];
 
 // Functions ///////////////////////////////////////////////////////////////////
@@ -107,8 +108,17 @@ int16_t get_transposed_sample(voice_t *v)
         for (l = N-1; l >= 1; l--) {
             x[l] = x[l-1];
         }
-        x[0] = v->sample->data[v->sample_idx];
+
+        if (v->sample->loop_enabled) {
+            // Handle loop
+            if (n > v->sample->loop_stop) {
+                m -= ((v->sample->loop_stop - v->sample->loop_start) * L) / M;
+                printf("%d, %d\n", v->sample->loop_start, v->sample->loop_stop);
+            }
+        }
+        x[0] = v->sample->data[n];
     }
+
 
     // No more input-samples
     if (n >= v->sample->length - 1) {
@@ -122,11 +132,6 @@ int16_t get_transposed_sample(voice_t *v)
     // Execute filter difference equation
     y = 0;
     for (l = 0; l < N; l++) {
-        // Skip unknown input sample values
-        if (n - l < 0) {
-            continue;
-        }
-
         y += (L * h[L*l + k] * (float)x[l]) / AMPLITUDE_DIVIDER;
     }
 
@@ -340,6 +345,9 @@ void loop()
 int32_t main(void)
 {
     int32_t err;
+
+    // Initialize log
+    log_h = fopen("log.log", "w");
 
     // Initialize sample bank
     err = samplebank_init();

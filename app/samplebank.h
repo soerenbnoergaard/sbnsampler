@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "file_helpers.h"
 
 // Types ///////////////////////////////////////////////////////////////////////
@@ -13,6 +14,9 @@ typedef struct {
     uint8_t note_root;
     uint8_t note_min;
     uint8_t note_max;
+    bool loop_enabled;
+    uint32_t loop_start;
+    uint32_t loop_stop;
 } sample_t;
 
 // Defines, macros, and constants //////////////////////////////////////////////
