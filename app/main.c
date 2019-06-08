@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <assert.h>
 
 #include "dac.h"
 #include "midi.h"
@@ -15,6 +16,7 @@ typedef struct {
 
     sample_t *sample;
     int32_t sample_idx; // Input sample index `n` of the poly-phase filter.
+    int16_t sample_dl[PPF_NUM_TABS]; // Input sample delay line
 
     ppf_t *ppf;
     int32_t ppf_idx; // Output sample index `m` of the poly-phase filter.
@@ -40,10 +42,17 @@ voice_t voices[NUM_VOICES];
 
 int32_t voice_reset(voice_t *v)
 {
+    // Make sure to update the arrays below if PPF_NUM_TABS is updated!
+    assert(PPF_NUM_TABS == 4);
+
     voice_t voice_default = {
         .active = false,
         .sample = &samplebank[0],
         .sample_idx = 0,
+        .sample_dl[0] = 0,
+        .sample_dl[1] = 0,
+        .sample_dl[2] = 0,
+        .sample_dl[3] = 0,
         .ppf = &ppf[0],
         .ppf_idx = 0,
         .note = -1,
@@ -77,7 +86,7 @@ int16_t get_transposed_sample(voice_t *v)
     uint32_t N = PPF_NUM_TABS;
 
     // Short-hand names for voice variables
-    int16_t *x = v->sample->data;
+    int16_t *x = v->sample_dl;
     int32_t n = v->sample_idx;
     int32_t m = v->ppf_idx;
     int32_t M = v->ppf->M;
@@ -91,6 +100,15 @@ int16_t get_transposed_sample(voice_t *v)
 
     // Compute input buffer index (de-activate the voice if there are no more samples)
     n = (m * M) / L;
+
+    // Update delay line if `n` has changed.
+    // Index into delay line == number of delays
+    if (n != v->sample_idx) {
+        for (l = N-1; l >= 1; l--) {
+            x[l] = x[l-1];
+        }
+        x[0] = v->sample->data[v->sample_idx];
+    }
 
     // No more input-samples
     if (n >= v->sample->length - 1) {
@@ -109,7 +127,7 @@ int16_t get_transposed_sample(voice_t *v)
             continue;
         }
 
-        y += (L * h[L*l + k] * (float)x[n - l]) / AMPLITUDE_DIVIDER;
+        y += (L * h[L*l + k] * (float)x[l]) / AMPLITUDE_DIVIDER;
     }
 
     // Update voice names from internal variables
