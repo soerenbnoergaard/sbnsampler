@@ -8,6 +8,8 @@ SOURCES = main.c \
 	  samplebank.c \
 	  file_helpers.c
 
+SENSITIVITY = polyfilter.h
+
 OBJECTS = $(SOURCES:.c=.o)
 
 LIBS = -lasound
@@ -36,7 +38,7 @@ $(TARGET): $(OBJECTS)
 	$(Q)echo "    LD  $(TARGET)"
 	$(Q)$(CC) $(LDARGS) -o $@ $(LIBS) $(OBJECTS)
 
-%.o: %.c
+%.o: %.c $(SENSITIVITY)
 	$(Q)echo "    CC  $<"
 	$(Q)$(CC) $(CCARGS) -o $@ -c $<
 
