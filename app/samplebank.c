@@ -32,9 +32,9 @@ int32_t samplebank_init(void)
     samplebank[0].note_root = 12;
     samplebank[0].note_max = 12;
     samplebank[0].note_min = 0;
-    samplebank[0].loop_enabled = false;
-    samplebank[0].loop_start = 36254;
-    samplebank[0].loop_stop = 74428;
+    samplebank[0].loop_enabled = true;
+    samplebank[0].loop_start = 27195;
+    samplebank[0].loop_stop = 71691;
 
     // C1
     if ((tmp = fh_read_file(NAME("c1"))) == NULL)
@@ -44,9 +44,9 @@ int32_t samplebank_init(void)
     samplebank[1].note_root = 24;
     samplebank[1].note_max = 24;
     samplebank[1].note_min = 13;
-    samplebank[1].loop_enabled = false;
-    samplebank[1].loop_start = 36480;
-    samplebank[1].loop_stop = 75360;
+    samplebank[1].loop_enabled = true;
+    samplebank[1].loop_start = 26606;
+    samplebank[1].loop_stop = 71110;
 
     // C2
     if ((tmp = fh_read_file(NAME("c2"))) == NULL)
@@ -56,9 +56,9 @@ int32_t samplebank_init(void)
     samplebank[2].note_root = 36;
     samplebank[2].note_max = 36;
     samplebank[2].note_min = 25;
-    samplebank[2].loop_enabled = false;
-    samplebank[2].loop_start = 36480;
-    samplebank[2].loop_stop = 75360;
+    samplebank[2].loop_enabled = true;
+    samplebank[2].loop_start = 26713;
+    samplebank[2].loop_stop = 70868;
 
     // C3
     if ((tmp = fh_read_file(NAME("c3"))) == NULL)
@@ -68,9 +68,9 @@ int32_t samplebank_init(void)
     samplebank[3].note_root = 48;
     samplebank[3].note_max = 48;
     samplebank[3].note_min = 37;
-    samplebank[3].loop_enabled = false;
-    samplebank[3].loop_start = 36471;
-    samplebank[3].loop_stop = 79247;
+    samplebank[3].loop_enabled = true;
+    samplebank[3].loop_start = 26592;
+    samplebank[3].loop_stop = 70614;
 
     // C4
     if ((tmp = fh_read_file(NAME("c4"))) == NULL)
@@ -80,9 +80,9 @@ int32_t samplebank_init(void)
     samplebank[4].note_root = 60;
     samplebank[4].note_max = 60;
     samplebank[4].note_min = 49;
-    samplebank[4].loop_enabled = false;
-    samplebank[4].loop_start = 36317;
-    samplebank[4].loop_stop = 74572;
+    samplebank[4].loop_enabled = true;
+    samplebank[4].loop_start = 26538;
+    samplebank[4].loop_stop = 70618;
 
     // C5
     if ((tmp = fh_read_file(NAME("c5"))) == NULL)
@@ -92,9 +92,9 @@ int32_t samplebank_init(void)
     samplebank[5].note_root = 72;
     samplebank[5].note_max = 72;
     samplebank[5].note_min = 61;
-    samplebank[5].loop_enabled = false;
-    samplebank[5].loop_start = 36918;
-    samplebank[5].loop_stop = 74489;
+    samplebank[5].loop_enabled = true;
+    samplebank[5].loop_start = 26481;
+    samplebank[5].loop_stop = 70590;
 
     // C6
     if ((tmp = fh_read_file(NAME("c6"))) == NULL)
@@ -104,9 +104,9 @@ int32_t samplebank_init(void)
     samplebank[6].note_root = 84;
     samplebank[6].note_max = 84;
     samplebank[6].note_min = 73;
-    samplebank[6].loop_enabled = false;
-    samplebank[6].loop_start = 37064;
-    samplebank[6].loop_stop = 74161;
+    samplebank[6].loop_enabled = true;
+    samplebank[6].loop_start = 26477;
+    samplebank[6].loop_stop = 70574;
 
     // // C7
     // if ((tmp = fh_read_file(NAME("c7"))) == NULL)

@@ -113,7 +113,7 @@ int16_t get_transposed_sample(voice_t *v)
             // Handle loop
             if (n > v->sample->loop_stop) {
                 m -= ((v->sample->loop_stop - v->sample->loop_start) * L) / M;
-                printf("%d, %d\n", v->sample->loop_start, v->sample->loop_stop);
+                // printf("%d, %d\n", v->sample->loop_start, v->sample->loop_stop);
             }
         }
         x[0] = v->sample->data[n];
