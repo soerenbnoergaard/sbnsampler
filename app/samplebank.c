@@ -14,7 +14,9 @@ int32_t samplebank_init(void)
     // Skip WAV header
     samplebank[0].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[0].length = (tmp->size/2) - WAV_HEADER_SIZE;
-    samplebank[0].root_note = 60; // C4
+    samplebank[0].note_root = 60; // C4
+    samplebank[0].note_min = 49; // C#3
+    samplebank[0].note_max = 71; // C#4
 
     return 0;
 }

@@ -124,6 +124,7 @@ int32_t handle_note_on(midi_message_t m)
 {
     int32_t n;
     voice_t *v = NULL;
+    sample_t *sample = NULL;
     int32_t transpose = 0;
 
     // Find empty voice
@@ -146,7 +147,7 @@ int32_t handle_note_on(midi_message_t m)
     }
 
     // Find transposition interval
-    transpose = m.data[0] - v->sample->root_note;
+    transpose = m.data[0] - v->sample->note_root;
 
     // Find the necessary polyphase filter to obtain the transposition
     if ((transpose < PPF_TRANSPOSE_MIN) || (PPF_TRANSPOSE_MAX < transpose)) {
@@ -154,8 +155,20 @@ int32_t handle_note_on(midi_message_t m)
         return 1;
     }
 
+    // Find the sample to activate
+    for (n = 0; n < NUM_SAMPLES; n++) {
+        if ((samplebank[n].note_min <= m.data[0]) && (m.data[0] <= samplebank[n].note_max)) {
+            sample = &samplebank[n];
+        }
+    }
+
+    if (sample == NULL) {
+        fprintf(stderr, "Note out of range\n");
+        return 1;
+    }
+
     // Activate voice
-    v->sample = &samplebank[0];
+    v->sample = sample;
     v->sample_idx = 0;
     v->ppf_idx = 0;
     v->ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + transpose];
