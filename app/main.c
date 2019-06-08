@@ -146,24 +146,23 @@ int32_t handle_note_on(midi_message_t m)
         return 1;
     }
 
-    // Find transposition interval
-    transpose = m.data[0] - v->sample->note_root;
-
-    // Find the necessary polyphase filter to obtain the transposition
-    if ((transpose < PPF_TRANSPOSE_MIN) || (PPF_TRANSPOSE_MAX < transpose)) {
-        fprintf(stderr, "Transposition out of range: %d\n", transpose);
-        return 1;
-    }
-
     // Find the sample to activate
     for (n = 0; n < NUM_SAMPLES; n++) {
         if ((samplebank[n].note_min <= m.data[0]) && (m.data[0] <= samplebank[n].note_max)) {
             sample = &samplebank[n];
         }
     }
-
     if (sample == NULL) {
         fprintf(stderr, "Note out of range\n");
+        return 1;
+    }
+
+    // Find transposition interval
+    transpose = m.data[0] - sample->note_root;
+
+    // Find the necessary polyphase filter to obtain the transposition
+    if ((transpose < PPF_TRANSPOSE_MIN) || (PPF_TRANSPOSE_MAX < transpose)) {
+        fprintf(stderr, "Transposition out of range: %d\n", transpose);
         return 1;
     }
 
@@ -301,6 +300,7 @@ int32_t main(void)
     // Begin program
     //
 
+    printf("Ready!\n");
     loop();
 
     //
