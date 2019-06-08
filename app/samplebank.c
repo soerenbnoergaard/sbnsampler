@@ -13,11 +13,11 @@
 // 8   117 118 119 108 109 110 111 112 113 114 115 116
 // 9               120 121 122 123 124 125 126 127
 
-
-
 sample_t samplebank[NUM_SAMPLES];
 
 #define WAV_HEADER_SIZE 44
+// #define NAME(note) "sound/piano_"note".wav"
+#define NAME(note) "sound/volca_"note".wav"
 
 int32_t samplebank_init(void)
 {
@@ -25,7 +25,8 @@ int32_t samplebank_init(void)
     binary_data_t *tmp;
 
     // C0
-    if ((tmp = fh_read_file("sound/piano_c0.wav")) == NULL)
+    // if ((tmp = fh_read_file("sound/piano_c0.wav")) == NULL)
+    if ((tmp = fh_read_file(NAME("c0"))) == NULL)
         return 1;
     samplebank[0].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[0].length = (tmp->size/2) - WAV_HEADER_SIZE;
@@ -34,7 +35,7 @@ int32_t samplebank_init(void)
     samplebank[0].note_min = 0;
 
     // C1
-    if ((tmp = fh_read_file("sound/piano_c1.wav")) == NULL)
+    if ((tmp = fh_read_file(NAME("c1"))) == NULL)
         return 1;
     samplebank[1].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[1].length = (tmp->size/2) - WAV_HEADER_SIZE;
@@ -43,7 +44,7 @@ int32_t samplebank_init(void)
     samplebank[1].note_min = 13;
 
     // C2
-    if ((tmp = fh_read_file("sound/piano_c2.wav")) == NULL)
+    if ((tmp = fh_read_file(NAME("c2"))) == NULL)
         return 1;
     samplebank[2].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[2].length = (tmp->size/2) - WAV_HEADER_SIZE;
@@ -52,7 +53,7 @@ int32_t samplebank_init(void)
     samplebank[2].note_min = 25;
 
     // C3
-    if ((tmp = fh_read_file("sound/piano_c3.wav")) == NULL)
+    if ((tmp = fh_read_file(NAME("c3"))) == NULL)
         return 1;
     samplebank[3].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[3].length = (tmp->size/2) - WAV_HEADER_SIZE;
@@ -61,7 +62,7 @@ int32_t samplebank_init(void)
     samplebank[3].note_min = 37;
 
     // C4
-    if ((tmp = fh_read_file("sound/piano_c4.wav")) == NULL)
+    if ((tmp = fh_read_file(NAME("c4"))) == NULL)
         return 1;
     samplebank[4].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[4].length = (tmp->size/2) - WAV_HEADER_SIZE;
@@ -70,7 +71,7 @@ int32_t samplebank_init(void)
     samplebank[4].note_min = 49;
 
     // C5
-    if ((tmp = fh_read_file("sound/piano_c5.wav")) == NULL)
+    if ((tmp = fh_read_file(NAME("c5"))) == NULL)
         return 1;
     samplebank[5].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[5].length = (tmp->size/2) - WAV_HEADER_SIZE;
@@ -79,7 +80,7 @@ int32_t samplebank_init(void)
     samplebank[5].note_min = 61;
 
     // C6
-    if ((tmp = fh_read_file("sound/piano_c6.wav")) == NULL)
+    if ((tmp = fh_read_file(NAME("c6"))) == NULL)
         return 1;
     samplebank[6].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[6].length = (tmp->size/2) - WAV_HEADER_SIZE;
@@ -87,14 +88,14 @@ int32_t samplebank_init(void)
     samplebank[6].note_max = 84;
     samplebank[6].note_min = 73;
 
-    // C7
-    if ((tmp = fh_read_file("sound/piano_c7.wav")) == NULL)
-        return 1;
-    samplebank[7].data = tmp->data + WAV_HEADER_SIZE;
-    samplebank[7].length = (tmp->size/2) - WAV_HEADER_SIZE;
-    samplebank[7].note_root = 96;
-    samplebank[7].note_max = 96;
-    samplebank[7].note_min = 85;
+    // // C7
+    // if ((tmp = fh_read_file(NAME("c7"))) == NULL)
+    //     return 1;
+    // samplebank[7].data = tmp->data + WAV_HEADER_SIZE;
+    // samplebank[7].length = (tmp->size/2) - WAV_HEADER_SIZE;
+    // samplebank[7].note_root = 96;
+    // samplebank[7].note_max = 96;
+    // samplebank[7].note_min = 85;
 
     return 0;
 }

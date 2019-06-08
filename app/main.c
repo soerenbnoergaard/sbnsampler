@@ -25,18 +25,6 @@ typedef struct {
     bool killed; // True when a note has been signaled off.
 } voice_t;
 
-voice_t voice_reset = {
-    .active = false,
-    .sample = &samplebank[0],
-    .sample_idx = 0,
-    .ppf = &ppf[0],
-    .ppf_idx = 0,
-    .note = -1,
-    .velocity = 0,
-    .sustained = false,
-    .killed = false,
-};
-
 // Defines, macros, and constants //////////////////////////////////////////////
 
 #define SAMPLE_RATE_Hz 44100
@@ -50,11 +38,29 @@ voice_t voices[NUM_VOICES];
 
 // Functions ///////////////////////////////////////////////////////////////////
 
+int32_t voice_reset(voice_t *v)
+{
+    voice_t voice_default = {
+        .active = false,
+        .sample = &samplebank[0],
+        .sample_idx = 0,
+        .ppf = &ppf[0],
+        .ppf_idx = 0,
+        .note = -1,
+        .velocity = 0,
+        .sustained = false,
+        .killed = false,
+    };
+
+    *v = voice_default;
+    return 0;
+}
+
 int32_t voices_init(void)
 {
     int32_t n;
     for (n = 0; n < NUM_VOICES; n++) {
-        voices[n] = voice_reset;
+        voice_reset(&voices[n]);
     }
 
     return 0;
@@ -88,7 +94,7 @@ int16_t get_transposed_sample(voice_t *v)
 
     // No more input-samples
     if (n >= v->sample->length - 1) {
-        v->active = false;
+        voice_reset(v);
         goto exit_zero_sample;
     }
 
@@ -262,7 +268,7 @@ int32_t handle_midi(void)
     // Kill notes that are no longer sustained
     for (n = 0; n < NUM_VOICES; n++) {
         if ((voices[n].killed == true) && (voices[n].sustained == false)) {
-            voices[n] = voice_reset;
+            voice_reset(&voices[n]);
         }
     }
 
