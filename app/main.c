@@ -19,14 +19,30 @@ typedef struct {
     ppf_t *ppf;
     int32_t ppf_idx; // Output sample index `m` of the poly-phase filter.
 
-    int32_t note; // Midi number corresponding to the active note.
+    int16_t note; // Midi number corresponding to the active note (negative == inactive)
+    uint8_t velocity; // Midi note velocity;
+    bool sustained; // True when a note is being sustained.
+    bool killed; // True when a note has been signaled off.
 } voice_t;
+
+voice_t voice_reset = {
+    .active = false,
+    .sample = &samplebank[0],
+    .sample_idx = 0,
+    .ppf = &ppf[0],
+    .ppf_idx = 0,
+    .note = -1,
+    .velocity = 0,
+    .sustained = false,
+    .killed = false,
+};
 
 // Defines, macros, and constants //////////////////////////////////////////////
 
 #define SAMPLE_RATE_Hz 44100
 #define BUFFER_SIZE 128
-#define NUM_VOICES 4
+#define NUM_VOICES 8
+#define AMPLITUDE_DIVIDER (4)
 
 // Globals /////////////////////////////////////////////////////////////////////
 
@@ -38,12 +54,7 @@ int32_t voices_init(void)
 {
     int32_t n;
     for (n = 0; n < NUM_VOICES; n++) {
-        voices[n].active = false;
-        voices[n].sample = &samplebank[0];
-        voices[n].sample_idx = 0;
-        voices[n].note = -1;
-        voices[n].ppf = &ppf[0];
-        voices[n].ppf_idx = 0;
+        voices[n] = voice_reset;
     }
 
     return 0;
@@ -92,7 +103,7 @@ int16_t get_transposed_sample(voice_t *v)
             continue;
         }
 
-        y += (L * h[L*l + k] * (float)x[n - l]) / NUM_VOICES;
+        y += (L * h[L*l + k] * (float)x[n - l]) / AMPLITUDE_DIVIDER;
     }
 
     // Update voice names from internal variables
@@ -172,6 +183,8 @@ int32_t handle_note_on(midi_message_t m)
     v->ppf_idx = 0;
     v->ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + transpose];
     v->note = m.data[0];
+    v->velocity = m.data[1];
+    v->killed = false;
     v->active = true;
 
     return 0;
@@ -184,16 +197,35 @@ int32_t handle_note_off(midi_message_t m)
     // Find the active voice
     for (n = 0; n < NUM_VOICES; n++) {
         if (voices[n].note == m.data[0]) {
-            voices[n].active = false;
-            voices[n].note = -1;
+            // Signal the voice to be killed when sustain is over.
+            voices[n].killed = true;
         }
     }
 
     return 0;
 }
 
+int32_t handle_sustain_on()
+{
+    int32_t n;
+    for (n = 0; n < NUM_VOICES; n++) {
+        voices[n].sustained = true;
+    }
+    return 0;
+}
+
+int32_t handle_sustain_off()
+{
+    int32_t n;
+    for (n = 0; n < NUM_VOICES; n++) {
+        voices[n].sustained = false;
+    }
+    return 0;
+}
+
 int32_t handle_midi(void)
 {
+    int32_t n;
     int32_t err;
     midi_message_t m;
 
@@ -215,6 +247,23 @@ int32_t handle_midi(void)
     }
     else if ((m.status & 0xf0) == 0x80) {
         handle_note_off(m);
+    }
+    else if ((m.status & 0xf0) == 0xb0) {
+        if (m.data[0] == 0x40) {
+            if (m.data[1] == 0) {
+                handle_sustain_off();
+            }
+            else {
+                handle_sustain_on();
+            }
+        }
+    }
+
+    // Kill notes that are no longer sustained
+    for (n = 0; n < NUM_VOICES; n++) {
+        if ((voices[n].killed == true) && (voices[n].sustained == false)) {
+            voices[n] = voice_reset;
+        }
     }
 
     return 0;
@@ -241,7 +290,7 @@ void loop()
 
         for (i = 0; i < NUM_VOICES; i++) {
             v = &voices[i];
-            y += get_transposed_sample(v);
+            y += (v->velocity * get_transposed_sample(v)) / 128;
 
             // if (v->active)
             //     y += get_squarewave_sample();
