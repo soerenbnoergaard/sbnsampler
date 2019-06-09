@@ -23,8 +23,8 @@ CC = $(BIN_DIR)/arm-linux-gcc
 LD = $(BIN_DIR)/arm-linux-ld
 RM = rm -rf
 
-CCARGS = -Wall
-LDARGS = -Wall
+CCARGS = -Wall -Werror
+LDARGS = -Wall -Werror
 
 Q = @
 

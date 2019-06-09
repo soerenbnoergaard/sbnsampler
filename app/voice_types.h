@@ -18,6 +18,8 @@ typedef struct {
     int16_t note; // Midi number corresponding to the active note (negative == inactive)
     uint8_t velocity; // Midi note velocity;
 
+    vcf_t vcf;
+
     // TODO: Replace the two below with an ADSR
     bool sustained; // True when a note is being sustained.
     bool killed; // True when a note has been signaled off.

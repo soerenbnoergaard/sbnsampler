@@ -185,6 +185,10 @@ void loop()
 
         for (i = 0; i < NUM_VOICES; i++) {
             v = &voices[i];
+            if (v->active == false) {
+                continue;
+            }
+
             x += (v->velocity * ppf_get_transposed_sample(v)) / 128;
 
             // Apply filter (VCF)

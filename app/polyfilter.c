@@ -32,11 +32,6 @@ int16_t ppf_get_transposed_sample(voice_t *v)
     int32_t L = v->ppf->L;
     float *h = v->ppf->h;
 
-    // Return zero if the voice is inactive
-    if (v->active == false) {
-        goto exit_zero_sample;
-    }
-
     // Compute input buffer index (de-activate the voice if there are no more samples)
     n = (m * M) / L;
 
@@ -57,11 +52,10 @@ int16_t ppf_get_transposed_sample(voice_t *v)
         x[0] = v->sample->data[n];
     }
 
-
     // No more input-samples
     if (n >= v->sample->length - 1) {
         voice_reset(v);
-        goto exit_zero_sample;
+        return 0;
     }
 
     // Compute polyphase sub-filter selector
@@ -80,9 +74,4 @@ int16_t ppf_get_transposed_sample(voice_t *v)
 
     // Return resulting sample
     return (int16_t)y;
-
-exit_zero_sample:
-    v->sample_idx = 0;
-    v->ppf_idx = 0;
-    return 0;
 }
