@@ -19,10 +19,11 @@ def relative_path(path):
 # Main
 #
 
-template = """\
-#ifndef POLYFILTER_H
-#define POLYFILTER_H
+template_h = """\
+#ifndef POLYFILTER_COEFFS_H
+#define POLYFILTER_COEFFS_H
 
+#include <stdint.h>
 {defines:s}
 
 typedef struct {{
@@ -38,6 +39,14 @@ typedef struct {{
 // Poly-phase filter structures for each interval
 {structures:s}
 #endif
+"""
+
+template_c = """\
+#include "{h_file:s}"
+
+{coefficients:s}
+
+{structures:s}
 """
 
 intervals_0 = [
@@ -121,13 +130,13 @@ intervals = [
     [1, 2],
 ]
 
-
 zero_transpose_offset = intervals.index([1, 1])
 transpose_min = - zero_transpose_offset
 transpose_max = len(intervals) - 1 - zero_transpose_offset
 
 N = 4
-output_file = relative_path("../app/polyfilter.h")
+output_file_h = relative_path("../app/polyfilter_coeffs.h")
+output_file_c = relative_path("../app/polyfilter_coeffs.c")
 
 # Generate filter coefficients for each interval
 coefficients = [0]*len(intervals)
@@ -144,33 +153,45 @@ s_defines = """\
 """.format(N, zero_transpose_offset, transpose_min, transpose_max)
 
 # Generate c code for coefficients
-s_coefficients = ""
+s_coefficients_h = ""
+s_coefficients_c = ""
 for k, h in enumerate(coefficients):
-    s_coefficients += "float ppf_h{n:d}[] = {{ {h:s} }};\n".format(
+    s_coefficients_h += "extern float ppf_h{n:d}[{length:d}];\n".format(n = k, length = len(h))
+    s_coefficients_c += "float ppf_h{n:d}[] = {{ {h:s} }};\n".format(
         n = k,
         h = ", ".join([str(X) for X in h]),
     )
 
 # Generate c code for structures
-s_structures = ""
-s_structures += "ppf_t ppf[{:d}] = {{\n".format(len(intervals))
+s_structures_h = ""
+s_structures_c = ""
+s_structures_h += "extern ppf_t ppf[{length:d}];\n".format(length = len(intervals))
+s_structures_c += "ppf_t ppf[{:d}] = {{\n".format(len(intervals))
 for k in range(len(intervals)):
-    s_structures += "    {{ .h = ppf_h{n:<5d}, .h_length = {h_length:5d}, .L = {L:5d}, .M = {M:5d} }}{end:s}\n".format(
+    s_structures_c += "    {{ .h = ppf_h{n:<5d}, .h_length = {h_length:5d}, .L = {L:5d}, .M = {M:5d} }}{end:s}\n".format(
         n = k,
         h_length = len(coefficients[k]),
         L = intervals[k][0],
         M = intervals[k][1],
         end = "," if k != len(intervals) - 1 else "",
     )
-s_structures += "};"
+s_structures_c += "};"
 
 # Write to file
-with open(output_file, "w") as f:
-    tmp = template.format(
+with open(output_file_h, "w") as f:
+    tmp = template_h.format(
         defines = s_defines,
-        coefficients = s_coefficients,
-        structures = s_structures,
+        coefficients = s_coefficients_h,
+        structures = s_structures_h,
     )
-
     f.write(tmp)
-print("Generated poly-phase filter coefficients in {:s}".format(output_file))
+
+with open(output_file_c, "w") as f:
+    tmp = template_c.format(
+        h_file = os.path.basename(output_file_h),
+        coefficients = s_coefficients_c,
+        structures = s_structures_c,
+    )
+    f.write(tmp)
+
+print("Generated poly-phase filter coefficients in {:s} and {:s}".format(output_file_h, output_file_c))

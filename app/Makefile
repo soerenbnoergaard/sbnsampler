@@ -6,6 +6,9 @@ SOURCES = main.c \
 	  dac.c \
 	  midi.c \
 	  samplebank.c \
+	  voice.c \
+	  polyfilter.c \
+	  polyfilter_coeffs.c \
 	  file_helpers.c
 
 SENSITIVITY = polyfilter.h
