@@ -39,11 +39,11 @@ class PRBS(object):
         return self.prbs_generic(num_bits, seed, 23, lambda x: (((x >> 22) ^ (x >> 17)) & 1))
 
 
-output_file = relative_path("../app/sound/prbs15.wav")
 sample_rate = 44100
-N = 2**15-1
-
 noise = PRBS()
-data = (2**15-1) * np.array(noise.prbs15(N), dtype="<h")
 
-scipy.io.wavfile.write(output_file, sample_rate, data)
+data = (2**15-1) * np.array(noise.prbs15(2**15-1), dtype="<h")
+scipy.io.wavfile.write(relative_path("../app/sound/prbs15.wav"), sample_rate, data)
+
+data = (2**15-1) * np.array(noise.prbs15(2**20-1), dtype="<h")
+scipy.io.wavfile.write(relative_path("../app/sound/prbs20.wav"), sample_rate, data)
