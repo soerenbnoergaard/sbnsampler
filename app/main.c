@@ -18,6 +18,10 @@
 #define SAMPLE_RATE_Hz 44100
 #define BUFFER_SIZE 128
 
+#define MIDI_CC_SUSTAIN 64
+#define MIDI_CC_CUTOFF 74
+#define MIDI_CC_RESONANCE 71
+
 // Globals /////////////////////////////////////////////////////////////////////
 
 FILE *log_h;
@@ -83,6 +87,11 @@ int32_t handle_note_on(midi_message_t m)
     return 0;
 }
 
+int32_t handle_cc(midi_message_t m)
+{
+    return 0;
+}
+
 int32_t handle_note_off(midi_message_t m)
 {
     int32_t n;
@@ -98,21 +107,60 @@ int32_t handle_note_off(midi_message_t m)
     return 0;
 }
 
-int32_t handle_sustain_on()
+int32_t handle_sustain(midi_message_t m)
 {
     int32_t n;
-    for (n = 0; n < NUM_VOICES; n++) {
-        voices[n].sustained = true;
+
+    if (m.data[1] == 0) {
+        // Sustain off
+        for (n = 0; n < NUM_VOICES; n++) {
+            voices[n].sustained = false;
+        }
+    }
+    else {
+        // Sustain on
+        for (n = 0; n < NUM_VOICES; n++) {
+            voices[n].sustained = true;
+        }
     }
     return 0;
 }
 
-int32_t handle_sustain_off()
+int32_t handle_cutoff(midi_message_t m)
 {
+    // Map cutoff to VCF parameter `g`.
+    // 0 = 0.005
+    // 127 = 0.9
+
+    const float b = 0.005;
+    const float a = (0.9-b) / 127;
+
     int32_t n;
+    float g = a*m.data[1] + b;
+
     for (n = 0; n < NUM_VOICES; n++) {
-        voices[n].sustained = false;
+        voice_default.vcf.g = g;
+        voices[n].vcf.g = g;
     }
+
+    return 0;
+}
+
+int32_t handle_resonance(midi_message_t m)
+{
+    // Map cutoff to VCF parameter `k`.
+
+    const float b = 0.5;
+    const float a = (1.5-b) / 127;
+
+    int32_t n;
+    float k = a*m.data[1] + b;
+
+    for (n = 0; n < NUM_VOICES; n++) {
+        voice_default.vcf.k = k;
+        voices[n].vcf.k = k;
+    }
+
     return 0;
 }
 
@@ -142,13 +190,18 @@ int32_t handle_midi(void)
         handle_note_off(m);
     }
     else if ((m.status & 0xf0) == 0xb0) {
-        if (m.data[0] == 0x40) {
-            if (m.data[1] == 0) {
-                handle_sustain_off();
-            }
-            else {
-                handle_sustain_on();
-            }
+        switch (m.data[0]) {
+        case MIDI_CC_SUSTAIN:
+            handle_sustain(m);
+            break;
+
+        case MIDI_CC_CUTOFF:
+            handle_cutoff(m);
+            break;
+
+        case MIDI_CC_RESONANCE:
+            handle_resonance(m);
+            break;
         }
     }
 
