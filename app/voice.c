@@ -20,7 +20,7 @@ int32_t voice_reset(voice_t *v)
         .note = -1,
         .velocity = 0,
         .vcf = {
-            .g = 0.02,
+            .g = 0.1,
             .k = 0.5,
             .w1 = {0, 0, 0, 0},
             .y1 = 0
