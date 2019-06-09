@@ -2,6 +2,17 @@
 
 #define AMPLITUDE_DIVIDER (4)
 
+// static int16_t get_squarewave_sample(void)
+// {
+//     static int32_t n = 0;
+//     int16_t x;
+
+//     x = (n < 50) * 32767;
+//     n = (n + 1) % 100;
+
+//     return x;
+// }
+
 int16_t get_transposed_sample(voice_t *v)
 {
     // Polyphase re-sampling filter
@@ -73,15 +84,4 @@ exit_zero_sample:
     v->sample_idx = 0;
     v->ppf_idx = 0;
     return 0;
-}
-
-int16_t get_squarewave_sample(void)
-{
-    static int32_t n = 0;
-    int16_t x;
-
-    x = (n < 50) * 32767;
-    n = (n + 1) % 100;
-
-    return x;
 }
