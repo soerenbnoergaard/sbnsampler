@@ -9,6 +9,7 @@
 #include "samplebank.h"
 #include "voice.h"
 #include "polyfilter.h"
+#include "vcf.h"
 
 // Types ///////////////////////////////////////////////////////////////////////
 
@@ -167,6 +168,7 @@ void loop()
     int16_t buffer[BUFFER_SIZE];
     int32_t buffer_idx = 0;
 
+    float x;
     float y;
 
     int32_t i;
@@ -178,14 +180,15 @@ void loop()
         handle_midi(); 
 
         // Generate audio from voices
+        x = 0;
         y = 0;
 
         for (i = 0; i < NUM_VOICES; i++) {
             v = &voices[i];
-            y += (v->velocity * ppf_get_transposed_sample(v)) / 128;
+            x += (v->velocity * ppf_get_transposed_sample(v)) / 128;
 
-            // if (v->active)
-            //     y += get_squarewave_sample();
+            // Apply filter (VCF) TODO
+            y = x;
         }
 
         // Write output do DAC

@@ -9,6 +9,7 @@ SOURCES = main.c \
 	  voice.c \
 	  polyfilter.c \
 	  polyfilter_coeffs.c \
+	  vcf.c \
 	  file_helpers.c
 
 SENSITIVITY = polyfilter.h

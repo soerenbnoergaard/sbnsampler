@@ -7,8 +7,9 @@
 
 #define NUM_VOICES 8
 
-#include "polyfilter_coeffs.h"
 #include "samplebank.h"
+#include "polyfilter_types.h"
+#include "vcf_types.h"
 
 typedef struct {
     bool active;
@@ -22,6 +23,8 @@ typedef struct {
 
     int16_t note; // Midi number corresponding to the active note (negative == inactive)
     uint8_t velocity; // Midi note velocity;
+
+    // TODO: Replace the two below with an ADSR
     bool sustained; // True when a note is being sustained.
     bool killed; // True when a note has been signaled off.
 } voice_t;
