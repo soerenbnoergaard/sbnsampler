@@ -3,6 +3,7 @@
 voice_t voices[NUM_VOICES];
 voice_t voice_default = {
     .active = false,
+    .activation_index = 0,
     .sample = &samplebank[0],
     .sample_idx = 0,
     .sample_dl[0] = 0,

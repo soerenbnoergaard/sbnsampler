@@ -8,7 +8,7 @@
 #include "voice_types.h"
 
 // Defines
-#define NUM_VOICES 8
+#define NUM_VOICES 6
 
 // Global variables (initialized elsewhere)
 extern voice_t voices[NUM_VOICES];

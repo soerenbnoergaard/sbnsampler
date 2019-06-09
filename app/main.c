@@ -34,7 +34,7 @@ FILE *log_h;
 float map_midi_to_cutoff(uint8_t value)
 {
     // Map cutoff to VCF parameter `g`.
-    const float b = 0.005;
+    const float b = 0.01;
     const float a = (0.9-b) / (127*127*127);
     return a*value*value*value + b;
 }
@@ -89,23 +89,54 @@ int32_t handle_note_on(midi_message_t m)
     sample_t *sample = NULL;
     int32_t transpose = 0;
 
+    int32_t n_chosen = -1;
+    int32_t n_min = 0; 
+    int32_t idx_min = 99999;
+    int32_t idx_max = -1;
+
     // Find empty voice
+
+    // TODO:
+    // Get the insertion order-based voice selection working
+    //
+
     for (n = 0; n < NUM_VOICES; n++) {
         if (voices[n].note == m.data[0]) {
             // Take over existing note
-            v = &voices[n];
-            break;
+            n_chosen = n;
         }
         else if (voices[n].active == false) {
-            // Choose new voice
-            v = &voices[n];
-            break;
+            // Empty voice
+            n_chosen = n;
+        }
+
+        // Store the activation index extremes
+        if (idx_max < voices[n].activation_index) {
+            idx_max = voices[n].activation_index;
+        }
+        if (idx_min > voices[n].activation_index) {
+            idx_min = voices[n].activation_index;
+            n_min = n;
         }
     }
 
-    if (v == NULL) {
+    // If there is no empty slots, select the one with the lowest activation
+    // index.
+    if (n_chosen < 0) {
         // No voices available
-        return 1;
+        n_chosen = n_min;
+    }
+    printf("%02d @ %02d -> %02d\n", idx_min, n_min, n_chosen);
+    v = &voices[n_chosen];
+    v->activation_index = idx_max+1;
+
+    // List voices
+    for (n = 0; n < NUM_VOICES; n++) {
+        printf("%2d %02d %s\n",
+            n,
+            voices[n].activation_index, 
+            n == n_chosen ? "<" :
+                voices[n].active ? "x" : " ");
     }
 
     // Find the sample to activate
@@ -136,6 +167,7 @@ int32_t handle_note_on(midi_message_t m)
     if (MAP_VELOCITY_TO_CUTOFF) {
         v->vcf.g = map_midi_to_cutoff(v->velocity);
     }
+    v->killed = false;
     v->active = true;
 
     return 0;

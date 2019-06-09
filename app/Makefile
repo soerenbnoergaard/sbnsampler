@@ -12,7 +12,7 @@ SOURCES = main.c \
 	  vcf.c \
 	  file_helpers.c
 
-SENSITIVITY = polyfilter.h
+SENSITIVITY = $(wildcard *.h)
 
 OBJECTS = $(SOURCES:.c=.o)
 

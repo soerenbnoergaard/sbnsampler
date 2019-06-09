@@ -7,6 +7,7 @@
 
 typedef struct {
     bool active;
+    int32_t activation_index; // At what point the voice was activated.
 
     sample_t *sample;
     int32_t sample_idx; // Input sample index `n` of the poly-phase filter.
