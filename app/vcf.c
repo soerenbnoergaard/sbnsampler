@@ -1,4 +1,5 @@
 #include "vcf.h"
+#include <stdio.h>
 
 int16_t vcf_filter(int16_t input_sample, voice_t *voice)
 {
@@ -16,10 +17,6 @@ int16_t vcf_filter(int16_t input_sample, voice_t *voice)
     float u;
     float v;
     float G;
-
-    // if (voice->active == false) {
-    //     return 0;
-    // }
 
     // Ladder filter
     u = (float)input_sample - (*y1)*k;

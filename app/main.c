@@ -22,11 +22,65 @@
 #define MIDI_CC_CUTOFF 74
 #define MIDI_CC_RESONANCE 71
 
+#define MAP_VELOCITY_TO_AMPLITUDE false
+#define MAP_VELOCITY_TO_CUTOFF true
+
 // Globals /////////////////////////////////////////////////////////////////////
 
 FILE *log_h;
 
 // Functions ///////////////////////////////////////////////////////////////////
+
+float map_midi_to_cutoff(uint8_t value)
+{
+    // Map cutoff to VCF parameter `g`.
+    const float b = 0.005;
+    const float a = (0.9-b) / (127*127*127);
+    return a*value*value*value + b;
+}
+
+int32_t handle_cutoff(midi_message_t m)
+{
+    // FIXME: At the moment, the cutoff is either controlled by velocity or
+    // manually - not both.
+    if (MAP_VELOCITY_TO_CUTOFF) {
+        return 0;
+    }
+    else {
+        int32_t n;
+        float g = map_midi_to_cutoff(m.data[1]);
+
+        for (n = 0; n < NUM_VOICES; n++) {
+            voice_default.vcf.g = g;
+            voices[n].vcf.g = g;
+        }
+
+        return 0;
+    }
+}
+
+float map_midi_to_resonance(uint8_t value)
+{
+    // Map resonance to VCF parameter `k`.
+    const float b = 0.5;
+    const float a = (1.5-b) / 127;
+    return a*value + b;
+}
+
+int32_t handle_resonance(midi_message_t m)
+{
+    // Map cutoff to VCF parameter `k`.
+
+    int32_t n;
+    float k = map_midi_to_resonance(m.data[1]);
+
+    for (n = 0; n < NUM_VOICES; n++) {
+        voice_default.vcf.k = k;
+        voices[n].vcf.k = k;
+    }
+
+    return 0;
+}
 
 int32_t handle_note_on(midi_message_t m)
 {
@@ -76,19 +130,14 @@ int32_t handle_note_on(midi_message_t m)
 
     // Activate voice
     v->sample = sample;
-    v->sample_idx = 0;
-    v->ppf_idx = 0;
     v->ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + transpose];
     v->note = m.data[0];
     v->velocity = m.data[1];
-    v->killed = false;
+    if (MAP_VELOCITY_TO_CUTOFF) {
+        v->vcf.g = map_midi_to_cutoff(v->velocity);
+    }
     v->active = true;
 
-    return 0;
-}
-
-int32_t handle_cc(midi_message_t m)
-{
     return 0;
 }
 
@@ -126,43 +175,6 @@ int32_t handle_sustain(midi_message_t m)
     return 0;
 }
 
-int32_t handle_cutoff(midi_message_t m)
-{
-    // Map cutoff to VCF parameter `g`.
-    // 0 = 0.005
-    // 127 = 0.9
-
-    const float b = 0.005;
-    const float a = (0.9-b) / 127;
-
-    int32_t n;
-    float g = a*m.data[1] + b;
-
-    for (n = 0; n < NUM_VOICES; n++) {
-        voice_default.vcf.g = g;
-        voices[n].vcf.g = g;
-    }
-
-    return 0;
-}
-
-int32_t handle_resonance(midi_message_t m)
-{
-    // Map cutoff to VCF parameter `k`.
-
-    const float b = 0.5;
-    const float a = (1.5-b) / 127;
-
-    int32_t n;
-    float k = a*m.data[1] + b;
-
-    for (n = 0; n < NUM_VOICES; n++) {
-        voice_default.vcf.k = k;
-        voices[n].vcf.k = k;
-    }
-
-    return 0;
-}
 
 int32_t handle_midi(void)
 {
@@ -221,6 +233,7 @@ void loop()
     int16_t buffer[BUFFER_SIZE];
     int32_t buffer_idx = 0;
 
+    float A;
     float x;
     float y;
 
@@ -233,19 +246,25 @@ void loop()
         handle_midi(); 
 
         // Generate audio from voices
-        x = 0;
         y = 0;
 
         for (i = 0; i < NUM_VOICES; i++) {
-            v = &voices[i];
+            v = &(voices[i]);
             if (v->active == false) {
                 continue;
             }
 
-            x += (v->velocity * ppf_get_transposed_sample(v)) / 128;
+            if (MAP_VELOCITY_TO_AMPLITUDE) {
+                A = v->velocity / 128.0;
+            }
+            else {
+                A = 1.0;
+            }
+            x = A * ppf_get_transposed_sample(v);
 
             // Apply filter (VCF)
-            y = vcf_filter(x, v);
+            // Accumulate result of all voices!
+            y += vcf_filter(x, v);
         }
 
         // Write output do DAC

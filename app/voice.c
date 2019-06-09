@@ -25,10 +25,6 @@ voice_t voice_default = {
 
 int32_t voice_reset(voice_t *v)
 {
-    // Make sure to update the arrays below if PPF_NUM_TABS is updated!
-    assert(PPF_NUM_TABS == 4);
-
-
     *v = voice_default;
     return 0;
 }
