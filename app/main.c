@@ -182,7 +182,7 @@ void loop()
 
         for (i = 0; i < NUM_VOICES; i++) {
             v = &voices[i];
-            y += (v->velocity * get_transposed_sample(v)) / 128;
+            y += (v->velocity * ppf_get_transposed_sample(v)) / 128;
 
             // if (v->active)
             //     y += get_squarewave_sample();

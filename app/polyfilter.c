@@ -13,7 +13,7 @@
 //     return x;
 // }
 
-int16_t get_transposed_sample(voice_t *v)
+int16_t ppf_get_transposed_sample(voice_t *v)
 {
     // Polyphase re-sampling filter
     // Variable names after Lyons - Understanding Digital Signal Processing.
