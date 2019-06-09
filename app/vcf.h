@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #include "vcf_types.h"
-#include "voice.h"
+#include "voice_types.h"
 
 int16_t vcf_filter(voice_t *v);
 

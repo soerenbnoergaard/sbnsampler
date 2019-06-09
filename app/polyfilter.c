@@ -1,4 +1,5 @@
 #include "polyfilter.h"
+#include "voice.h"
 
 #define AMPLITUDE_DIVIDER (4)
 
