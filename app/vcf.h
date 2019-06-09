@@ -7,6 +7,6 @@
 #include "vcf_types.h"
 #include "voice_types.h"
 
-int16_t vcf_filter(voice_t *v);
+int16_t vcf_filter(int16_t x, voice_t *v);
 
 #endif

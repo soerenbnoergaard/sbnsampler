@@ -187,8 +187,8 @@ void loop()
             v = &voices[i];
             x += (v->velocity * ppf_get_transposed_sample(v)) / 128;
 
-            // Apply filter (VCF) TODO
-            y = x;
+            // Apply filter (VCF)
+            y = vcf_filter(x, v);
         }
 
         // Write output do DAC
