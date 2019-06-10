@@ -27,60 +27,14 @@
 
 // Globals /////////////////////////////////////////////////////////////////////
 
+static settings_t global = {
+    .sustain = false,
+    .cutoff = 64,
+    .resonance = 0,
+};
 FILE *log_h;
 
 // Functions ///////////////////////////////////////////////////////////////////
-
-float map_midi_to_cutoff(uint8_t value)
-{
-    // Map cutoff to VCF parameter `g`.
-    const float b = 0.01;
-    const float a = (0.9-b) / (127*127*127);
-    return a*value*value*value + b;
-}
-
-int32_t handle_cutoff(midi_message_t m)
-{
-    // FIXME: At the moment, the cutoff is either controlled by velocity or
-    // manually - not both.
-    if (MAP_VELOCITY_TO_CUTOFF) {
-        return 0;
-    }
-    else {
-        int32_t n;
-        float g = map_midi_to_cutoff(m.data[1]);
-
-        for (n = 0; n < NUM_VOICES; n++) {
-            voice_default.vcf.g = g;
-            voices[n].vcf.g = g;
-        }
-
-        return 0;
-    }
-}
-
-float map_midi_to_resonance(uint8_t value)
-{
-    // Map resonance to VCF parameter `k`.
-    const float b = 0.5;
-    const float a = (1.5-b) / 127;
-    return a*value + b;
-}
-
-int32_t handle_resonance(midi_message_t m)
-{
-    // Map cutoff to VCF parameter `k`.
-
-    int32_t n;
-    float k = map_midi_to_resonance(m.data[1]);
-
-    for (n = 0; n < NUM_VOICES; n++) {
-        voice_default.vcf.k = k;
-        voices[n].vcf.k = k;
-    }
-
-    return 0;
-}
 
 int32_t handle_note_on(midi_message_t m)
 {
@@ -140,7 +94,6 @@ int32_t handle_note_on(midi_message_t m)
     v->note = m.data[0];
     v->velocity = m.data[1];
     v->state = VOICE_STATE_STARTING;
-
     return 0;
 }
 
@@ -151,30 +104,10 @@ int32_t handle_note_off(midi_message_t m)
     // Find the active voice
     for (n = 0; n < NUM_VOICES; n++) {
         if (voices[n].note == m.data[0]) {
-            // Signal the voice to be stopped when sustain is over.
             voices[n].state = VOICE_STATE_STOPPED;
         }
     }
 
-    return 0;
-}
-
-int32_t handle_sustain(midi_message_t m)
-{
-    int32_t n;
-
-    if (m.data[1] == 0) {
-        // Sustain off
-        for (n = 0; n < NUM_VOICES; n++) {
-            voices[n].sustained = false;
-        }
-    }
-    else {
-        // Sustain on
-        for (n = 0; n < NUM_VOICES; n++) {
-            voices[n].sustained = true;
-        }
-    }
     return 0;
 }
 
@@ -205,15 +138,15 @@ int32_t handle_midi(void)
     else if ((m.status & 0xf0) == 0xb0) {
         switch (m.data[0]) {
         case MIDI_CC_SUSTAIN:
-            handle_sustain(m);
+            global.sustain = m.data[1] == 0 ? false : true;
             break;
 
         case MIDI_CC_CUTOFF:
-            handle_cutoff(m);
+            global.cutoff = m.data[1];
             break;
 
         case MIDI_CC_RESONANCE:
-            handle_resonance(m);
+            global.resonance = m.data[1];
             break;
         }
     }
@@ -243,17 +176,15 @@ void loop()
         y = 0;
 
         for (i = 0; i < NUM_VOICES; i++) {
-            v = &(voices[i]);
+            v = &voices[i];
 
             switch (v->state) {
             case VOICE_STATE_IDLE:
                 continue;
 
             case VOICE_STATE_STARTING:
-
-                if (MAP_VELOCITY_TO_CUTOFF) {
-                    v->vcf.g = map_midi_to_cutoff(v->velocity);
-                }
+                v->settings.cutoff = MAP_VELOCITY_TO_CUTOFF ? v->velocity : global.cutoff;
+                v->settings.resonance = global.resonance;
 
                 v->state = VOICE_STATE_RUNNING;
                 continue;
@@ -262,7 +193,7 @@ void loop()
                 break;
 
             case VOICE_STATE_STOPPED:
-                if (v->sustained) {
+                if (global.sustain) {
                     break;
                 }
                 else {
@@ -288,7 +219,7 @@ void loop()
 
             // Apply filter (VCF)
             // Accumulate result of all voices!
-            y += vcf_filter(x, v);
+            y += vcf_filter(x, v, v->settings.cutoff, v->settings.resonance);
         }
 
         // Write output do DAC

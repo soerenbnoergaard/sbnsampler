@@ -1,7 +1,23 @@
 #include "vcf.h"
 #include <stdio.h>
 
-int16_t vcf_filter(int16_t input_sample, voice_t *voice)
+static float map_midi_to_cutoff(uint8_t value)
+{
+    // Map cutoff to VCF parameter `g`.
+    const float b = 0.01;
+    const float a = (0.9-b) / (127*127*127);
+    return a*value*value*value + b;
+}
+
+float map_midi_to_resonance(uint8_t value)
+{
+    // Map resonance to VCF parameter `k`.
+    const float b = 0.5;
+    const float a = (1.5-b) / 127;
+    return a*value + b;
+}
+
+int16_t vcf_filter(int16_t input_sample, voice_t *voice, uint8_t cutoff, uint8_t resonance)
 {
     // Per-filter inputs and outputs
     float x;
@@ -10,8 +26,8 @@ int16_t vcf_filter(int16_t input_sample, voice_t *voice)
     // Short-hand names for VCF parameters
     float *y1 = &voice->vcf.y1;
     float *w1 = voice->vcf.w1;
-    float k = voice->vcf.k;
-    float g = voice->vcf.g;
+    float g = map_midi_to_cutoff(cutoff);
+    float k = map_midi_to_resonance(resonance);
 
     // Various variables
     float u;

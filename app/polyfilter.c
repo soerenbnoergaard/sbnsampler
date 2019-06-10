@@ -54,7 +54,7 @@ int16_t ppf_get_transposed_sample(voice_t *v)
 
     // No more input-samples
     if (n >= v->sample->length - 1) {
-        voice_reset(v);
+        v->state = VOICE_STATE_IDLE;
         return 0;
     }
 

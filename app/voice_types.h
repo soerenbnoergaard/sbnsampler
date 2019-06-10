@@ -5,6 +5,12 @@
 #include "polyfilter_types.h"
 #include "vcf_types.h"
 
+typedef struct {
+    bool sustain;
+    uint8_t cutoff;
+    uint8_t resonance;
+} settings_t;
+
 typedef enum {
     VOICE_STATE_IDLE = 0,
     VOICE_STATE_STARTING,
@@ -14,6 +20,7 @@ typedef enum {
 
 typedef struct {
     voice_state_t state;
+    settings_t settings; // Local variant of global settings
 
     sample_t *sample;
     int32_t sample_idx; // Input sample index `n` of the poly-phase filter.
@@ -26,10 +33,6 @@ typedef struct {
     uint8_t velocity; // Midi note velocity;
 
     vcf_t vcf;
-
-    // TODO: Replace these with an ADSR
-    bool sustained; // True when a note is being sustained.
 } voice_t;
-
 
 #endif
