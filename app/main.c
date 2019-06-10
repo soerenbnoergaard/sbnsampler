@@ -21,7 +21,7 @@
 #define MIDI_CC_CUTOFF 74
 #define MIDI_CC_RESONANCE 71
 
-#define MAP_VELOCITY_TO_AMPLITUDE false
+#define MAP_VELOCITY_TO_AMPLITUDE true
 #define MAP_VELOCITY_TO_CUTOFF true
 
 // Globals /////////////////////////////////////////////////////////////////////
