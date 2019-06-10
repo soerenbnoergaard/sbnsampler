@@ -5,8 +5,15 @@
 #include "polyfilter_types.h"
 #include "vcf_types.h"
 
+typedef enum {
+    VOICE_STATE_IDLE = 0,
+    VOICE_STATE_STARTING,
+    VOICE_STATE_RUNNING,
+    VOICE_STATE_STOPPED
+} voice_state_t;
+
 typedef struct {
-    bool active;
+    voice_state_t state;
 
     sample_t *sample;
     int32_t sample_idx; // Input sample index `n` of the poly-phase filter.
@@ -20,9 +27,8 @@ typedef struct {
 
     vcf_t vcf;
 
-    // TODO: Replace the two below with an ADSR
+    // TODO: Replace these with an ADSR
     bool sustained; // True when a note is being sustained.
-    bool killed; // True when a note has been signaled off.
 } voice_t;
 
 

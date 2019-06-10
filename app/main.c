@@ -102,7 +102,7 @@ int32_t handle_note_on(midi_message_t m)
             // Take over existing note
             n_chosen = n;
         }
-        else if (voices[n].active == false) {
+        else if (voices[n].state == VOICE_STATE_IDLE) {
             // Empty voice
             n_chosen = n;
         }
@@ -113,15 +113,6 @@ int32_t handle_note_on(midi_message_t m)
         return 1;
     }
     v = &voices[n_chosen];
-
-    // List voices
-    for (n = 0; n < NUM_VOICES; n++) {
-        printf("%2d %02d %s\n",
-            n,
-            voices[n].activation_index, 
-            n == n_chosen ? "<" :
-                voices[n].active ? "x" : " ");
-    }
 
     // Find the sample to activate
     for (n = 0; n < NUM_SAMPLES; n++) {
@@ -148,11 +139,7 @@ int32_t handle_note_on(midi_message_t m)
     v->ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + transpose];
     v->note = m.data[0];
     v->velocity = m.data[1];
-    if (MAP_VELOCITY_TO_CUTOFF) {
-        v->vcf.g = map_midi_to_cutoff(v->velocity);
-    }
-    v->killed = false;
-    v->active = true;
+    v->state = VOICE_STATE_STARTING;
 
     return 0;
 }
@@ -164,8 +151,8 @@ int32_t handle_note_off(midi_message_t m)
     // Find the active voice
     for (n = 0; n < NUM_VOICES; n++) {
         if (voices[n].note == m.data[0]) {
-            // Signal the voice to be killed when sustain is over.
-            voices[n].killed = true;
+            // Signal the voice to be stopped when sustain is over.
+            voices[n].state = VOICE_STATE_STOPPED;
         }
     }
 
@@ -191,10 +178,8 @@ int32_t handle_sustain(midi_message_t m)
     return 0;
 }
 
-
 int32_t handle_midi(void)
 {
-    int32_t n;
     int32_t err;
     midi_message_t m;
 
@@ -233,13 +218,6 @@ int32_t handle_midi(void)
         }
     }
 
-    // Kill notes that are no longer sustained
-    for (n = 0; n < NUM_VOICES; n++) {
-        if ((voices[n].killed == true) && (voices[n].sustained == false)) {
-            voice_reset(&voices[n]);
-        }
-    }
-
     return 0;
 }
 
@@ -266,9 +244,39 @@ void loop()
 
         for (i = 0; i < NUM_VOICES; i++) {
             v = &(voices[i]);
-            if (v->active == false) {
+
+            switch (v->state) {
+            case VOICE_STATE_IDLE:
+                continue;
+
+            case VOICE_STATE_STARTING:
+
+                if (MAP_VELOCITY_TO_CUTOFF) {
+                    v->vcf.g = map_midi_to_cutoff(v->velocity);
+                }
+
+                v->state = VOICE_STATE_RUNNING;
+                continue;
+
+            case VOICE_STATE_RUNNING:
+                break;
+
+            case VOICE_STATE_STOPPED:
+
+                if (v->sustained == false) {
+                    v->state = VOICE_STATE_IDLE;
+                    continue;
+                }
+                else {
+                    break;
+                }
+
+            default:
+                fprintf(stderr, "Unknown state\n");
                 continue;
             }
+
+            // Fetch sound for the given voice
 
             if (MAP_VELOCITY_TO_AMPLITUDE) {
                 A = v->velocity / 128.0;
@@ -281,6 +289,7 @@ void loop()
             // Apply filter (VCF)
             // Accumulate result of all voices!
             y += vcf_filter(x, v);
+
         }
 
         // Write output do DAC

@@ -2,7 +2,7 @@
 
 voice_t voices[NUM_VOICES];
 voice_t voice_default = {
-    .active = false,
+    .state = VOICE_STATE_IDLE,
     .sample = &samplebank[0],
     .sample_idx = 0,
     .sample_dl[0] = 0,
@@ -20,7 +20,6 @@ voice_t voice_default = {
         .y1 = 0
     },
     .sustained = false,
-    .killed = false,
 };
 
 int32_t voice_reset(voice_t *v)
