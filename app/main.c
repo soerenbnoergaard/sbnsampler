@@ -93,6 +93,7 @@ int32_t handle_note_on(midi_message_t m)
     v->note = m.data[0];
     v->velocity = m.data[1];
     v->state = VOICE_STATE_STARTING;
+
     return 0;
 }
 
@@ -163,10 +164,23 @@ void loop()
     float x;
     float y;
 
-    int32_t i;
+    int32_t n;
     voice_t *v;
 
+    int32_t summary_tick = 0;
+
     while (1) {
+        // Periodically print voice summary
+        if (summary_tick == 0) {
+            for (n = 0; n < NUM_VOICES; n++) {
+                printf("%2d %2d\n", 
+                    n,
+                    (int)voices[n].state
+                );
+            }
+            printf("\n");
+        }
+        summary_tick = (summary_tick + 1) % (1<<15);
 
         // Update voices based on MIDI input
         handle_midi(); 
@@ -174,8 +188,8 @@ void loop()
         // Generate audio from voices
         y = 0;
 
-        for (i = 0; i < NUM_VOICES; i++) {
-            v = &voices[i];
+        for (n = 0; n < NUM_VOICES; n++) {
+            v = &voices[n];
 
             switch (v->state) {
             case VOICE_STATE_IDLE:
@@ -183,6 +197,10 @@ void loop()
 
             case VOICE_STATE_STARTING:
 
+                // Reset polyphase filter and sample settings
+                voice_reset(v);
+
+                // Update sound parameters
                 if (MAP_VELOCITY_TO_CUTOFF) {
                     v->settings.cutoff = (global.cutoff>>1) + (v->velocity>>1);
                 }

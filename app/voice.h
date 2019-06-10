@@ -15,5 +15,6 @@ extern voice_t voices[NUM_VOICES];
 
 // Prototypes
 int32_t voice_init(void);
+int32_t voice_reset(voice_t *v);
 
 #endif

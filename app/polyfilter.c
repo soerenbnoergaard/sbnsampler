@@ -32,7 +32,7 @@ int16_t ppf_get_transposed_sample(voice_t *v)
     int32_t L = v->ppf->L;
     float *h = v->ppf->h;
 
-    // Compute input buffer index (de-activate the voice if there are no more samples)
+    // Compute input buffer index
     n = (m * M) / L;
 
     // Update delay line if `n` has changed.
