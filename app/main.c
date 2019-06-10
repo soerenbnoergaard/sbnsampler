@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <assert.h>
 
 #include "dac.h"
 #include "midi.h"
@@ -29,7 +28,7 @@
 
 static settings_t global = {
     .sustain = false,
-    .cutoff = 64,
+    .cutoff = 0,
     .resonance = 0,
 };
 FILE *log_h;
@@ -183,7 +182,13 @@ void loop()
                 continue;
 
             case VOICE_STATE_STARTING:
-                v->settings.cutoff = MAP_VELOCITY_TO_CUTOFF ? v->velocity : global.cutoff;
+
+                if (MAP_VELOCITY_TO_CUTOFF) {
+                    v->settings.cutoff = (global.cutoff>>1) + (v->velocity>>1);
+                }
+                else {
+                    v->settings.cutoff = global.cutoff;
+                }
                 v->settings.resonance = global.resonance;
 
                 v->state = VOICE_STATE_RUNNING;
