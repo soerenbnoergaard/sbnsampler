@@ -262,13 +262,12 @@ void loop()
                 break;
 
             case VOICE_STATE_STOPPED:
-
-                if (v->sustained == false) {
-                    v->state = VOICE_STATE_IDLE;
-                    continue;
+                if (v->sustained) {
+                    break;
                 }
                 else {
-                    break;
+                    v->state = VOICE_STATE_IDLE;
+                    continue;
                 }
 
             default:
@@ -276,6 +275,7 @@ void loop()
                 continue;
             }
 
+            // Break target:
             // Fetch sound for the given voice
 
             if (MAP_VELOCITY_TO_AMPLITUDE) {
@@ -289,7 +289,6 @@ void loop()
             // Apply filter (VCF)
             // Accumulate result of all voices!
             y += vcf_filter(x, v);
-
         }
 
         // Write output do DAC
