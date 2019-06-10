@@ -90,9 +90,6 @@ int32_t handle_note_on(midi_message_t m)
     int32_t transpose = 0;
 
     int32_t n_chosen = -1;
-    int32_t n_min = 0; 
-    int32_t idx_min = 99999;
-    int32_t idx_max = -1;
 
     // Find empty voice
 
@@ -109,26 +106,13 @@ int32_t handle_note_on(midi_message_t m)
             // Empty voice
             n_chosen = n;
         }
-
-        // Store the activation index extremes
-        if (idx_max < voices[n].activation_index) {
-            idx_max = voices[n].activation_index;
-        }
-        if (idx_min > voices[n].activation_index) {
-            idx_min = voices[n].activation_index;
-            n_min = n;
-        }
     }
 
-    // If there is no empty slots, select the one with the lowest activation
-    // index.
     if (n_chosen < 0) {
         // No voices available
-        n_chosen = n_min;
+        return 1;
     }
-    printf("%02d @ %02d -> %02d\n", idx_min, n_min, n_chosen);
     v = &voices[n_chosen];
-    v->activation_index = idx_max+1;
 
     // List voices
     for (n = 0; n < NUM_VOICES; n++) {
