@@ -18,17 +18,17 @@
 #define BUFFER_SIZE 128
 
 #define MIDI_CC_SUSTAIN 64
-#define MIDI_CC_CUTOFF 74
-#define MIDI_CC_RESONANCE 71
+#define MIDI_CC_CUTOFF 48
+#define MIDI_CC_RESONANCE 49
 
 #define MAP_VELOCITY_TO_AMPLITUDE true
-#define MAP_VELOCITY_TO_CUTOFF true
+#define MAP_VELOCITY_TO_CUTOFF false
 
 // Globals /////////////////////////////////////////////////////////////////////
 
 static settings_t global = {
     .sustain = false,
-    .cutoff = 0,
+    .cutoff = 127,
     .resonance = 0,
 };
 FILE *log_h;
@@ -200,6 +200,11 @@ void loop()
                 // Reset polyphase filter and sample settings
                 voice_reset(v);
 
+                v->state = VOICE_STATE_RUNNING;
+                continue;
+
+            case VOICE_STATE_RUNNING:
+
                 // Update sound parameters
                 if (MAP_VELOCITY_TO_CUTOFF) {
                     v->settings.cutoff = (global.cutoff>>1) + (v->velocity>>1);
@@ -209,10 +214,6 @@ void loop()
                 }
                 v->settings.resonance = global.resonance;
 
-                v->state = VOICE_STATE_RUNNING;
-                continue;
-
-            case VOICE_STATE_RUNNING:
                 break;
 
             case VOICE_STATE_STOPPED:
