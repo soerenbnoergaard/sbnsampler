@@ -27,12 +27,12 @@ int32_t adsr_update(adsr_t *adsr)
         adsr->step = 0;
 
         // Calculate attack slope
-        adsr->steps_per_increment = 8*adsr->attack + 1;
+        adsr->slope = 8*adsr->attack + 1;
         adsr->state = ADSR_STATE_ATTACK;
         break;
 
     case ADSR_STATE_ATTACK:
-        if ((adsr->step % adsr->steps_per_increment) == 0) {
+        if ((adsr->step % adsr->slope) == 0) {
             adsr->value += 1;
         }
 
@@ -40,20 +40,45 @@ int32_t adsr_update(adsr_t *adsr)
             adsr->step += 1;
         }
         else {
+            // Calculate decay slope
+            adsr->slope = 8*adsr->decay + 1;
             adsr->step = 0;
             adsr->state = ADSR_STATE_DECAY;
         }
         break;
 
     case ADSR_STATE_DECAY:
-        adsr->state = ADSR_STATE_SUSTAIN;
+        if ((adsr->step % adsr->slope) == 0) {
+            adsr->value -= 1;
+        }
+
+        if (adsr->value > adsr->sustain) {
+            adsr->step += 1;
+        }
+        else {
+            // Calculate release slope
+            adsr->slope = 8*adsr->release + 1;
+            adsr->step = 0;
+            adsr->state = ADSR_STATE_SUSTAIN;
+        }
+
         break;
 
     case ADSR_STATE_SUSTAIN:
         break;
 
     case ADSR_STATE_RELEASE:
-        adsr->state = ADSR_STATE_IDLE;
+        if ((adsr->step % adsr->slope) == 0) {
+            adsr->value -= 1;
+        }
+
+        if (adsr->value > 0) {
+            adsr->step += 1;
+        }
+        else {
+            adsr->state = ADSR_STATE_IDLE;
+        }
+
         break;
     }
 

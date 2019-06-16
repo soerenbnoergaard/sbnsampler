@@ -16,9 +16,14 @@
 
 // Defines, macros, and constants //////////////////////////////////////////////
 
-#define MIDI_CC_SUSTAIN 64
+// #define MIDI_CC_SUSTAIN 64
 #define MIDI_CC_CUTOFF 48
 #define MIDI_CC_RESONANCE 49
+
+#define MIDI_CC_AMP_ATTACK 64
+#define MIDI_CC_AMP_DECAY 66
+#define MIDI_CC_AMP_SUSTAIN 67
+#define MIDI_CC_AMP_RELEASE 65
 
 #define MAP_VELOCITY_TO_AMPLITUDE false
 #define MAP_VELOCITY_TO_CUTOFF false
@@ -29,10 +34,10 @@ static settings_t global = {
     .sustain = false,
     .cutoff = 127,
     .resonance = 0,
-    .amp_attack = 127,
+    .amp_attack = 64,
     .amp_decay = 0,
-    .amp_sustain = 0,
-    .amp_release = 0
+    .amp_sustain = 127,
+    .amp_release = 64
 };
 FILE *log_h;
 
@@ -140,9 +145,9 @@ int32_t handle_midi(void)
     }
     else if ((m.status & 0xf0) == 0xb0) {
         switch (m.data[0]) {
-        case MIDI_CC_SUSTAIN:
-            global.sustain = m.data[1] == 0 ? false : true;
-            break;
+        // case MIDI_CC_SUSTAIN:
+        //     global.sustain = m.data[1] == 0 ? false : true;
+        //     break;
 
         case MIDI_CC_CUTOFF:
             global.cutoff = m.data[1];
@@ -150,6 +155,22 @@ int32_t handle_midi(void)
 
         case MIDI_CC_RESONANCE:
             global.resonance = m.data[1];
+            break;
+        
+        case MIDI_CC_AMP_ATTACK:
+            global.amp_attack = m.data[1];
+            break;
+
+        case MIDI_CC_AMP_DECAY:
+            global.amp_decay = m.data[1];
+            break;
+
+        case MIDI_CC_AMP_SUSTAIN:
+            global.amp_sustain = m.data[1];
+            break;
+
+        case MIDI_CC_AMP_RELEASE:
+            global.amp_release = m.data[1];
             break;
         }
     }

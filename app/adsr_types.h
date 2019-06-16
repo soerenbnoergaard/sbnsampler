@@ -19,7 +19,7 @@ typedef struct {
     uint8_t sustain;
     uint8_t release;
     int32_t step;
-    int32_t steps_per_increment;
+    int32_t slope; // Num. time steps it takes to increment/decrement the value
     int16_t value;
 } adsr_t;
 
