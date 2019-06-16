@@ -5,8 +5,12 @@ static float map_midi_to_cutoff(uint8_t value)
 {
     // Map cutoff to VCF parameter `g`.
     const float b = 0.01;
-    const float a = (0.9-b) / (127);
-    return a*value + b;
+    const float a = (0.9-b) / (127*127*127);
+    return a*value*value*value + b;
+
+    // const float b = 0.0;
+    // const float a = 1.0/127;
+    // return a*value + b;
 }
 
 float map_midi_to_resonance(uint8_t value)
