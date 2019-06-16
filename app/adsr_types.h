@@ -9,7 +9,8 @@ typedef enum {
     ADSR_STATE_ATTACK,
     ADSR_STATE_DECAY,
     ADSR_STATE_SUSTAIN,
-    ADSR_STATE_RELEASE
+    ADSR_STATE_RELEASE,
+    ADSR_STATE_QUICK_RELEASE
 } adsr_state_t;
 
 typedef struct {

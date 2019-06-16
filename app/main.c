@@ -62,10 +62,12 @@ int32_t handle_note_on(midi_message_t m)
         if (voices[n].note == m.data[0]) {
             // Take over existing note
             n_chosen = n;
+            adsr_restart(&voices[n].amplitude_envelope);
         }
         else if (voices[n].state == VOICE_STATE_IDLE) {
             // Empty voice
             n_chosen = n;
+            adsr_start(&voices[n].amplitude_envelope, global.amp_attack, global.amp_decay, global.amp_sustain, global.amp_release);
         }
     }
 
@@ -223,7 +225,7 @@ void loop()
 
                 // Reset polyphase filter and sample settings
                 voice_reset(v);
-                adsr_start(&v->amplitude_envelope, global.amp_attack, global.amp_decay, global.amp_sustain, global.amp_release);
+
 
                 v->state = VOICE_STATE_RUNNING;
                 continue;
@@ -266,6 +268,10 @@ void loop()
             // Fetch sound for the given voice
 
             adsr_update(&v->amplitude_envelope);
+            if (v->amplitude_envelope.state == ADSR_STATE_IDLE) {
+                v->state = VOICE_STATE_IDLE;
+                continue;
+            }
 
             A = v->amplitude_envelope.value / 128.0;
             x = A * ppf_get_transposed_sample(v);
