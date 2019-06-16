@@ -3,25 +3,24 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "utils.h"
 #include "dac.h"
 #include "midi.h"
 #include "samplebank.h"
 #include "voice.h"
 #include "polyfilter.h"
 #include "vcf.h"
+#include "adsr.h"
 
 // Types ///////////////////////////////////////////////////////////////////////
 
 // Defines, macros, and constants //////////////////////////////////////////////
 
-#define SAMPLE_RATE_Hz 44100
-#define BUFFER_SIZE 128
-
 #define MIDI_CC_SUSTAIN 64
 #define MIDI_CC_CUTOFF 48
 #define MIDI_CC_RESONANCE 49
 
-#define MAP_VELOCITY_TO_AMPLITUDE true
+#define MAP_VELOCITY_TO_AMPLITUDE false
 #define MAP_VELOCITY_TO_CUTOFF false
 
 // Globals /////////////////////////////////////////////////////////////////////
@@ -30,6 +29,10 @@ static settings_t global = {
     .sustain = false,
     .cutoff = 127,
     .resonance = 0,
+    .amp_attack = 127,
+    .amp_decay = 0,
+    .amp_sustain = 0,
+    .amp_release = 0
 };
 FILE *log_h;
 
@@ -172,13 +175,13 @@ void loop()
     while (1) {
         // Periodically print voice summary
         if (summary_tick == 0) {
-            for (n = 0; n < NUM_VOICES; n++) {
-                printf("%2d %2d\n", 
-                    n,
-                    (int)voices[n].state
-                );
-            }
-            printf("\n");
+            // for (n = 0; n < NUM_VOICES; n++) {
+            //     printf("%2d %2d\n", 
+            //         n,
+            //         (int)voices[n].state
+            //     );
+            // }
+            // printf("\n");
         }
         summary_tick = (summary_tick + 1) % (1<<15);
 
@@ -199,6 +202,7 @@ void loop()
 
                 // Reset polyphase filter and sample settings
                 voice_reset(v);
+                adsr_start(&v->amplitude_envelope, global.amp_attack, global.amp_decay, global.amp_sustain, global.amp_release);
 
                 v->state = VOICE_STATE_RUNNING;
                 continue;
@@ -221,9 +225,16 @@ void loop()
                     break;
                 }
                 else {
-                    v->state = VOICE_STATE_IDLE;
-                    continue;
+                    adsr_stop(&v->amplitude_envelope);
+                    v->state = VOICE_STATE_RELEASED;
+                    break;
                 }
+
+            case VOICE_STATE_RELEASED:
+                if (v->amplitude_envelope.value <= 0) {
+                    v->state = VOICE_STATE_IDLE;
+                }
+                break;
 
             default:
                 fprintf(stderr, "Unknown state\n");
@@ -233,12 +244,9 @@ void loop()
             // Break target:
             // Fetch sound for the given voice
 
-            if (MAP_VELOCITY_TO_AMPLITUDE) {
-                A = v->velocity / 128.0;
-            }
-            else {
-                A = 1.0;
-            }
+            adsr_update(&v->amplitude_envelope);
+
+            A = v->amplitude_envelope.value / 128.0;
             x = A * ppf_get_transposed_sample(v);
 
             // Apply filter (VCF)

@@ -10,6 +10,7 @@ SOURCES = main.c \
 	  polyfilter.c \
 	  polyfilter_coeffs.c \
 	  vcf.c \
+	  adsr.c \
 	  file_helpers.c
 
 SENSITIVITY = $(wildcard *.h)

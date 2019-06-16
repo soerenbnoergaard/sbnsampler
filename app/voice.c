@@ -26,5 +26,8 @@ int32_t voice_reset(voice_t *v)
 
     v->vcf.y1 = 0;
 
+    // Reset envelopes
+    v->amplitude_envelope.state = ADSR_STATE_IDLE;
+
     return 0;
 }
