@@ -11,6 +11,7 @@
 #include "polyfilter.h"
 #include "vcf.h"
 #include "adsr.h"
+#include "gpio.h"
 
 // Types ///////////////////////////////////////////////////////////////////////
 
@@ -32,12 +33,12 @@
 
 static settings_t global = {
     .sustain = false,
-    .cutoff = 127,
+    .cutoff = 10,
     .resonance = 0,
-    .amp_attack = 64,
+    .amp_attack = 0,
     .amp_decay = 0,
     .amp_sustain = 127,
-    .amp_release = 64
+    .amp_release = 16
 };
 FILE *log_h;
 
@@ -62,12 +63,10 @@ int32_t handle_note_on(midi_message_t m)
         if (voices[n].note == m.data[0]) {
             // Take over existing note
             n_chosen = n;
-            adsr_restart(&voices[n].amplitude_envelope);
         }
         else if (voices[n].state == VOICE_STATE_IDLE) {
             // Empty voice
             n_chosen = n;
-            adsr_start(&voices[n].amplitude_envelope, global.amp_attack, global.amp_decay, global.amp_sustain, global.amp_release);
         }
     }
 
@@ -225,7 +224,7 @@ void loop()
 
                 // Reset polyphase filter and sample settings
                 voice_reset(v);
-
+                adsr_start(&v->amplitude_envelope, global.amp_attack, global.amp_decay, global.amp_sustain, global.amp_release);
 
                 v->state = VOICE_STATE_RUNNING;
                 continue;
@@ -268,7 +267,7 @@ void loop()
             // Fetch sound for the given voice
 
             adsr_update(&v->amplitude_envelope);
-            if (v->amplitude_envelope.state == ADSR_STATE_IDLE) {
+            if (v->amplitude_envelope.state == ADSR_STATE_STOPPED) {
                 v->state = VOICE_STATE_IDLE;
                 continue;
             }
@@ -285,7 +284,9 @@ void loop()
         buffer[buffer_idx] = (int16_t)y;
 
         if (buffer_idx == BUFFER_SIZE-1) {
+            gpio5_set();
             dac_write(buffer, BUFFER_SIZE);
+            gpio5_clear();
             buffer_idx = 0;
         }
         else {
@@ -308,28 +309,35 @@ int32_t main(void)
     // Initialize sample bank
     err = samplebank_init();
     if (err != 0) {
-        fprintf(stderr, "Error initializin Sample Bank\n");
+        fprintf(stderr, "Error initializing Sample Bank\n");
         return 1;
     }
 
     // Initialize DAC
     err = dac_init("default", SAMPLE_RATE_Hz);
     if (err != 0) {
-        fprintf(stderr, "Error initializin DAC\n");
+        fprintf(stderr, "Error initializing DAC\n");
         return 1;
     }
 
     // Initialize MIDI
     err = midi_init();
     if (err != 0) {
-        fprintf(stderr, "Error initializin MIDI\n");
+        fprintf(stderr, "Error initializing MIDI\n");
         return 1;
     }
 
     // Initialize Voices
     err = voice_init();
     if (err != 0) {
-        fprintf(stderr, "Error initializin Voices\n");
+        fprintf(stderr, "Error initializing Voices\n");
+        return 1;
+    }
+
+    // Initialize GPIO
+    err = gpio_init();
+    if (err != 0) {
+        fprintf(stderr, "Error initializing GPIO\n");
         return 1;
     }
 

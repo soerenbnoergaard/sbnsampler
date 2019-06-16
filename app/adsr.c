@@ -62,6 +62,9 @@ int32_t adsr_update(adsr_t *adsr)
         if (adsr->value > adsr->sustain) {
             adsr->step += 1;
         }
+        else if (adsr->value == 0) {
+            adsr->state = ADSR_STATE_STOPPED;
+        }
         else {
             // Calculate release slope
             adsr->slope = 8*adsr->release + 1;
@@ -83,7 +86,7 @@ int32_t adsr_update(adsr_t *adsr)
             adsr->step += 1;
         }
         else {
-            adsr->state = ADSR_STATE_IDLE;
+            adsr->state = ADSR_STATE_STOPPED;
         }
 
         break;
@@ -99,6 +102,9 @@ int32_t adsr_update(adsr_t *adsr)
             adsr->slope = 8*adsr->attack + 1;
             adsr->state = ADSR_STATE_ATTACK;
         }
+        break;
+
+    case ADSR_STATE_STOPPED:
         break;
     }
 

@@ -11,6 +11,7 @@ SOURCES = main.c \
 	  polyfilter_coeffs.c \
 	  vcf.c \
 	  adsr.c \
+	  gpio.c \
 	  file_helpers.c
 
 SENSITIVITY = $(wildcard *.h)
@@ -24,8 +25,8 @@ CC = $(BIN_DIR)/arm-linux-gcc
 LD = $(BIN_DIR)/arm-linux-ld
 RM = rm -rf
 
-CCARGS = -Wall -Werror
-LDARGS = -Wall -Werror
+CCARGS = -Wall -Werror -O2
+LDARGS = -Wall -Werror -O2
 
 Q = @
 
