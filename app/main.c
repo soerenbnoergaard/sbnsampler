@@ -18,13 +18,13 @@
 // Defines, macros, and constants //////////////////////////////////////////////
 
 // #define MIDI_CC_SUSTAIN 64
-#define MIDI_CC_CUTOFF 48
-#define MIDI_CC_RESONANCE 49
+#define MIDI_CC_CUTOFF 0x4a
+#define MIDI_CC_RESONANCE 0x47
 
-#define MIDI_CC_AMP_ATTACK 64
-#define MIDI_CC_AMP_DECAY 66
-#define MIDI_CC_AMP_SUSTAIN 67
-#define MIDI_CC_AMP_RELEASE 65
+#define MIDI_CC_AMP_ATTACK 0x53
+#define MIDI_CC_AMP_DECAY 0x59
+#define MIDI_CC_AMP_SUSTAIN 0x55
+#define MIDI_CC_AMP_RELEASE 0x52
 
 #define MAP_VELOCITY_TO_AMPLITUDE false
 #define MAP_VELOCITY_TO_CUTOFF false
@@ -321,6 +321,7 @@ int32_t main(void)
     }
 
     // Initialize MIDI
+    midi_list();
     err = midi_init();
     if (err != 0) {
         fprintf(stderr, "Error initializing MIDI\n");

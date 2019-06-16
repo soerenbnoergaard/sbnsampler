@@ -1,4 +1,5 @@
 #include "midi.h"
+#include "midi_stanford.h"
 #include <stdio.h>
 #include <alsa/asoundlib.h>
 
@@ -7,8 +8,9 @@ static snd_rawmidi_t* midi_in = NULL;
 int32_t midi_init(void)
 {
     // TODO: Merge all midi streams into one
-    const char* interface = "hw:1,0,0";  // see alsarawportlist.c example program
+    const char* interface = "hw:1,0,1";
     int32_t err;
+    printf("Selected midi port: %s\n", interface);
 
     if ((err = snd_rawmidi_open(&midi_in, NULL, interface, SND_RAWMIDI_NONBLOCK)) < 0) {
         fprintf(stderr, "Problem opening MIDI input: %s\n", snd_strerror(err));
@@ -67,4 +69,10 @@ int32_t midi_get(midi_message_t *m)
     }
 
     return err;
+}
+
+int32_t midi_list(void)
+{
+    print_midi_ports();
+    return 0;
 }

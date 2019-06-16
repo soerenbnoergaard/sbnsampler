@@ -12,6 +12,7 @@ SOURCES = main.c \
 	  vcf.c \
 	  adsr.c \
 	  gpio.c \
+	  midi_stanford.c \
 	  file_helpers.c
 
 SENSITIVITY = $(wildcard *.h)
