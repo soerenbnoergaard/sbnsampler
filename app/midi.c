@@ -8,7 +8,9 @@ static snd_rawmidi_t* midi_in = NULL;
 int32_t midi_init(void)
 {
     // TODO: Merge all midi streams into one
-    const char* interface = "hw:1,0,1";
+
+    // const char* interface = "hw:1,0,0"; // MicroKONTROL - External MIDI in
+    const char* interface = "hw:1,0,1"; ; // MicroKONTROL - Internal keyboard+controls
     int32_t err;
     printf("Selected midi port: %s\n", interface);
 
