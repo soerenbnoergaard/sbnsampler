@@ -3,20 +3,48 @@
 #include <stdio.h>
 #include <alsa/asoundlib.h>
 
-static snd_rawmidi_t* midi_in = NULL;
+// Types ///////////////////////////////////////////////////////////////////////
+
+typedef enum {
+    MIDI_IN_STATE_WAITING_FOR_STATUS,
+    MIDI_IN_STATE_WAITING_FOR_DATA1,
+    MIDI_IN_STATE_WAITING_FOR_DATA2
+} midi_in_state_t;
+
+typedef struct {
+    midi_in_state_t state;
+    midi_message_t message;
+    snd_rawmidi_t *handle;
+} midi_in_t;
+
+// Defines, macros, and constants //////////////////////////////////////////////
+
+#define NUM_MIDI_IN 2
+const char *midi_interface[NUM_MIDI_IN] = {
+    "hw:1,0,1",
+    "hw:1,0,0"
+};
+
+// Globals /////////////////////////////////////////////////////////////////////
+
+static midi_in_t midi_in[NUM_MIDI_IN];
+
+// Functions ///////////////////////////////////////////////////////////////////
 
 int32_t midi_init(void)
 {
-    // TODO: Merge all midi streams into one
-
-    // const char* interface = "hw:1,0,0"; // MicroKONTROL - External MIDI in
-    const char* interface = "hw:1,0,1"; ; // MicroKONTROL - Internal keyboard+controls
     int32_t err;
-    printf("Selected midi port: %s\n", interface);
+    int32_t n;
 
-    if ((err = snd_rawmidi_open(&midi_in, NULL, interface, SND_RAWMIDI_NONBLOCK)) < 0) {
-        fprintf(stderr, "Problem opening MIDI input: %s\n", snd_strerror(err));
-        return 1;
+    for (n = 0; n < NUM_MIDI_IN; n++) {
+        printf("Selected midi port: %s\n", midi_interface[n]);
+
+        if ((err = snd_rawmidi_open(&midi_in[n].handle, NULL, midi_interface[n], SND_RAWMIDI_NONBLOCK)) < 0) {
+            fprintf(stderr, "Problem opening MIDI input: %s\n", snd_strerror(err));
+            return 1;
+        }
+
+        midi_in[n].state = MIDI_IN_STATE_WAITING_FOR_STATUS;
     }
 
     return 0;
@@ -24,50 +52,71 @@ int32_t midi_init(void)
 
 int32_t midi_close(void)
 {
-    snd_rawmidi_close(midi_in);
-    midi_in  = NULL;    // snd_rawmidi_close() does not clear invalid pointer,
-    return 0;          // so might be a good idea to erase it after closing.
+    int32_t n;
+
+    for (n = 0; n < NUM_MIDI_IN; n++) {
+        snd_rawmidi_close(midi_in[n].handle);
+        midi_in[n].handle = NULL;
+    }
+
+    return 0;
 }
 
 int32_t midi_get(midi_message_t *m)
 {
+    int32_t n;
     int32_t err;
     uint8_t buffer;
-    static int32_t state = 0;
-    static midi_message_t active_message;
+    midi_in_t *h;
 
-    if ((err = snd_rawmidi_read(midi_in, &buffer, 1)) < 0) {
-        return 1;
-    }
+    for (n = 0; n < NUM_MIDI_IN; n++) {
+        h = &midi_in[n];
 
-    // A status message is received if the MSB is set
-    if (buffer & 0x80) {
-        state = 0;
-    }
+        if (snd_rawmidi_read(h->handle, &buffer, 1) < 0) {
+            err = 1;
+            continue;
+        }
 
-    switch (state) {
-    case 0:
-        active_message.status = buffer;
-        state = 1;
+        //
+        // Default values
+        //
+
         err = 1;
-        break;
 
-    case 1:
-        active_message.data[0] = buffer;
-        state = 2;
-        err = 1;
-        break;
+        //
+        // Overwriting cases
+        //
 
-    case 2:
-        active_message.data[1] = buffer;
-        state = 3;
-        err = 0;
-        *m = active_message;
-        break;
+        // A status message is received if the MSB is set.
+        if (buffer & 0x80) {
+            h->state = MIDI_IN_STATE_WAITING_FOR_STATUS;
+        }
 
-    default:
-        err = 1;
-        break;
+        switch (h->state) {
+        case MIDI_IN_STATE_WAITING_FOR_STATUS:
+            h->message.status = buffer;
+            h->state = MIDI_IN_STATE_WAITING_FOR_DATA1;
+            break;
+
+        case MIDI_IN_STATE_WAITING_FOR_DATA1:
+            h->message.data[0] = buffer;
+            h->state = MIDI_IN_STATE_WAITING_FOR_DATA2;
+            break;
+
+        case MIDI_IN_STATE_WAITING_FOR_DATA2:
+            h->message.data[1] = buffer;
+            h->state = MIDI_IN_STATE_WAITING_FOR_STATUS;
+            err = 0;
+
+            // If a message is ready, return it immideately instead of finishing
+            // the midi_in loop.
+            *m = h->message;
+            return err;
+
+        default:
+            err = 1;
+            break;
+        }
     }
 
     return err;
