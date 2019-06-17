@@ -33,9 +33,9 @@
 
 static settings_t global = {
     .sustain = false,
-    .cutoff = 10,
+    .cutoff = 64,
     .resonance = 0,
-    .amp_attack = 0,
+    .amp_attack = 25,
     .amp_decay = 0,
     .amp_sustain = 127,
     .amp_release = 16
@@ -44,65 +44,89 @@ FILE *log_h;
 
 // Functions ///////////////////////////////////////////////////////////////////
 
-int32_t handle_note_on(midi_message_t m)
+voice_t *find_voice(uint8_t note, bool *voice_takeover)
 {
+    // Find a suiting voice for the incoming note.
     int32_t n;
-    voice_t *v = NULL;
-    sample_t *sample = NULL;
-    int32_t transpose = 0;
-
-    int32_t n_chosen = -1;
-
-    // Find empty voice
-
-    // TODO:
-    // Get the insertion order-based voice selection working
-    //
+    voice_t *ret = NULL;
 
     for (n = 0; n < NUM_VOICES; n++) {
-        if (voices[n].note == m.data[0]) {
-            // Take over existing note
-            n_chosen = n;
+        if (voices[n].note == note) {
+            // Take over existing note's voice
+            *voice_takeover = true;
+            ret = &voices[n];
+            break;
         }
         else if (voices[n].state == VOICE_STATE_IDLE) {
             // Empty voice
-            n_chosen = n;
+            *voice_takeover = false;
+            ret = &voices[n];
         }
     }
 
-    if (n_chosen < 0) {
-        // No voices available
+    return ret;
+}
+
+sample_t *find_sample(uint8_t note)
+{
+    // Find the sample to activate
+    int32_t n;
+
+    for (n = 0; n < NUM_SAMPLES; n++) {
+        if ((samplebank[n].note_min <= note) && (note <= samplebank[n].note_max)) {
+            return &samplebank[n];
+        }
+    }
+    return NULL;
+}
+
+ppf_t *find_transposition(voice_t *v)
+{
+    int32_t num_steps;
+    num_steps = v->note - v->sample->note_root;
+
+    // Find the necessary polyphase filter to obtain the transposition
+    if ((PPF_TRANSPOSE_MIN < num_steps) && (num_steps < PPF_TRANSPOSE_MAX)) {
+        return &ppf[PPF_ZERO_TRANSPOSE_OFFSET + num_steps];
+    }
+
+    return NULL;
+}
+
+int32_t handle_note_on(midi_message_t m)
+{
+    bool voice_takeover = false;
+    voice_t *v = NULL;
+    sample_t *sample = NULL;
+    ppf_t *transposition = NULL;
+
+    v = find_voice(m.data[0], &voice_takeover);
+    if (v == NULL) {
         return 1;
     }
-    v = &voices[n_chosen];
+    v->note = m.data[0];
+    v->velocity = m.data[1];
 
-    // Find the sample to activate
-    for (n = 0; n < NUM_SAMPLES; n++) {
-        if ((samplebank[n].note_min <= m.data[0]) && (m.data[0] <= samplebank[n].note_max)) {
-            sample = &samplebank[n];
-        }
+    if (voice_takeover) {
+        v->state = VOICE_STATE_RESTARTING_NOTE;
+        return 0;
     }
+
+    sample = find_sample(v->note);
     if (sample == NULL) {
         fprintf(stderr, "Note out of range\n");
         return 1;
     }
+    v->sample = sample;
 
-    // Find transposition interval
-    transpose = m.data[0] - sample->note_root;
-
-    // Find the necessary polyphase filter to obtain the transposition
-    if ((transpose < PPF_TRANSPOSE_MIN) || (PPF_TRANSPOSE_MAX < transpose)) {
-        fprintf(stderr, "Transposition out of range: %d\n", transpose);
+    transposition = find_transposition(v);
+    if (transposition == NULL) {
+        fprintf(stderr, "Transposition out of ranged\n");
         return 1;
     }
+    v->ppf = transposition;
 
-    // Activate voice
-    v->sample = sample;
-    v->ppf = &ppf[PPF_ZERO_TRANSPOSE_OFFSET + transpose];
-    v->note = m.data[0];
-    v->velocity = m.data[1];
-    v->state = VOICE_STATE_STARTING;
-
+    v->state = VOICE_STATE_STARTING_NOTE;
     return 0;
 }
 
@@ -216,18 +240,37 @@ void loop()
         for (n = 0; n < NUM_VOICES; n++) {
             v = &voices[n];
 
+            //
+            // VOICE STATE MACHINE
+            //
+
             switch (v->state) {
             case VOICE_STATE_IDLE:
                 continue;
 
+            case VOICE_STATE_STARTING_NOTE:
+
+                adsr_start(&v->amplitude_envelope);
+                v->state = VOICE_STATE_STARTING;
+
+                continue;
+
+            case VOICE_STATE_RESTARTING_NOTE:
+
+                adsr_restart(&v->amplitude_envelope);
+                v->state = VOICE_STATE_STARTING;
+
+                break;
+            
             case VOICE_STATE_STARTING:
 
-                // Reset polyphase filter and sample settings
-                voice_reset(v);
-                adsr_start(&v->amplitude_envelope, global.amp_attack, global.amp_decay, global.amp_sustain, global.amp_release);
+                if (v->amplitude_envelope.state == ADSR_STATE_IDLE) {
+                    voice_reset(v);
+                    adsr_setup(&v->amplitude_envelope, global.amp_attack, global.amp_decay, global.amp_sustain, global.amp_release);
+                    v->state = VOICE_STATE_RUNNING;
+                }
 
-                v->state = VOICE_STATE_RUNNING;
-                continue;
+                break;
 
             case VOICE_STATE_RUNNING:
 
@@ -263,8 +306,9 @@ void loop()
                 continue;
             }
 
-            // Break target:
-            // Fetch sound for the given voice
+            //
+            // VOICE PLAYBACK
+            //
 
             adsr_update(&v->amplitude_envelope);
             if (v->amplitude_envelope.state == ADSR_STATE_STOPPED) {

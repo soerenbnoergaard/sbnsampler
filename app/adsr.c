@@ -2,15 +2,18 @@
 #include "utils.h"
 #include <stdio.h>
 
-int32_t adsr_start(adsr_t *adsr, uint8_t attack, uint8_t decay, uint8_t sustain, uint8_t release)
+int32_t adsr_setup(adsr_t *adsr, uint8_t attack, uint8_t decay, uint8_t sustain, uint8_t release)
 {
-    adsr->state = ADSR_STATE_IDLE;
     adsr->attack = attack;
     adsr->decay = decay;
     adsr->sustain = sustain;
     adsr->release = release;
-    adsr->value = 0;
+    return 0;
+}
 
+int32_t adsr_start(adsr_t *adsr)
+{
+    adsr->state = ADSR_STATE_IDLE;
     return 0;
 }
 
@@ -92,16 +95,16 @@ int32_t adsr_update(adsr_t *adsr)
         break;
 
     case ADSR_STATE_QUICK_RELEASE:
-        adsr->value -= 1;
+        if (adsr->value <= 0) {
+            adsr->state = ADSR_STATE_IDLE;
+        }
 
-        if (adsr->value > 0) {
-            adsr->step += 1;
+        if ((adsr->step % 10) == 0) {
+            adsr->value -= 1;
         }
-        else {
-            // Calculate attack slope
-            adsr->slope = 8*adsr->attack + 1;
-            adsr->state = ADSR_STATE_ATTACK;
-        }
+
+        adsr->step += 1;
+
         break;
 
     case ADSR_STATE_STOPPED:
