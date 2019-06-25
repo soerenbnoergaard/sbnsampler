@@ -37,7 +37,7 @@ cleanall:
 buildroot:
 	$(Q)make -C buildroot $(BUILDROOT_MAKE_ARGS) clean
 	$(Q)make -C buildroot $(BUILDROOT_MAKE_ARGS) raspberrypi0_sbn_defconfig
-	$(Q)time make -C buildroot $(BUILDROOT_MAKE_ARGS)
+	$(Q)make -C buildroot $(BUILDROOT_MAKE_ARGS)
 
 menuconfig:
 	$(Q)make -C buildroot $(BUILDROOT_MAKE_ARGS) menuconfig

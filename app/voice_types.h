@@ -1,20 +1,11 @@
 #ifndef VOICE_TYPES_H
 #define VOICE_TYPES_H
 
-#include "samplebank.h"
+#include "samplebank_types.h"
 #include "polyfilter_types.h"
 #include "vcf_types.h"
 #include "adsr_types.h"
-
-typedef struct {
-    bool sustain;
-    uint8_t cutoff;
-    uint8_t resonance;
-    uint8_t amp_attack;
-    uint8_t amp_decay;
-    uint8_t amp_sustain;
-    uint8_t amp_release;
-} settings_t;
+#include "preset_types.h"
 
 typedef enum {
     VOICE_STATE_IDLE = 0,

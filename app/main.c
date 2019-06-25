@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "dac.h"
 #include "midi.h"
-#include "samplebank.h"
+#include "preset.h"
 #include "voice.h"
 #include "polyfilter.h"
 #include "vcf.h"
@@ -31,6 +31,7 @@
 
 // Globals /////////////////////////////////////////////////////////////////////
 
+static preset_t *active_preset = &presets[0];
 static settings_t global = {
     .sustain = false,
     .cutoff = 64,
@@ -71,10 +72,11 @@ sample_t *find_sample(uint8_t note)
 {
     // Find the sample to activate
     int32_t n;
+    preset_t *p = active_preset;
 
-    for (n = 0; n < NUM_SAMPLES; n++) {
-        if ((samplebank[n].note_min <= note) && (note <= samplebank[n].note_max)) {
-            return &samplebank[n];
+    for (n = 0; n < p->num_samples; n++) {
+        if ((p->samples[n]->note_min <= note) && (note <= p->samples[n]->note_max)) {
+            return p->samples[n];
         }
     }
     return NULL;
@@ -350,10 +352,10 @@ int32_t main(void)
     // Initialize log
     log_h = fopen("log.log", "w");
 
-    // Initialize sample bank
-    err = samplebank_init();
+    // Initialize presets
+    err = preset_init();
     if (err != 0) {
-        fprintf(stderr, "Error initializing Sample Bank\n");
+        fprintf(stderr, "Error initializing Preset\n");
         return 1;
     }
 

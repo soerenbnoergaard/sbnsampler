@@ -24,6 +24,10 @@ int32_t samplebank_init(void)
     // Malloc is done internally (never free'd!)
     binary_data_t *tmp;
 
+    //
+    // VOLCA KEYS
+    //
+
     // C0
     if ((tmp = fh_read_file(NAME("c0"))) == NULL)
         return 1;
@@ -107,15 +111,6 @@ int32_t samplebank_init(void)
     samplebank[6].loop_enabled = true;
     samplebank[6].loop_start = 26477;
     samplebank[6].loop_stop = 70574;
-
-    // // C7
-    // if ((tmp = fh_read_file(NAME("c7"))) == NULL)
-    //     return 1;
-    // samplebank[7].data = tmp->data + WAV_HEADER_SIZE;
-    // samplebank[7].length = (tmp->size/2) - WAV_HEADER_SIZE;
-    // samplebank[7].note_root = 96;
-    // samplebank[7].note_max = 96;
-    // samplebank[7].note_min = 85;
 
     return 0;
 }
