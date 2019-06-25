@@ -11,7 +11,7 @@ static void reset(preset_t *p)
     p->settings.resonance = 0;
     p->settings.amp_attack = 0;
     p->settings.amp_decay = 0;
-    p->settings.amp_sustain = 0;
+    p->settings.amp_sustain = 127;
     p->settings.amp_release = 0;
 }
 
@@ -32,14 +32,25 @@ int32_t preset_init(void)
     presets[0].samples[4] = &samplebank[4];
     presets[0].samples[5] = &samplebank[5];
     presets[0].samples[6] = &samplebank[6];
-    presets[0].samples[7] = &samplebank[7];
-    presets[0].num_samples = 8;
+    presets[0].num_samples = 7;
     presets[0].settings.cutoff = 64;
     presets[0].settings.resonance = 0;
     presets[0].settings.amp_attack = 0;
     presets[0].settings.amp_decay = 0;
     presets[0].settings.amp_sustain = 127;
     presets[0].settings.amp_release = 32;
+
+    // Piano
+    reset(&presets[1]);
+    presets[1].samples[0] = &samplebank[7];
+    presets[1].samples[1] = &samplebank[8];
+    presets[1].samples[2] = &samplebank[9];
+    presets[1].samples[3] = &samplebank[10];
+    presets[1].samples[4] = &samplebank[11];
+    presets[1].samples[5] = &samplebank[12];
+    presets[1].samples[6] = &samplebank[13];
+    presets[1].samples[7] = &samplebank[14];
+    presets[1].num_samples = 8;
 
     return 0;
 }

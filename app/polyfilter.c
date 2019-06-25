@@ -1,5 +1,6 @@
 #include "polyfilter.h"
 #include "voice.h"
+#include <stdio.h>
 
 #define AMPLITUDE_DIVIDER (4)
 
@@ -43,19 +44,27 @@ int16_t ppf_get_transposed_sample(voice_t *v)
         }
 
         if (v->sample->loop_enabled) {
-            // Handle loop
+            // LOOPED
+
             if (n > v->sample->loop_stop) {
                 m -= ((v->sample->loop_stop - v->sample->loop_start) * L) / M;
-                // printf("%d, %d\n", v->sample->loop_start, v->sample->loop_stop);
             }
         }
-        x[0] = v->sample->data[n];
-    }
+        else {
+            // NOT LOOPED
 
-    // No more input-samples
-    if (n >= v->sample->length - 1) {
-        v->state = VOICE_STATE_IDLE;
-        return 0;
+            if ((n % 10000) == 0) {
+                printf("%d/%d\n", n, v->sample->length);
+            }
+
+            if (n >= v->sample->length - 1) {
+                // No more input-samples
+                v->state = VOICE_STATE_IDLE;
+                return 0;
+            }
+        }
+
+        x[0] = v->sample->data[n];
     }
 
     // Compute polyphase sub-filter selector

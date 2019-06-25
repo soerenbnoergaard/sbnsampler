@@ -31,7 +31,7 @@
 
 // Globals /////////////////////////////////////////////////////////////////////
 
-static preset_t *active_preset = &presets[0];
+static preset_t *active_preset = &presets[1];
 static settings_t global; // Settings loaded from the panel (or a preset)
 FILE *log_h;
 
@@ -215,13 +215,14 @@ void loop()
     while (1) {
         // Periodically print voice summary
         if (summary_tick == 0) {
-            // for (n = 0; n < NUM_VOICES; n++) {
-            //     printf("%2d %2d\n", 
-            //         n,
-            //         (int)voices[n].state
-            //     );
-            // }
-            // printf("\n");
+            for (n = 0; n < NUM_VOICES; n++) {
+                printf("%2d %2d %2d\n", 
+                    n,
+                    (int)voices[n].state,
+                    (int)voices[n].amplitude_envelope.state
+                );
+            }
+            printf("\n");
         }
         summary_tick = (summary_tick + 1) % (1<<15);
 
@@ -240,6 +241,7 @@ void loop()
 
             switch (v->state) {
             case VOICE_STATE_IDLE:
+                v->amplitude_envelope.state = ADSR_STATE_IDLE;
                 continue;
 
             case VOICE_STATE_STARTING_NOTE:
