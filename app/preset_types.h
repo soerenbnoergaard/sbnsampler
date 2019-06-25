@@ -20,6 +20,7 @@ typedef struct {
 typedef struct {
     sample_t *samples[PRESET_MAX_NUM_SAMPLES];
     int32_t num_samples;
+    settings_t settings;
 } preset_t;
 
 

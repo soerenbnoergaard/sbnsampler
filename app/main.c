@@ -32,15 +32,7 @@
 // Globals /////////////////////////////////////////////////////////////////////
 
 static preset_t *active_preset = &presets[0];
-static settings_t global = {
-    .sustain = false,
-    .cutoff = 64,
-    .resonance = 0,
-    .amp_attack = 0,
-    .amp_decay = 0,
-    .amp_sustain = 127,
-    .amp_release = 16
-};
+static settings_t global; // Settings loaded from the panel (or a preset)
 FILE *log_h;
 
 // Functions ///////////////////////////////////////////////////////////////////
@@ -393,6 +385,11 @@ int32_t main(void)
     //
 
     printf("Ready!\n");
+
+    // Load preset
+    global = active_preset->settings;
+
+    // Run infinitely
     loop();
 
     //
