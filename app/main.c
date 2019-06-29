@@ -200,6 +200,8 @@ int32_t handle_midi(void)
 
 void loop() 
 {
+    int32_t err;
+
     // Output buffer
     int16_t buffer[BUFFER_SIZE];
     int32_t buffer_idx = 0;
@@ -329,7 +331,10 @@ void loop()
 
         if (buffer_idx == BUFFER_SIZE-1) {
             gpio5_set();
-            dac_write(buffer, BUFFER_SIZE);
+            err = dac_write(buffer, BUFFER_SIZE);
+            if (err != 0) {
+                return;
+            }
             gpio5_clear();
             buffer_idx = 0;
         }
@@ -357,13 +362,6 @@ int32_t main(void)
         return 1;
     }
 
-    // Initialize DAC
-    err = dac_init("default", SAMPLE_RATE_Hz);
-    if (err != 0) {
-        fprintf(stderr, "Error initializing DAC\n");
-        return 1;
-    }
-
     // Initialize MIDI
     midi_list();
     err = midi_init();
@@ -386,27 +384,37 @@ int32_t main(void)
         return 1;
     }
 
-    //
-    // Begin program
-    //
-
-    printf("Ready!\n");
-
     // Load preset
     global = active_preset->settings;
 
-    // Run infinitely
-    loop();
+    while (1) {
 
-    //
-    // End program
-    //
+        // Initialize DAC
+        err = dac_init("default", SAMPLE_RATE_Hz);
+        if (err != 0) {
+            fprintf(stderr, "Error initializing DAC\n");
+            return 1;
+        }
 
-    // Close DAC
-    err = dac_close();
-    if (err != 0) {
-        fprintf(stderr, "Error closing DAC\n");
-        return 1;
+        //
+        // Begin program
+        //
+        printf("Ready!\n");
+
+        // Run infinitely (if the function returns, re-initialize the sound interface)
+        loop();
+
+        //
+        // End program
+        //
+
+        // Close DAC
+        err = dac_close();
+        if (err != 0) {
+            fprintf(stderr, "Error closing DAC\n");
+            return 1;
+        }
+
     }
 
     // Close MIDI
