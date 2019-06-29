@@ -1,4 +1,5 @@
 #include "vcf.h"
+#include "gpio.h"
 #include <stdio.h>
 
 static float map_midi_to_cutoff(uint8_t value)
@@ -40,6 +41,8 @@ int16_t vcf_filter(int16_t input_sample, voice_t *voice, uint8_t cutoff, uint8_t
 
     // Ladder filter
     u = (float)input_sample - (*y1)*k;
+    // u = (float)input_sample;
+
     G = g/(1+g);
 
     // 1

@@ -17,7 +17,7 @@
 
 // Defines, macros, and constants //////////////////////////////////////////////
 
-// #define MIDI_CC_SUSTAIN 64
+#define MIDI_CC_SUSTAIN 0x40
 #define MIDI_CC_CUTOFF 0x4a
 #define MIDI_CC_RESONANCE 0x47
 
@@ -165,9 +165,9 @@ int32_t handle_midi(void)
     }
     else if ((m.status & 0xf0) == 0xb0) {
         switch (m.data[0]) {
-        // case MIDI_CC_SUSTAIN:
-        //     global.sustain = m.data[1] == 0 ? false : true;
-        //     break;
+        case MIDI_CC_SUSTAIN:
+            global.sustain = m.data[1] == 0 ? false : true;
+            break;
 
         case MIDI_CC_CUTOFF:
             global.cutoff = m.data[1];
@@ -216,14 +216,14 @@ void loop()
     while (1) {
         // Periodically print voice summary
         if (summary_tick == 0) {
-            for (n = 0; n < NUM_VOICES; n++) {
-                printf("%2d %2d %2d\n", 
-                    n,
-                    (int)voices[n].state,
-                    (int)voices[n].amplitude_envelope.state
-                );
-            }
-            printf("\n");
+            // for (n = 0; n < NUM_VOICES; n++) {
+            //     printf("%2d %2d %2d\n", 
+            //         n,
+            //         (int)voices[n].state,
+            //         (int)voices[n].amplitude_envelope.state
+            //     );
+            // }
+            // printf("\n");
         }
         summary_tick = (summary_tick + 1) % (1<<15);
 
@@ -316,10 +316,11 @@ void loop()
             A = v->amplitude_envelope.value / 128.0;
             x = A * ppf_get_transposed_sample(v);
 
-            // // Apply filter (VCF)
-            // // Accumulate result of all voices!
-            // y += vcf_filter(x, v, v->settings.cutoff, v->settings.resonance);
+            // Apply filter (VCF)
+            // FIXME: Something makes the VCF unstable (possibly with zero-samples as input)
+            // x = vcf_filter(x, v, v->settings.cutoff, v->settings.resonance);
 
+            // Accumulate result of all voices!
             y += x;
         }
 

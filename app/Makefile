@@ -16,7 +16,7 @@ SOURCES = main.c \
 	  preset.c \
 	  file_helpers.c
 
-SENSITIVITY = $(wildcard *.h)
+SENSITIVITY = $(wildcard *.h) Makefile
 
 OBJECTS = $(SOURCES:.c=.o)
 
@@ -27,8 +27,8 @@ CC = $(BIN_DIR)/arm-linux-gcc
 LD = $(BIN_DIR)/arm-linux-ld
 RM = rm -rf
 
-CCARGS = -Wall -Werror -O2
-LDARGS = -Wall -Werror -O2
+CCARGS = -Wall -O2
+LDARGS = -Wall -O2
 
 Q = @
 

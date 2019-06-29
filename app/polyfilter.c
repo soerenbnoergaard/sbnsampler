@@ -53,10 +53,6 @@ int16_t ppf_get_transposed_sample(voice_t *v)
         else {
             // NOT LOOPED
 
-            if ((n % 10000) == 0) {
-                printf("%d/%d\n", n, v->sample->length);
-            }
-
             if (n >= v->sample->length - 1) {
                 // No more input-samples
                 v->state = VOICE_STATE_IDLE;
