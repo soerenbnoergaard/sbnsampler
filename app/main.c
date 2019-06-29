@@ -44,7 +44,7 @@ voice_t *find_voice(uint8_t note, bool *voice_takeover)
     voice_t *ret = NULL;
 
     for (n = 0; n < NUM_VOICES; n++) {
-        if (voices[n].note == note) {
+        if ((voices[n].state != VOICE_STATE_IDLE) && (voices[n].note == note)) {
             // Take over existing note's voice
             *voice_takeover = true;
             ret = &voices[n];
@@ -96,6 +96,7 @@ int32_t handle_note_on(midi_message_t m)
 
     v = find_voice(m.data[0], &voice_takeover);
     if (v == NULL) {
+        fprintf(stderr, "No voice available\n");
         return 1;
     }
     v->note = m.data[0];
@@ -315,9 +316,11 @@ void loop()
             A = v->amplitude_envelope.value / 128.0;
             x = A * ppf_get_transposed_sample(v);
 
-            // Apply filter (VCF)
-            // Accumulate result of all voices!
-            y += vcf_filter(x, v, v->settings.cutoff, v->settings.resonance);
+            // // Apply filter (VCF)
+            // // Accumulate result of all voices!
+            // y += vcf_filter(x, v, v->settings.cutoff, v->settings.resonance);
+
+            y += x;
         }
 
         // Write output do DAC
