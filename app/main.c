@@ -17,6 +17,8 @@
 
 // Defines, macros, and constants //////////////////////////////////////////////
 
+#define MAX_NUM_RETRIES 512
+
 #define VOICE_AMPLITUDE 0.2
 
 #define MIDI_CC_PRESET 0x50
@@ -374,6 +376,7 @@ void loop()
 int32_t main(void)
 {
     int32_t err;
+    int32_t retries;
 
     // Initialize log
     log_h = fopen("log.log", "w");
@@ -409,8 +412,9 @@ int32_t main(void)
 
     // Load preset
     global = active_preset->settings;
+    retries = MAX_NUM_RETRIES;
 
-    while (1) {
+    while (retries-- > 0) {
 
         // Initialize DAC
         err = dac_init("default", SAMPLE_RATE_Hz);

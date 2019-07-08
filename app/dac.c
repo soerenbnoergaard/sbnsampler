@@ -1,4 +1,5 @@
 #include "dac.h"
+#include "utils.h"
 #include <alsa/asoundlib.h>
 
 static snd_pcm_t *playback_handle;
@@ -8,9 +9,9 @@ int32_t dac_init(const char *interface, uint32_t sample_rate_Hz)
 {
     // https://users.suse.com/~mana/alsa090_howto.html#sect02
     int32_t err;
-    uint32_t channels = 1;
-    uint32_t periods = 2;
-    uint32_t periodsize = 256;
+    const uint32_t channels = 1;
+    const uint32_t periods = 2;
+    const uint32_t periodsize = 2*BUFFER_SIZE;
 
     if ((err = snd_pcm_open(&playback_handle, interface, SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
         fprintf(stderr, "cannot open audio device %s (%s)\n", 
