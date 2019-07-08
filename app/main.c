@@ -319,7 +319,7 @@ void loop()
             x = A * ppf_get_transposed_sample(v);
 
             // Apply filter (VCF)
-            // x = vcf_filter(x, v, v->settings.cutoff, v->settings.resonance);
+            x = vcf_filter(x, v, v->settings.cutoff, v->settings.resonance);
 
             // Accumulate result of all voices!
             y += x;

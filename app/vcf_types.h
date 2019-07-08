@@ -5,7 +5,7 @@
 // Ladder filter, page 63 and 48
 
 typedef struct {
-    int16_t w1[5]; // Delayed samples
+    int32_t w1[5]; // Delayed samples
 } vcf_t;
 
 #endif
