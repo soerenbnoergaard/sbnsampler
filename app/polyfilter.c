@@ -2,8 +2,6 @@
 #include "voice.h"
 #include <stdio.h>
 
-#define AMPLITUDE_DIVIDER (4)
-
 // static int16_t get_squarewave_sample(void)
 // {
 //     static int32_t n = 0;
@@ -69,7 +67,7 @@ int16_t ppf_get_transposed_sample(voice_t *v)
     // Execute filter difference equation
     y = 0;
     for (l = 0; l < N; l++) {
-        y += (L * h[L*l + k] * (float)x[l]) / AMPLITUDE_DIVIDER;
+        y += (L * h[L*l + k] * (float)x[l]);
     }
 
     // Update voice names from internal variables

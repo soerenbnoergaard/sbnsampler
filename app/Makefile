@@ -27,8 +27,8 @@ CC = $(BIN_DIR)/arm-linux-gcc
 LD = $(BIN_DIR)/arm-linux-ld
 RM = rm -rf
 
-CCARGS = -Wall -O2
-LDARGS = -Wall -O2
+CCARGS = -Wall -O3
+LDARGS = -Wall -O3
 
 Q = @
 

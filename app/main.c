@@ -17,6 +17,10 @@
 
 // Defines, macros, and constants //////////////////////////////////////////////
 
+#define VOICE_AMPLITUDE 0.2
+
+#define MIDI_CC_PRESET 0x50
+#define MIDI_CC_VOLUME 0x46
 #define MIDI_CC_SUSTAIN 0x40
 #define MIDI_CC_CUTOFF 0x4a
 #define MIDI_CC_RESONANCE 0x47
@@ -25,9 +29,6 @@
 #define MIDI_CC_AMP_DECAY 0x59
 #define MIDI_CC_AMP_SUSTAIN 0x55
 #define MIDI_CC_AMP_RELEASE 0x52
-
-#define MAP_VELOCITY_TO_AMPLITUDE false
-#define MAP_VELOCITY_TO_CUTOFF false
 
 // Globals /////////////////////////////////////////////////////////////////////
 
@@ -141,6 +142,7 @@ int32_t handle_note_off(midi_message_t m)
 
 int32_t handle_midi(void)
 {
+    int32_t n;
     int32_t err;
     midi_message_t m;
 
@@ -165,6 +167,21 @@ int32_t handle_midi(void)
     }
     else if ((m.status & 0xf0) == 0xb0) {
         switch (m.data[0]) {
+        case MIDI_CC_PRESET:
+            if (m.data[1] < NUM_PRESETS) {
+                active_preset = &presets[m.data[1]];
+                global = active_preset->settings;
+                for (n = 0; n < NUM_VOICES; n++) {
+                    voice_reset(&voices[n]);
+                }
+
+            }
+            break;
+
+        case MIDI_CC_VOLUME:
+            global.volume = m.data[1];
+            break;
+
         case MIDI_CC_SUSTAIN:
             global.sustain = m.data[1] == 0 ? false : true;
             break;
@@ -274,13 +291,14 @@ void loop()
             case VOICE_STATE_RUNNING:
 
                 // Update sound parameters
-                if (MAP_VELOCITY_TO_CUTOFF) {
-                    v->settings.cutoff = (global.cutoff>>1) + (v->velocity>>1);
+                v->settings.cutoff = global.cutoff + (((int32_t)v->velocity*(int32_t)global.cutoff_velocity)>>7);
+
+                if (v->settings.cutoff > 127) {
+                    v->settings.cutoff = 127;
                 }
-                else {
-                    v->settings.cutoff = global.cutoff;
-                }
+
                 v->settings.resonance = global.resonance;
+                v->settings.amp_velocity = global.amp_velocity;
 
                 break;
 
@@ -315,18 +333,24 @@ void loop()
                 continue;
             }
 
-            A = v->amplitude_envelope.value / 128.0;
-            x = A * ppf_get_transposed_sample(v);
+            // TODO; Implement mapping from velocity to amplitude
+            A = v->amplitude_envelope.value;
+
+            if (A > 127) {
+                A = 127;
+            }
+
+            x = (A/128.0) * ppf_get_transposed_sample(v);
 
             // Apply filter (VCF)
             x = vcf_filter(x, v, v->settings.cutoff, v->settings.resonance);
 
             // Accumulate result of all voices!
-            y += x;
+            y += VOICE_AMPLITUDE*x;
         }
 
         // Write output do DAC
-        buffer[buffer_idx] = (int16_t)y;
+        buffer[buffer_idx] = (int16_t) (global.volume/128.0*y);
 
         if (buffer_idx == BUFFER_SIZE-1) {
             gpio5_set();
