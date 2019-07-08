@@ -31,7 +31,7 @@
 
 // Globals /////////////////////////////////////////////////////////////////////
 
-static preset_t *active_preset = &presets[1];
+static preset_t *active_preset = &presets[0];
 static settings_t global; // Settings loaded from the panel (or a preset)
 FILE *log_h;
 
@@ -319,7 +319,6 @@ void loop()
             x = A * ppf_get_transposed_sample(v);
 
             // Apply filter (VCF)
-            // FIXME: Something makes the VCF unstable (possibly with zero-samples as input)
             // x = vcf_filter(x, v, v->settings.cutoff, v->settings.resonance);
 
             // Accumulate result of all voices!

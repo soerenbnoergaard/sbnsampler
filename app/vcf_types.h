@@ -5,8 +5,7 @@
 // Ladder filter, page 63 and 48
 
 typedef struct {
-    float w1[4]; // Delayed sum of y[n] and x[n]*G
-    float y1; // Delayed output
+    int16_t w1[5]; // Delayed samples
 } vcf_t;
 
 #endif

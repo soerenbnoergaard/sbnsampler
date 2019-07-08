@@ -5,3 +5,5 @@ app/sbnsampler
 .vscode/ipch
 workbooks/.ipynb_checkpoints
 workbooks/*.wav
+workbooks/*.so
+workbooks/*.c

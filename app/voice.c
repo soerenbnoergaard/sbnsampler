@@ -21,11 +21,9 @@ int32_t voice_reset(voice_t *v)
         v->sample_dl[n] = 0;
     }
 
-    for (n = 0; n < 4; n++) {
+    for (n = 0; n < 5; n++) {
         v->vcf.w1[n] = 0;
     }
-
-    v->vcf.y1 = 0;
 
     return 0;
 }
