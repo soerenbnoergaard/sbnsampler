@@ -1,12 +1,12 @@
 # SBN Sampler
 
-## Build steps:
+## Build steps
 
     git submodule update --init
     make buildroot
     make sdcard
 
-## Running the application:
+## Running the application
 
 Generate `sbnsampler`
 
@@ -17,6 +17,44 @@ Connect to the Raspberry Pi through Minicom on the host. Follow these steps to t
 1. On target: `rz`
 2. On host: `Ctrl-a s -> zmodem ->` navigate to `app/sbnsampler` `-> space -> enter` (repeat for all `.wav` files.
 3. On target: `./sbnsampler`
+
+## Start application on boot
+
+Add the following content to the file `/etc/init.d/S99sbnsampler`:
+
+    HERE=$(pwd)
+
+    case "$1" in
+      start)
+            printf "Starting sbnsampler: "
+            cd /root/
+            ./sbnsampler &
+            cd $HERE
+            [ $? = 0 ] && echo "OK" || echo "FAIL"
+            ;;
+      stop)
+            printf "Stopping sbnsampler: "
+            killall sbnsampler
+            [ $? = 0 ] && echo "OK" || echo "FAIL"
+            ;;
+      restart|reload)
+            "$0" stop
+            "$0" start
+            ;;
+      *)
+            echo "Usage: $0 {start|stop|restart}"
+            exit 1
+    esac
+
+    exit $?
+
+## Copy files from USB drive
+
+This is much faster than transfering files with zmodem:
+
+    mount /dev/sda /mnt
+    cp /mnt/SOURCE ~/DESTINATION
+    umount /mnt
 
 ## Notes and TODOs
 
