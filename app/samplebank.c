@@ -196,6 +196,91 @@ int32_t samplebank_init(void)
     samplebank[14].note_min = 85;
     samplebank[14].loop_enabled = false;
 
+    //
+    // Precision bass
+    //
+
+    // E1
+    if ((tmp = fh_read_file("sound/pbass_e1.wav")) == NULL)
+        return 1;
+    samplebank[15].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[15].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[15].note_root = 28;
+    samplebank[15].note_max = 28;
+    samplebank[15].note_min = 0;
+    samplebank[15].loop_enabled = false;
+
+    // A1
+    if ((tmp = fh_read_file("sound/pbass_a1.wav")) == NULL)
+        return 1;
+    samplebank[16].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[16].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[16].note_root = 33;
+    samplebank[16].note_max = 33;
+    samplebank[16].note_min = 29;
+    samplebank[16].loop_enabled = false;
+
+    // D2
+    if ((tmp = fh_read_file("sound/pbass_d2.wav")) == NULL)
+        return 1;
+    samplebank[17].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[17].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[17].note_root = 38;
+    samplebank[17].note_max = 38;
+    samplebank[17].note_min = 34;
+    samplebank[17].loop_enabled = false;
+
+    // G2
+    if ((tmp = fh_read_file("sound/pbass_g2.wav")) == NULL)
+        return 1;
+    samplebank[18].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[18].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[18].note_root = 43;
+    samplebank[18].note_max = 43;
+    samplebank[18].note_min = 39;
+    samplebank[18].loop_enabled = false;
+
+    // C3
+    if ((tmp = fh_read_file("sound/pbass_c3.wav")) == NULL)
+        return 1;
+    samplebank[19].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[19].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[19].note_root = 48;
+    samplebank[19].note_max = 48;
+    samplebank[19].note_min = 44;
+    samplebank[19].loop_enabled = false;
+
+    // F3
+    if ((tmp = fh_read_file("sound/pbass_f3.wav")) == NULL)
+        return 1;
+    samplebank[20].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[20].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[20].note_root = 53;
+    samplebank[20].note_max = 53;
+    samplebank[20].note_min = 49;
+    samplebank[20].loop_enabled = false;
+
+    // Bb3
+    if ((tmp = fh_read_file("sound/pbass_bb3.wav")) == NULL)
+        return 1;
+    samplebank[21].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[21].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[21].note_root = 58;
+    samplebank[21].note_max = 58;
+    samplebank[21].note_min = 54;
+    samplebank[21].loop_enabled = false;
+
+    // Eb4
+    if ((tmp = fh_read_file("sound/pbass_eb4.wav")) == NULL)
+        return 1;
+    samplebank[22].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[22].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[22].note_root = 63;
+    samplebank[22].note_max = 63;
+    samplebank[22].note_min = 59;
+    samplebank[22].loop_enabled = false;
+
+
     return 0;
 }
 

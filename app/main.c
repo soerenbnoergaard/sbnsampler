@@ -23,6 +23,7 @@
 
 #define MIDI_CC_PRESET 0x50
 #define MIDI_CC_VOLUME 0x46
+#define MIDI_CC_CUTOFF_VELOCITY 0x0a
 #define MIDI_CC_SUSTAIN 0x40
 #define MIDI_CC_CUTOFF 0x4a
 #define MIDI_CC_RESONANCE 0x47
@@ -182,6 +183,10 @@ int32_t handle_midi(void)
 
         case MIDI_CC_VOLUME:
             global.volume = m.data[1];
+            break;
+
+        case MIDI_CC_CUTOFF_VELOCITY:
+            global.cutoff_velocity = m.data[1];
             break;
 
         case MIDI_CC_SUSTAIN:

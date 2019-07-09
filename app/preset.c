@@ -62,5 +62,22 @@ int32_t preset_init(void)
     presets[1].settings.amp_release = 20;
     presets[1].settings.cutoff_velocity = 127;
 
+    // Precision bass
+    reset(&presets[2]);
+    presets[2].samples[0] = &samplebank[15];
+    presets[2].samples[1] = &samplebank[16];
+    presets[2].samples[2] = &samplebank[17];
+    presets[2].samples[3] = &samplebank[18];
+    presets[2].samples[4] = &samplebank[19];
+    presets[2].samples[5] = &samplebank[20];
+    presets[2].samples[6] = &samplebank[21];
+    presets[2].samples[7] = &samplebank[22];
+    presets[2].num_samples = 8;
+
+    presets[2].settings.cutoff = 0;
+    presets[2].settings.resonance = 0;
+    presets[2].settings.amp_release = 20;
+    presets[2].settings.cutoff_velocity = 127;
+
     return 0;
 }
