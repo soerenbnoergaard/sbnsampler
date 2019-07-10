@@ -3,8 +3,8 @@ __deprecated__
 app/sbnsampler
 *.o
 .vscode/ipch
-workbooks/.ipynb_checkpoints
-workbooks/*.wav
-workbooks/*.so
-workbooks/*.c
-workbooks/venv
+notebooks/.ipynb_checkpoints
+notebooks/*.wav
+notebooks/*.so
+notebooks/*.c
+notebooks/venv
