@@ -7,3 +7,4 @@ workbooks/.ipynb_checkpoints
 workbooks/*.wav
 workbooks/*.so
 workbooks/*.c
+workbooks/venv
