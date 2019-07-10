@@ -15,7 +15,6 @@ int32_t voice_reset(voice_t *v)
     v->ppf_idx = 0;
     v->sample_idx = 0;
 
-
     // Reset delay lines
     for (n = 0; n < PPF_NUM_TABS; n++) {
         v->sample_dl[n] = 0;
@@ -24,6 +23,10 @@ int32_t voice_reset(voice_t *v)
     for (n = 0; n < 5; n++) {
         v->vcf.w1[n] = 0;
     }
+
+    // Reset states
+    v->state = VOICE_STATE_IDLE;
+    v->amplitude_envelope.state = ADSR_STATE_IDLE;
 
     return 0;
 }

@@ -13,6 +13,15 @@
 #include "adsr.h"
 #include "gpio.h"
 
+// FIXME: Sustain pedal related note repeat: (1) change to preset 4
+//        [SOLVED?] Overwriting voice settings with global in MIDI_CC_PRESET handler
+//        (2) hold sustain
+//        (3) press D (middle)
+//        (4) press C (middle)
+//        (5) release D.
+//        Issue: After (5), D is restarting
+//        This is not very reproducable!
+
 // Types ///////////////////////////////////////////////////////////////////////
 
 // Defines, macros, and constants //////////////////////////////////////////////
@@ -53,10 +62,12 @@ voice_t *find_voice(uint8_t note, bool enable_stealing, bool *voice_stolen)
     for (n = 0; n < NUM_VOICES; n++) {
         v = &voices[n];
 
-        if (v->state == VOICE_STATE_IDLE) {
+        switch (v->state) {
+        case VOICE_STATE_IDLE:
             n_idle = n;
-        }
-        else {
+            break;
+
+        default:
             if (v->note == note) {
                 n_steal = n;
             }
@@ -67,6 +78,7 @@ voice_t *find_voice(uint8_t note, bool enable_stealing, bool *voice_stolen)
             else if (v->ppf_idx > voices[n_oldest].ppf_idx) {
                 n_oldest = n;
             }
+            break;
         }
     }
 
@@ -197,8 +209,8 @@ int32_t handle_midi(void)
                 global = active_preset->settings;
                 for (n = 0; n < NUM_VOICES; n++) {
                     voice_reset(&voices[n]);
+                    voices[n].settings = global;
                 }
-
             }
             break;
 
