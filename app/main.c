@@ -14,7 +14,6 @@
 #include "gpio.h"
 
 // FIXME: Sustain pedal related note repeat: (1) change to preset 4
-//        [SOLVED?] Overwriting voice settings with global in MIDI_CC_PRESET handler
 //        (2) hold sustain
 //        (3) press D (middle)
 //        (4) press C (middle)
