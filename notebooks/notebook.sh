@@ -28,7 +28,7 @@ fi
 if [ $CMD == "init" ]; then
     $PY -m venv $VENV_DIR
     $ACTIVATE
-    $PIP install jupyterlab numpy scipy matplotlib fortran-magic numba cython
+    $PIP install jupyter numpy scipy matplotlib fortran-magic numba cython
     $DEACTIVATE
     CMD="run"
 fi
@@ -36,6 +36,6 @@ fi
 # Run jupyter 
 if [ $CMD == "run" ]; then
     $ACTIVATE
-    $PY -m jupyterlab
+    $PY -m notebook --browser="chromium-browser"
     $DEACTIVATE
 fi
