@@ -35,7 +35,7 @@
 
 // Globals /////////////////////////////////////////////////////////////////////
 
-static preset_t *active_preset = &presets[1];
+static preset_t *active_preset = &presets[2];
 static settings_t global; // Settings loaded from the panel (or a preset)
 FILE *log_h;
 

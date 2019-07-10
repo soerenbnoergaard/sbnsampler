@@ -113,11 +113,11 @@ int32_t samplebank_init(void)
     samplebank[6].loop_stop = 70574;
 
     //
-    // Piano
+    // Nord piano
     //
 
     // C0
-    if ((tmp = fh_read_file("sound/piano_c0.wav")) == NULL)
+    if ((tmp = fh_read_file("sound/nord_grand_c0.wav")) == NULL)
         return 1;
     samplebank[7].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[7].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -127,7 +127,7 @@ int32_t samplebank_init(void)
     samplebank[7].loop_enabled = false;
 
     // C1
-    if ((tmp = fh_read_file("sound/piano_c1.wav")) == NULL)
+    if ((tmp = fh_read_file("sound/nord_grand_c1.wav")) == NULL)
         return 1;
     samplebank[8].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[8].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -137,7 +137,7 @@ int32_t samplebank_init(void)
     samplebank[8].loop_enabled = false;
 
     // C2
-    if ((tmp = fh_read_file("sound/piano_c2.wav")) == NULL)
+    if ((tmp = fh_read_file("sound/nord_grand_c2.wav")) == NULL)
         return 1;
     samplebank[9].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[9].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -147,7 +147,7 @@ int32_t samplebank_init(void)
     samplebank[9].loop_enabled = false;
 
     // C3
-    if ((tmp = fh_read_file("sound/piano_c3.wav")) == NULL)
+    if ((tmp = fh_read_file("sound/nord_grand_c3.wav")) == NULL)
         return 1;
     samplebank[10].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[10].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -157,7 +157,7 @@ int32_t samplebank_init(void)
     samplebank[10].loop_enabled = false;
 
     // C4
-    if ((tmp = fh_read_file("sound/piano_c4.wav")) == NULL)
+    if ((tmp = fh_read_file("sound/nord_grand_c4.wav")) == NULL)
         return 1;
     samplebank[11].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[11].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -167,7 +167,7 @@ int32_t samplebank_init(void)
     samplebank[11].loop_enabled = false;
 
     // C5
-    if ((tmp = fh_read_file("sound/piano_c5.wav")) == NULL)
+    if ((tmp = fh_read_file("sound/nord_grand_c5.wav")) == NULL)
         return 1;
     samplebank[12].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[12].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -177,7 +177,7 @@ int32_t samplebank_init(void)
     samplebank[12].loop_enabled = false;
 
     // C6
-    if ((tmp = fh_read_file("sound/piano_c6.wav")) == NULL)
+    if ((tmp = fh_read_file("sound/nord_grand_c6.wav")) == NULL)
         return 1;
     samplebank[13].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[13].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -187,7 +187,7 @@ int32_t samplebank_init(void)
     samplebank[13].loop_enabled = false;
 
     // C7
-    if ((tmp = fh_read_file("sound/piano_c7.wav")) == NULL)
+    if ((tmp = fh_read_file("sound/nord_grand_c7.wav")) == NULL)
         return 1;
     samplebank[14].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[14].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -280,6 +280,173 @@ int32_t samplebank_init(void)
     samplebank[22].note_min = 59;
     samplebank[22].loop_enabled = false;
 
+    //
+    // FP90 grand
+    //
+
+    // C0
+    if ((tmp = fh_read_file("sound/fp90_grand_c0.wav")) == NULL)
+        return 1;
+    samplebank[23].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[23].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[23].note_root = 12;
+    samplebank[23].note_max = 12;
+    samplebank[23].note_min = 0;
+    samplebank[23].loop_enabled = false;
+
+    // C1
+    if ((tmp = fh_read_file("sound/fp90_grand_c1.wav")) == NULL)
+        return 1;
+    samplebank[24].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[24].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[24].note_root = 24;
+    samplebank[24].note_max = 24;
+    samplebank[24].note_min = 13;
+    samplebank[24].loop_enabled = false;
+
+    // C2
+    if ((tmp = fh_read_file("sound/fp90_grand_c2.wav")) == NULL)
+        return 1;
+    samplebank[25].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[25].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[25].note_root = 36;
+    samplebank[25].note_max = 36;
+    samplebank[25].note_min = 25;
+    samplebank[25].loop_enabled = false;
+
+    // C3
+    if ((tmp = fh_read_file("sound/fp90_grand_c3.wav")) == NULL)
+        return 1;
+    samplebank[26].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[26].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[26].note_root = 48;
+    samplebank[26].note_max = 48;
+    samplebank[26].note_min = 37;
+    samplebank[26].loop_enabled = false;
+
+    // C4
+    if ((tmp = fh_read_file("sound/fp90_grand_c4.wav")) == NULL)
+        return 1;
+    samplebank[27].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[27].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[27].note_root = 60;
+    samplebank[27].note_max = 60;
+    samplebank[27].note_min = 49;
+    samplebank[27].loop_enabled = false;
+
+    // C5
+    if ((tmp = fh_read_file("sound/fp90_grand_c5.wav")) == NULL)
+        return 1;
+    samplebank[28].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[28].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[28].note_root = 72;
+    samplebank[28].note_max = 72;
+    samplebank[28].note_min = 61;
+    samplebank[28].loop_enabled = false;
+
+    // C6
+    if ((tmp = fh_read_file("sound/fp90_grand_c6.wav")) == NULL)
+        return 1;
+    samplebank[29].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[29].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[29].note_root = 84;
+    samplebank[29].note_max = 84;
+    samplebank[29].note_min = 73;
+    samplebank[29].loop_enabled = false;
+
+    // C7
+    if ((tmp = fh_read_file("sound/fp90_grand_c7.wav")) == NULL)
+        return 1;
+    samplebank[30].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[30].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[30].note_root = 96;
+    samplebank[30].note_max = 96;
+    samplebank[30].note_min = 85;
+    samplebank[30].loop_enabled = false;
+
+    //
+    // FP90 upright
+    //
+
+    // C0
+    if ((tmp = fh_read_file("sound/fp90_upright_c0.wav")) == NULL)
+        return 1;
+    samplebank[31].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[31].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[31].note_root = 12;
+    samplebank[31].note_max = 12;
+    samplebank[31].note_min = 0;
+    samplebank[31].loop_enabled = false;
+
+    // C1
+    if ((tmp = fh_read_file("sound/fp90_upright_c1.wav")) == NULL)
+        return 1;
+    samplebank[32].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[32].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[32].note_root = 24;
+    samplebank[32].note_max = 24;
+    samplebank[32].note_min = 13;
+    samplebank[32].loop_enabled = false;
+
+    // C2
+    if ((tmp = fh_read_file("sound/fp90_upright_c2.wav")) == NULL)
+        return 1;
+    samplebank[33].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[33].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[33].note_root = 36;
+    samplebank[33].note_max = 36;
+    samplebank[33].note_min = 25;
+    samplebank[33].loop_enabled = false;
+
+    // C3
+    if ((tmp = fh_read_file("sound/fp90_upright_c3.wav")) == NULL)
+        return 1;
+    samplebank[34].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[34].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[34].note_root = 48;
+    samplebank[34].note_max = 48;
+    samplebank[34].note_min = 37;
+    samplebank[34].loop_enabled = false;
+
+    // C4
+    if ((tmp = fh_read_file("sound/fp90_upright_c4.wav")) == NULL)
+        return 1;
+    samplebank[35].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[35].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[35].note_root = 60;
+    samplebank[35].note_max = 60;
+    samplebank[35].note_min = 49;
+    samplebank[35].loop_enabled = false;
+
+    // C5
+    if ((tmp = fh_read_file("sound/fp90_upright_c5.wav")) == NULL)
+        return 1;
+    samplebank[36].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[36].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[36].note_root = 72;
+    samplebank[36].note_max = 72;
+    samplebank[36].note_min = 61;
+    samplebank[36].loop_enabled = false;
+
+    // C6
+    if ((tmp = fh_read_file("sound/fp90_upright_c6.wav")) == NULL)
+        return 1;
+    samplebank[37].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[37].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[37].note_root = 84;
+    samplebank[37].note_max = 84;
+    samplebank[37].note_min = 73;
+    samplebank[37].loop_enabled = false;
+
+    // C7
+    if ((tmp = fh_read_file("sound/fp90_upright_c7.wav")) == NULL)
+        return 1;
+    samplebank[38].data = tmp->data + WAV_HEADER_SIZE;
+    samplebank[38].length = (tmp->size - WAV_HEADER_SIZE)/2;
+    samplebank[38].note_root = 96;
+    samplebank[38].note_max = 96;
+    samplebank[38].note_min = 85;
+    samplebank[38].loop_enabled = false;
 
     return 0;
 }

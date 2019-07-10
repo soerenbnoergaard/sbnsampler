@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "preset_types.h"
 
-#define NUM_PRESETS 3
+#define NUM_PRESETS 5
 
 extern preset_t presets[NUM_PRESETS];
 
