@@ -6,6 +6,8 @@ preset_t presets[NUM_PRESETS];
 static void reset(preset_t *p)
 {
     p->num_samples = 0;
+
+    p->settings.note_stealing = true;
     p->settings.sustain = false;
     p->settings.volume = 127;
     p->settings.cutoff = 127;
@@ -74,6 +76,7 @@ int32_t preset_init(void)
     presets[2].samples[7] = &samplebank[22];
     presets[2].num_samples = 8;
 
+    presets[2].settings.note_stealing = false;
     presets[2].settings.cutoff = 0;
     presets[2].settings.resonance = 0;
     presets[2].settings.amp_release = 20;

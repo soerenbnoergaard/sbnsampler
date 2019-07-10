@@ -41,27 +41,48 @@ FILE *log_h;
 
 // Functions ///////////////////////////////////////////////////////////////////
 
-voice_t *find_voice(uint8_t note, bool *voice_takeover)
+voice_t *find_voice(uint8_t note, bool enable_stealing, bool *voice_stolen)
 {
     // Find a suiting voice for the incoming note.
     int32_t n;
-    voice_t *ret = NULL;
+    int32_t n_idle = -1;
+    int32_t n_steal = -1;
+    int32_t n_oldest = -1;
+    voice_t *v;
 
     for (n = 0; n < NUM_VOICES; n++) {
-        if ((voices[n].state != VOICE_STATE_IDLE) && (voices[n].note == note)) {
-            // Take over existing note's voice
-            *voice_takeover = true;
-            ret = &voices[n];
-            break;
+        v = &voices[n];
+
+        if (v->state == VOICE_STATE_IDLE) {
+            n_idle = n;
         }
-        else if (voices[n].state == VOICE_STATE_IDLE) {
-            // Empty voice
-            *voice_takeover = false;
-            ret = &voices[n];
+        else {
+            if (v->note == note) {
+                n_steal = n;
+            }
+
+            if (n_oldest < 0) {
+                n_oldest = n;
+            }
+            else if (v->ppf_idx > voices[n_oldest].ppf_idx) {
+                n_oldest = n;
+            }
         }
     }
 
-    return ret;
+    if ((enable_stealing) && (n_steal >= 0)) {
+        *voice_stolen = true;
+        return &voices[n_steal];
+    }
+    else if (n_idle >= 0) {
+        *voice_stolen = false;
+        return &voices[n_idle];
+    }
+    else {
+        *voice_stolen = true;
+        return &voices[n_oldest];
+    }
+
 }
 
 sample_t *find_sample(uint8_t note)
@@ -93,23 +114,18 @@ ppf_t *find_transposition(voice_t *v)
 
 int32_t handle_note_on(midi_message_t m)
 {
-    bool voice_takeover = false;
+    bool voice_stolen = false;
     voice_t *v = NULL;
     sample_t *sample = NULL;
     ppf_t *transposition = NULL;
 
-    v = find_voice(m.data[0], &voice_takeover);
+    v = find_voice(m.data[0], global.note_stealing, &voice_stolen);
     if (v == NULL) {
         fprintf(stderr, "No voice available\n");
         return 1;
     }
     v->note = m.data[0];
     v->velocity = m.data[1];
-
-    if (voice_takeover) {
-        v->state = VOICE_STATE_RESTARTING_NOTE;
-        return 0;
-    }
 
     sample = find_sample(v->note);
     if (sample == NULL) {
@@ -124,6 +140,11 @@ int32_t handle_note_on(midi_message_t m)
         return 1;
     }
     v->ppf = transposition;
+
+    if (voice_stolen) {
+        v->state = VOICE_STATE_RESTARTING_NOTE;
+        return 0;
+    }
 
     v->state = VOICE_STATE_STARTING_NOTE;
     return 0;

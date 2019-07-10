@@ -8,8 +8,9 @@
 #include "samplebank_types.h"
 
 typedef struct {
-    uint8_t volume;
     bool sustain;
+    bool note_stealing;
+    uint8_t volume;
     uint8_t cutoff;
     uint8_t resonance;
     uint8_t cutoff_velocity;

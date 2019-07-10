@@ -95,15 +95,16 @@ int32_t adsr_update(adsr_t *adsr)
         break;
 
     case ADSR_STATE_QUICK_RELEASE:
-        if (adsr->value <= 0) {
-            adsr->state = ADSR_STATE_IDLE;
-        }
-
         if ((adsr->step % 10) == 0) {
             adsr->value -= 1;
         }
 
-        adsr->step += 1;
+        if (adsr->value > 0) {
+            adsr->step += 1;
+        }
+        else {
+            adsr->state = ADSR_STATE_IDLE;
+        }
 
         break;
 
