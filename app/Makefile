@@ -14,6 +14,7 @@ SOURCES = main.c \
 	  gpio.c \
 	  midi_stanford.c \
 	  preset.c \
+	  signal.c \
 	  file_helpers.c
 
 SENSITIVITY = $(wildcard *.h) Makefile
