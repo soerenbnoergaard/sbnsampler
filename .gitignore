@@ -12,3 +12,4 @@ notebooks/venv
 simulator/simulator
 simulator/*.bin
 *.pyc
+simulator/*.wav
