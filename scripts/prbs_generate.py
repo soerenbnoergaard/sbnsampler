@@ -43,7 +43,7 @@ sample_rate = 44100
 noise = PRBS()
 
 data = (2**15-1) * np.array(noise.prbs15(2**15-1), dtype="<h")
-scipy.io.wavfile.write(relative_path("../app/sound/prbs15.wav"), sample_rate, data)
+scipy.io.wavfile.write(relative_path("../app/sound/prbs15_.wav"), sample_rate, data)
 
-data = (2**15-1) * np.array(noise.prbs15(2**20-1), dtype="<h")
-scipy.io.wavfile.write(relative_path("../app/sound/prbs20.wav"), sample_rate, data)
+data = (2**15-1) * np.array(noise.prbs20(2**20-1), dtype="<h")
+scipy.io.wavfile.write(relative_path("../app/sound/prbs20_.wav"), sample_rate, data)

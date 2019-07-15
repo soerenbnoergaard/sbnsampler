@@ -14,6 +14,7 @@
 #include "gpio.h"
 
 // FIXME: Sustain pedal related note repeat: (1) change to preset 4
+// [SOLVED?]
 //        (2) hold sustain
 //        (3) press D (middle)
 //        (4) press C (middle)
@@ -156,9 +157,10 @@ int32_t handle_note_on(midi_message_t m)
         v->state = VOICE_STATE_RESTARTING_NOTE;
         return 0;
     }
-
-    v->state = VOICE_STATE_STARTING_NOTE;
-    return 0;
+    else {
+        v->state = VOICE_STATE_STARTING_NOTE;
+        return 0;
+    }
 }
 
 int32_t handle_note_off(midi_message_t m)
@@ -207,8 +209,7 @@ int32_t handle_midi(void)
                 active_preset = &presets[m.data[1]];
                 global = active_preset->settings;
                 for (n = 0; n < NUM_VOICES; n++) {
-                    voice_reset(&voices[n]);
-                    voices[n].settings = global;
+                    voices[n].state = VOICE_STATE_IDLE;
                 }
             }
             break;
@@ -301,6 +302,7 @@ void loop()
             switch (v->state) {
             case VOICE_STATE_IDLE:
                 v->amplitude_envelope.state = ADSR_STATE_IDLE;
+                voices[n].settings = global;
                 continue;
 
             case VOICE_STATE_STARTING_NOTE:
