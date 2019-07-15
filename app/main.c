@@ -3,8 +3,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "signal.h"
 #include "utils.h"
+#include "hardware.h"
+#include "process.h"
 
 // FIXME: Sustain pedal related note repeat: (1) change to preset 4
 // [SOLVED?]
@@ -22,18 +23,18 @@ int32_t main(void)
     int32_t err;
     int32_t num_fails = 0;
 
-    if (signal_init_memory() != 0) {
+    if (process_init("sound") != 0) {
         return 1;
     }
 
-    if (signal_init_hardware() != 0) {
+    if (hardware_init() != 0) {
         return 1;
     }
 
     do {
         err = 0;
-        err += signal_tick_hardware();
-        err += signal_tick_process();
+        err += hardware_tick();
+        err += process_tick();
 
         if (err == 0) {
             continue;
@@ -41,16 +42,16 @@ int32_t main(void)
 
         // Re-initialize hardware if the signal path fails
         num_fails += 1;
-        if (signal_close_hardware() != 0) {
+        if (hardware_close() != 0) {
             return 1;
         }
-        if (signal_init_hardware() != 0) {
+        if (hardware_init() != 0) {
             return 1;
         }
 
     } while (num_fails < MAX_NUM_RETRIES);
 
-    if (signal_close_memory() != 0) {
+    if (process_close() != 0) {
         return 1;
     }
 
