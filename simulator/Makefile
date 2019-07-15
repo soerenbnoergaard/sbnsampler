@@ -1,6 +1,6 @@
 .PHONY: all clean cleanall
 
-SHARED = 0
+SHARED = 1
 
 ifeq ($(SHARED), 1)
 TARGET = simulator.so
