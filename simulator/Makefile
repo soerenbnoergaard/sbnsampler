@@ -19,9 +19,12 @@ SOURCES += $(APP_DIR)vcf.c
 SOURCES += $(APP_DIR)adsr.c
 SOURCES += $(APP_DIR)preset.c
 SOURCES += $(APP_DIR)file_helpers.c
+SOURCES += $(APP_DIR)hardware.c
 
 # Hardware dependent
-SOURCES += $(APP_DIR)hardware_dummy.c
+SOURCES += $(APP_DIR)gpio_dummy.c
+SOURCES += $(APP_DIR)midi_dummy.c
+SOURCES += $(APP_DIR)dac_dummy.c
 
 SENSITIVITY = $(wildcard *.h) $(wildcard $(APP_DIR)*.h) Makefile
 
@@ -34,8 +37,8 @@ CC = $(BIN_DIR)gcc
 LD = $(BIN_DIR)ld
 RM = rm -rf
 
-CCARGS = -Wall -O2
-LDARGS = -Wall -O2
+CCARGS = -Wall -O0 -g3
+LDARGS = -Wall -O0 -g3
 
 Q = @
 

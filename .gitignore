@@ -8,3 +8,5 @@ notebooks/*.wav
 notebooks/*.so
 notebooks/*.c
 notebooks/venv
+simulator/simulator
+simulator/*.bin

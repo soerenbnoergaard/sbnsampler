@@ -15,9 +15,9 @@ SOURCES += vcf.c
 SOURCES += adsr.c
 SOURCES += preset.c
 SOURCES += file_helpers.c
+SOURCES += hardware.c
 
 # Hardware dependent
-SOURCES += hardware.c
 SOURCES += dac.c
 SOURCES += gpio.c
 SOURCES += midi.c 

@@ -7,12 +7,14 @@
 #include "hardware.h"
 #include "process.h"
 
+#define SIMULATION_LENGTH 1*SAMPLE_RATE_Hz
 #define MAX_NUM_RETRIES 512
 
 int32_t main(void)
 {
     int32_t err;
     int32_t num_fails = 0;
+    int32_t num_ticks = 0;
 
     if (process_init("../app/sound") != 0) {
         return 1;
@@ -26,6 +28,10 @@ int32_t main(void)
         err = 0;
         err += hardware_tick();
         err += process_tick();
+
+        if (num_ticks++ > SIMULATION_LENGTH) {
+            break;
+        }
 
         if (err == 0) {
             continue;

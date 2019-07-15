@@ -20,8 +20,5 @@ extern int32_t buffer_idx;
 int32_t process_init(const char *samplebank_path);
 int32_t process_close(void);
 int32_t process_tick(void);
-int32_t process_note_on(midi_message_t m);
-int32_t process_note_off(midi_message_t m);
-
 
 #endif
