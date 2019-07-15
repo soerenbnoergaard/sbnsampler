@@ -7,7 +7,7 @@
 #include "hardware.h"
 #include "process.h"
 
-#define SIMULATION_LENGTH 1*SAMPLE_RATE_Hz
+#define SIMULATION_LENGTH 5*SAMPLE_RATE_Hz
 #define MAX_NUM_RETRIES 512
 
 int32_t main(void)

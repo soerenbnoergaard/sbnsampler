@@ -24,7 +24,7 @@ int32_t dac_write(int16_t *buffer, uint32_t buffer_size)
     if (output_file == NULL) {
         return 1;
     }
-    fwrite(buffer, sizeof(buffer), sizeof(int16_t), output_file);
+    fwrite(buffer, sizeof(int16_t), buffer_size, output_file);
     return 0;
 }
 

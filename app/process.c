@@ -38,6 +38,9 @@ int32_t process_init(const char *samplebank_path)
         return 1;
     }
 
+    // Load preset
+    global = active_preset->settings;
+
     return 0;
 }
 
