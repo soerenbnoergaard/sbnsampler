@@ -1,4 +1,5 @@
 #include "samplebank.h"
+#include <stdio.h>
 
 // Midi numbers for each note and octave
 //     A   A#  B   C   C#  D   D#  E   F   F#  G   G#
@@ -16,20 +17,19 @@
 sample_t samplebank[SAMPLEBANK_NUM_SAMPLES];
 
 #define WAV_HEADER_SIZE 44
-// #define NAME(note) "sound/piano_"note".wav"
-#define NAME(note) "sound/volca_"note".wav"
 
-int32_t samplebank_init(void)
+int32_t samplebank_init(const char *path)
 {
     // Malloc is done internally (never free'd!)
     binary_data_t *tmp;
+    fh_set_path(path);
 
     //
     // VOLCA KEYS
     //
 
     // C0
-    if ((tmp = fh_read_file("sound/volca_c0.wav")) == NULL)
+    if ((tmp = fh_read_file("volca_c0.wav")) == NULL)
         return 1;
     samplebank[0].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[0].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -41,7 +41,7 @@ int32_t samplebank_init(void)
     samplebank[0].loop_stop = 71691;
 
     // C1
-    if ((tmp = fh_read_file("sound/volca_c1.wav")) == NULL)
+    if ((tmp = fh_read_file("volca_c1.wav")) == NULL)
         return 1;
     samplebank[1].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[1].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -53,7 +53,7 @@ int32_t samplebank_init(void)
     samplebank[1].loop_stop = 71110;
 
     // C2
-    if ((tmp = fh_read_file("sound/volca_c2.wav")) == NULL)
+    if ((tmp = fh_read_file("volca_c2.wav")) == NULL)
         return 1;
     samplebank[2].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[2].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -65,7 +65,7 @@ int32_t samplebank_init(void)
     samplebank[2].loop_stop = 70868;
 
     // C3
-    if ((tmp = fh_read_file("sound/volca_c3.wav")) == NULL)
+    if ((tmp = fh_read_file("volca_c3.wav")) == NULL)
         return 1;
     samplebank[3].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[3].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -77,7 +77,7 @@ int32_t samplebank_init(void)
     samplebank[3].loop_stop = 70614;
 
     // C4
-    if ((tmp = fh_read_file("sound/volca_c4.wav")) == NULL)
+    if ((tmp = fh_read_file("volca_c4.wav")) == NULL)
         return 1;
     samplebank[4].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[4].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -89,7 +89,7 @@ int32_t samplebank_init(void)
     samplebank[4].loop_stop = 70618;
 
     // C5
-    if ((tmp = fh_read_file("sound/volca_c5.wav")) == NULL)
+    if ((tmp = fh_read_file("volca_c5.wav")) == NULL)
         return 1;
     samplebank[5].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[5].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -101,7 +101,7 @@ int32_t samplebank_init(void)
     samplebank[5].loop_stop = 70590;
 
     // C6
-    if ((tmp = fh_read_file("sound/volca_c6.wav")) == NULL)
+    if ((tmp = fh_read_file("volca_c6.wav")) == NULL)
         return 1;
     samplebank[6].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[6].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -117,7 +117,7 @@ int32_t samplebank_init(void)
     //
 
     // C0
-    if ((tmp = fh_read_file("sound/nord_grand_c0.wav")) == NULL)
+    if ((tmp = fh_read_file("nord_grand_c0.wav")) == NULL)
         return 1;
     samplebank[7].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[7].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -127,7 +127,7 @@ int32_t samplebank_init(void)
     samplebank[7].loop_enabled = false;
 
     // C1
-    if ((tmp = fh_read_file("sound/nord_grand_c1.wav")) == NULL)
+    if ((tmp = fh_read_file("nord_grand_c1.wav")) == NULL)
         return 1;
     samplebank[8].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[8].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -137,7 +137,7 @@ int32_t samplebank_init(void)
     samplebank[8].loop_enabled = false;
 
     // C2
-    if ((tmp = fh_read_file("sound/nord_grand_c2.wav")) == NULL)
+    if ((tmp = fh_read_file("nord_grand_c2.wav")) == NULL)
         return 1;
     samplebank[9].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[9].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -147,7 +147,7 @@ int32_t samplebank_init(void)
     samplebank[9].loop_enabled = false;
 
     // C3
-    if ((tmp = fh_read_file("sound/nord_grand_c3.wav")) == NULL)
+    if ((tmp = fh_read_file("nord_grand_c3.wav")) == NULL)
         return 1;
     samplebank[10].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[10].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -157,7 +157,7 @@ int32_t samplebank_init(void)
     samplebank[10].loop_enabled = false;
 
     // C4
-    if ((tmp = fh_read_file("sound/nord_grand_c4.wav")) == NULL)
+    if ((tmp = fh_read_file("nord_grand_c4.wav")) == NULL)
         return 1;
     samplebank[11].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[11].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -167,7 +167,7 @@ int32_t samplebank_init(void)
     samplebank[11].loop_enabled = false;
 
     // C5
-    if ((tmp = fh_read_file("sound/nord_grand_c5.wav")) == NULL)
+    if ((tmp = fh_read_file("nord_grand_c5.wav")) == NULL)
         return 1;
     samplebank[12].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[12].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -177,7 +177,7 @@ int32_t samplebank_init(void)
     samplebank[12].loop_enabled = false;
 
     // C6
-    if ((tmp = fh_read_file("sound/nord_grand_c6.wav")) == NULL)
+    if ((tmp = fh_read_file("nord_grand_c6.wav")) == NULL)
         return 1;
     samplebank[13].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[13].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -187,7 +187,7 @@ int32_t samplebank_init(void)
     samplebank[13].loop_enabled = false;
 
     // C7
-    if ((tmp = fh_read_file("sound/nord_grand_c7.wav")) == NULL)
+    if ((tmp = fh_read_file("nord_grand_c7.wav")) == NULL)
         return 1;
     samplebank[14].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[14].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -201,7 +201,7 @@ int32_t samplebank_init(void)
     //
 
     // E1
-    if ((tmp = fh_read_file("sound/pbass_e1.wav")) == NULL)
+    if ((tmp = fh_read_file("pbass_e1.wav")) == NULL)
         return 1;
     samplebank[15].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[15].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -211,7 +211,7 @@ int32_t samplebank_init(void)
     samplebank[15].loop_enabled = false;
 
     // A1
-    if ((tmp = fh_read_file("sound/pbass_a1.wav")) == NULL)
+    if ((tmp = fh_read_file("pbass_a1.wav")) == NULL)
         return 1;
     samplebank[16].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[16].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -221,7 +221,7 @@ int32_t samplebank_init(void)
     samplebank[16].loop_enabled = false;
 
     // D2
-    if ((tmp = fh_read_file("sound/pbass_d2.wav")) == NULL)
+    if ((tmp = fh_read_file("pbass_d2.wav")) == NULL)
         return 1;
     samplebank[17].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[17].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -231,7 +231,7 @@ int32_t samplebank_init(void)
     samplebank[17].loop_enabled = false;
 
     // G2
-    if ((tmp = fh_read_file("sound/pbass_g2.wav")) == NULL)
+    if ((tmp = fh_read_file("pbass_g2.wav")) == NULL)
         return 1;
     samplebank[18].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[18].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -241,7 +241,7 @@ int32_t samplebank_init(void)
     samplebank[18].loop_enabled = false;
 
     // C3
-    if ((tmp = fh_read_file("sound/pbass_c3.wav")) == NULL)
+    if ((tmp = fh_read_file("pbass_c3.wav")) == NULL)
         return 1;
     samplebank[19].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[19].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -251,7 +251,7 @@ int32_t samplebank_init(void)
     samplebank[19].loop_enabled = false;
 
     // F3
-    if ((tmp = fh_read_file("sound/pbass_f3.wav")) == NULL)
+    if ((tmp = fh_read_file("pbass_f3.wav")) == NULL)
         return 1;
     samplebank[20].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[20].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -261,7 +261,7 @@ int32_t samplebank_init(void)
     samplebank[20].loop_enabled = false;
 
     // Bb3
-    if ((tmp = fh_read_file("sound/pbass_bb3.wav")) == NULL)
+    if ((tmp = fh_read_file("pbass_bb3.wav")) == NULL)
         return 1;
     samplebank[21].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[21].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -271,7 +271,7 @@ int32_t samplebank_init(void)
     samplebank[21].loop_enabled = false;
 
     // Eb4
-    if ((tmp = fh_read_file("sound/pbass_eb4.wav")) == NULL)
+    if ((tmp = fh_read_file("pbass_eb4.wav")) == NULL)
         return 1;
     samplebank[22].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[22].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -285,7 +285,7 @@ int32_t samplebank_init(void)
     //
 
     // C0
-    if ((tmp = fh_read_file("sound/fp90_grand_c0.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_grand_c0.wav")) == NULL)
         return 1;
     samplebank[23].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[23].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -295,7 +295,7 @@ int32_t samplebank_init(void)
     samplebank[23].loop_enabled = false;
 
     // C1
-    if ((tmp = fh_read_file("sound/fp90_grand_c1.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_grand_c1.wav")) == NULL)
         return 1;
     samplebank[24].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[24].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -305,7 +305,7 @@ int32_t samplebank_init(void)
     samplebank[24].loop_enabled = false;
 
     // C2
-    if ((tmp = fh_read_file("sound/fp90_grand_c2.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_grand_c2.wav")) == NULL)
         return 1;
     samplebank[25].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[25].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -315,7 +315,7 @@ int32_t samplebank_init(void)
     samplebank[25].loop_enabled = false;
 
     // C3
-    if ((tmp = fh_read_file("sound/fp90_grand_c3.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_grand_c3.wav")) == NULL)
         return 1;
     samplebank[26].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[26].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -325,7 +325,7 @@ int32_t samplebank_init(void)
     samplebank[26].loop_enabled = false;
 
     // C4
-    if ((tmp = fh_read_file("sound/fp90_grand_c4.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_grand_c4.wav")) == NULL)
         return 1;
     samplebank[27].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[27].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -335,7 +335,7 @@ int32_t samplebank_init(void)
     samplebank[27].loop_enabled = false;
 
     // C5
-    if ((tmp = fh_read_file("sound/fp90_grand_c5.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_grand_c5.wav")) == NULL)
         return 1;
     samplebank[28].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[28].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -345,7 +345,7 @@ int32_t samplebank_init(void)
     samplebank[28].loop_enabled = false;
 
     // C6
-    if ((tmp = fh_read_file("sound/fp90_grand_c6.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_grand_c6.wav")) == NULL)
         return 1;
     samplebank[29].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[29].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -355,7 +355,7 @@ int32_t samplebank_init(void)
     samplebank[29].loop_enabled = false;
 
     // C7
-    if ((tmp = fh_read_file("sound/fp90_grand_c7.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_grand_c7.wav")) == NULL)
         return 1;
     samplebank[30].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[30].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -369,7 +369,7 @@ int32_t samplebank_init(void)
     //
 
     // C0
-    if ((tmp = fh_read_file("sound/fp90_upright_c0.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_upright_c0.wav")) == NULL)
         return 1;
     samplebank[31].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[31].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -379,7 +379,7 @@ int32_t samplebank_init(void)
     samplebank[31].loop_enabled = false;
 
     // C1
-    if ((tmp = fh_read_file("sound/fp90_upright_c1.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_upright_c1.wav")) == NULL)
         return 1;
     samplebank[32].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[32].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -389,7 +389,7 @@ int32_t samplebank_init(void)
     samplebank[32].loop_enabled = false;
 
     // C2
-    if ((tmp = fh_read_file("sound/fp90_upright_c2.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_upright_c2.wav")) == NULL)
         return 1;
     samplebank[33].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[33].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -399,7 +399,7 @@ int32_t samplebank_init(void)
     samplebank[33].loop_enabled = false;
 
     // C3
-    if ((tmp = fh_read_file("sound/fp90_upright_c3.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_upright_c3.wav")) == NULL)
         return 1;
     samplebank[34].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[34].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -409,7 +409,7 @@ int32_t samplebank_init(void)
     samplebank[34].loop_enabled = false;
 
     // C4
-    if ((tmp = fh_read_file("sound/fp90_upright_c4.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_upright_c4.wav")) == NULL)
         return 1;
     samplebank[35].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[35].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -419,7 +419,7 @@ int32_t samplebank_init(void)
     samplebank[35].loop_enabled = false;
 
     // C5
-    if ((tmp = fh_read_file("sound/fp90_upright_c5.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_upright_c5.wav")) == NULL)
         return 1;
     samplebank[36].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[36].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -429,7 +429,7 @@ int32_t samplebank_init(void)
     samplebank[36].loop_enabled = false;
 
     // C6
-    if ((tmp = fh_read_file("sound/fp90_upright_c6.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_upright_c6.wav")) == NULL)
         return 1;
     samplebank[37].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[37].length = (tmp->size - WAV_HEADER_SIZE)/2;
@@ -439,7 +439,7 @@ int32_t samplebank_init(void)
     samplebank[37].loop_enabled = false;
 
     // C7
-    if ((tmp = fh_read_file("sound/fp90_upright_c7.wav")) == NULL)
+    if ((tmp = fh_read_file("fp90_upright_c7.wav")) == NULL)
         return 1;
     samplebank[38].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[38].length = (tmp->size - WAV_HEADER_SIZE)/2;

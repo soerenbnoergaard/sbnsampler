@@ -20,6 +20,6 @@ extern sample_t samplebank[SAMPLEBANK_NUM_SAMPLES];
 
 // Functions ///////////////////////////////////////////////////////////////////
 
-int32_t samplebank_init();
+int32_t samplebank_init(const char *path);
 
 #endif

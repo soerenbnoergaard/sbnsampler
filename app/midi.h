@@ -3,10 +3,7 @@
 
 #include <stdint.h>
 
-typedef struct {
-    uint8_t status;
-    uint8_t data[2];
-} midi_message_t;
+#include "midi_types.h"
 
 int32_t midi_init(void);
 int32_t midi_close(void);

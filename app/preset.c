@@ -20,11 +20,12 @@ static void reset(preset_t *p)
     p->settings.amp_velocity = 0;
 }
 
-int32_t preset_init(void)
+int32_t preset_init(const char *path)
 {
     int32_t err;
-    err = samplebank_init();
+    err = samplebank_init(path);
     if (err != 0) {
+        fprintf(stderr, "Error initializing Sample bank\n");
         return 1;
     }
 

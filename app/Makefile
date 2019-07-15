@@ -2,20 +2,26 @@
 
 TARGET = sbnsampler
 
-SOURCES = main.c \
-	  dac.c \
-	  midi.c \
-	  samplebank.c \
-	  voice.c \
-	  polyfilter.c \
-	  polyfilter_coeffs.c \
-	  vcf.c \
-	  adsr.c \
-	  gpio.c \
-	  midi_stanford.c \
-	  preset.c \
-	  signal.c \
-	  file_helpers.c
+# Project main
+SOURCES = main.c
+
+# Project files
+SOURCES += process.c
+SOURCES += samplebank.c
+SOURCES += voice.c
+SOURCES += polyfilter.c
+SOURCES += polyfilter_coeffs.c
+SOURCES += vcf.c
+SOURCES += adsr.c
+SOURCES += preset.c
+SOURCES += file_helpers.c
+
+# Hardware dependent
+SOURCES += hardware.c
+SOURCES += dac.c
+SOURCES += gpio.c
+SOURCES += midi.c 
+SOURCES += midi_stanford.c
 
 SENSITIVITY = $(wildcard *.h) Makefile
 
@@ -23,9 +29,9 @@ OBJECTS = $(SOURCES:.c=.o)
 
 LIBS = -lasound
 
-BIN_DIR = ../buildroot/output/host/usr/bin
-CC = $(BIN_DIR)/arm-linux-gcc
-LD = $(BIN_DIR)/arm-linux-ld
+BIN_DIR = ../buildroot/output/host/usr/bin/
+CC = $(BIN_DIR)arm-linux-gcc
+LD = $(BIN_DIR)arm-linux-ld
 RM = rm -rf
 
 CCARGS = -Wall -O2

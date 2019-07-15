@@ -1,7 +1,22 @@
 #include <stdio.h>
 #include <malloc.h>
+#include <string.h>
+#include <stdint.h>
 #include "file_helpers.h"
 
+#define MAX_PATH_LENGTH 256
+
+static char fh_path[MAX_PATH_LENGTH] = {'\0'};
+
+int32_t fh_set_path(const char *path)
+{
+    if (strncpy(fh_path, path, MAX_PATH_LENGTH) == NULL) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
 
 //Returns a binary_data_t structure if reading the file was OK.
 //In case of an error it always returns NULL.
@@ -14,8 +29,12 @@ binary_data_t *fh_read_file(const char *filename) {
         binary_data->size = 0;
         void *buffer = NULL;
         long position;
+        char path_and_file[MAX_PATH_LENGTH] = {'\0'};
+        
+        snprintf(path_and_file, MAX_PATH_LENGTH, "%s/%s", fh_path, filename);
+
         //Open the file for reading in binary mode
-        FILE *fIn = fopen(filename, "rb");
+        FILE *fIn = fopen(path_and_file, "rb");
 
         if (fIn != NULL) {
             //Go to the end of the file
