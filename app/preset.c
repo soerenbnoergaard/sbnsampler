@@ -119,3 +119,8 @@ int32_t preset_init(const char *path)
 
     return 0;
 }
+
+int32_t preset_close(void)
+{
+    return samplebank_close();
+}

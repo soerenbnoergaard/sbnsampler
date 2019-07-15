@@ -12,8 +12,9 @@ extern "C" {
         void *data;
     } binary_data_t;
 
-    int32_t fh_set_path(const char *path);
     binary_data_t *fh_read_file(const char *filename);
+    int32_t fh_free(binary_data_t *buffer);
+    int32_t fh_set_path(const char *path);
 
 #ifdef __cplusplus
 }

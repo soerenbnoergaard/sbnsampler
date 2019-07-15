@@ -2,6 +2,7 @@ __deprecated__
 *.old
 app/sbnsampler
 *.o
+*.so
 .vscode/ipch
 notebooks/.ipynb_checkpoints
 notebooks/*.wav

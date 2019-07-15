@@ -31,6 +31,7 @@ int32_t samplebank_init(const char *path)
     // C0
     if ((tmp = fh_read_file("volca_c0.wav")) == NULL)
         return 1;
+    samplebank[0].base_address = tmp;
     samplebank[0].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[0].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[0].note_root = 12;
@@ -43,6 +44,7 @@ int32_t samplebank_init(const char *path)
     // C1
     if ((tmp = fh_read_file("volca_c1.wav")) == NULL)
         return 1;
+    samplebank[1].base_address = tmp;
     samplebank[1].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[1].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[1].note_root = 24;
@@ -55,6 +57,7 @@ int32_t samplebank_init(const char *path)
     // C2
     if ((tmp = fh_read_file("volca_c2.wav")) == NULL)
         return 1;
+    samplebank[2].base_address = tmp;
     samplebank[2].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[2].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[2].note_root = 36;
@@ -67,6 +70,7 @@ int32_t samplebank_init(const char *path)
     // C3
     if ((tmp = fh_read_file("volca_c3.wav")) == NULL)
         return 1;
+    samplebank[3].base_address = tmp;
     samplebank[3].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[3].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[3].note_root = 48;
@@ -79,6 +83,7 @@ int32_t samplebank_init(const char *path)
     // C4
     if ((tmp = fh_read_file("volca_c4.wav")) == NULL)
         return 1;
+    samplebank[4].base_address = tmp;
     samplebank[4].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[4].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[4].note_root = 60;
@@ -91,6 +96,7 @@ int32_t samplebank_init(const char *path)
     // C5
     if ((tmp = fh_read_file("volca_c5.wav")) == NULL)
         return 1;
+    samplebank[5].base_address = tmp;
     samplebank[5].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[5].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[5].note_root = 72;
@@ -103,6 +109,7 @@ int32_t samplebank_init(const char *path)
     // C6
     if ((tmp = fh_read_file("volca_c6.wav")) == NULL)
         return 1;
+    samplebank[6].base_address = tmp;
     samplebank[6].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[6].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[6].note_root = 84;
@@ -119,6 +126,7 @@ int32_t samplebank_init(const char *path)
     // C0
     if ((tmp = fh_read_file("nord_grand_c0.wav")) == NULL)
         return 1;
+    samplebank[7].base_address = tmp;
     samplebank[7].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[7].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[7].note_root = 12;
@@ -129,6 +137,7 @@ int32_t samplebank_init(const char *path)
     // C1
     if ((tmp = fh_read_file("nord_grand_c1.wav")) == NULL)
         return 1;
+    samplebank[8].base_address = tmp;
     samplebank[8].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[8].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[8].note_root = 24;
@@ -139,6 +148,7 @@ int32_t samplebank_init(const char *path)
     // C2
     if ((tmp = fh_read_file("nord_grand_c2.wav")) == NULL)
         return 1;
+    samplebank[9].base_address = tmp;
     samplebank[9].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[9].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[9].note_root = 36;
@@ -149,6 +159,7 @@ int32_t samplebank_init(const char *path)
     // C3
     if ((tmp = fh_read_file("nord_grand_c3.wav")) == NULL)
         return 1;
+    samplebank[10].base_address = tmp;
     samplebank[10].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[10].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[10].note_root = 48;
@@ -159,6 +170,7 @@ int32_t samplebank_init(const char *path)
     // C4
     if ((tmp = fh_read_file("nord_grand_c4.wav")) == NULL)
         return 1;
+    samplebank[11].base_address = tmp;
     samplebank[11].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[11].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[11].note_root = 60;
@@ -169,6 +181,7 @@ int32_t samplebank_init(const char *path)
     // C5
     if ((tmp = fh_read_file("nord_grand_c5.wav")) == NULL)
         return 1;
+    samplebank[12].base_address = tmp;
     samplebank[12].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[12].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[12].note_root = 72;
@@ -179,6 +192,7 @@ int32_t samplebank_init(const char *path)
     // C6
     if ((tmp = fh_read_file("nord_grand_c6.wav")) == NULL)
         return 1;
+    samplebank[13].base_address = tmp;
     samplebank[13].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[13].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[13].note_root = 84;
@@ -189,6 +203,7 @@ int32_t samplebank_init(const char *path)
     // C7
     if ((tmp = fh_read_file("nord_grand_c7.wav")) == NULL)
         return 1;
+    samplebank[14].base_address = tmp;
     samplebank[14].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[14].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[14].note_root = 96;
@@ -203,6 +218,7 @@ int32_t samplebank_init(const char *path)
     // E1
     if ((tmp = fh_read_file("pbass_e1.wav")) == NULL)
         return 1;
+    samplebank[15].base_address = tmp;
     samplebank[15].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[15].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[15].note_root = 28;
@@ -213,6 +229,7 @@ int32_t samplebank_init(const char *path)
     // A1
     if ((tmp = fh_read_file("pbass_a1.wav")) == NULL)
         return 1;
+    samplebank[16].base_address = tmp;
     samplebank[16].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[16].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[16].note_root = 33;
@@ -223,6 +240,7 @@ int32_t samplebank_init(const char *path)
     // D2
     if ((tmp = fh_read_file("pbass_d2.wav")) == NULL)
         return 1;
+    samplebank[17].base_address = tmp;
     samplebank[17].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[17].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[17].note_root = 38;
@@ -233,6 +251,7 @@ int32_t samplebank_init(const char *path)
     // G2
     if ((tmp = fh_read_file("pbass_g2.wav")) == NULL)
         return 1;
+    samplebank[18].base_address = tmp;
     samplebank[18].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[18].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[18].note_root = 43;
@@ -243,6 +262,7 @@ int32_t samplebank_init(const char *path)
     // C3
     if ((tmp = fh_read_file("pbass_c3.wav")) == NULL)
         return 1;
+    samplebank[19].base_address = tmp;
     samplebank[19].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[19].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[19].note_root = 48;
@@ -253,6 +273,7 @@ int32_t samplebank_init(const char *path)
     // F3
     if ((tmp = fh_read_file("pbass_f3.wav")) == NULL)
         return 1;
+    samplebank[20].base_address = tmp;
     samplebank[20].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[20].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[20].note_root = 53;
@@ -263,6 +284,7 @@ int32_t samplebank_init(const char *path)
     // Bb3
     if ((tmp = fh_read_file("pbass_bb3.wav")) == NULL)
         return 1;
+    samplebank[21].base_address = tmp;
     samplebank[21].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[21].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[21].note_root = 58;
@@ -273,6 +295,7 @@ int32_t samplebank_init(const char *path)
     // Eb4
     if ((tmp = fh_read_file("pbass_eb4.wav")) == NULL)
         return 1;
+    samplebank[22].base_address = tmp;
     samplebank[22].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[22].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[22].note_root = 63;
@@ -287,6 +310,7 @@ int32_t samplebank_init(const char *path)
     // C0
     if ((tmp = fh_read_file("fp90_grand_c0.wav")) == NULL)
         return 1;
+    samplebank[23].base_address = tmp;
     samplebank[23].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[23].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[23].note_root = 12;
@@ -297,6 +321,7 @@ int32_t samplebank_init(const char *path)
     // C1
     if ((tmp = fh_read_file("fp90_grand_c1.wav")) == NULL)
         return 1;
+    samplebank[24].base_address = tmp;
     samplebank[24].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[24].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[24].note_root = 24;
@@ -307,6 +332,7 @@ int32_t samplebank_init(const char *path)
     // C2
     if ((tmp = fh_read_file("fp90_grand_c2.wav")) == NULL)
         return 1;
+    samplebank[25].base_address = tmp;
     samplebank[25].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[25].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[25].note_root = 36;
@@ -317,6 +343,7 @@ int32_t samplebank_init(const char *path)
     // C3
     if ((tmp = fh_read_file("fp90_grand_c3.wav")) == NULL)
         return 1;
+    samplebank[26].base_address = tmp;
     samplebank[26].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[26].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[26].note_root = 48;
@@ -327,6 +354,7 @@ int32_t samplebank_init(const char *path)
     // C4
     if ((tmp = fh_read_file("fp90_grand_c4.wav")) == NULL)
         return 1;
+    samplebank[27].base_address = tmp;
     samplebank[27].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[27].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[27].note_root = 60;
@@ -337,6 +365,7 @@ int32_t samplebank_init(const char *path)
     // C5
     if ((tmp = fh_read_file("fp90_grand_c5.wav")) == NULL)
         return 1;
+    samplebank[28].base_address = tmp;
     samplebank[28].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[28].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[28].note_root = 72;
@@ -347,6 +376,7 @@ int32_t samplebank_init(const char *path)
     // C6
     if ((tmp = fh_read_file("fp90_grand_c6.wav")) == NULL)
         return 1;
+    samplebank[29].base_address = tmp;
     samplebank[29].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[29].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[29].note_root = 84;
@@ -357,6 +387,7 @@ int32_t samplebank_init(const char *path)
     // C7
     if ((tmp = fh_read_file("fp90_grand_c7.wav")) == NULL)
         return 1;
+    samplebank[30].base_address = tmp;
     samplebank[30].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[30].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[30].note_root = 96;
@@ -371,6 +402,7 @@ int32_t samplebank_init(const char *path)
     // C0
     if ((tmp = fh_read_file("fp90_upright_c0.wav")) == NULL)
         return 1;
+    samplebank[31].base_address = tmp;
     samplebank[31].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[31].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[31].note_root = 12;
@@ -381,6 +413,7 @@ int32_t samplebank_init(const char *path)
     // C1
     if ((tmp = fh_read_file("fp90_upright_c1.wav")) == NULL)
         return 1;
+    samplebank[32].base_address = tmp;
     samplebank[32].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[32].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[32].note_root = 24;
@@ -391,6 +424,7 @@ int32_t samplebank_init(const char *path)
     // C2
     if ((tmp = fh_read_file("fp90_upright_c2.wav")) == NULL)
         return 1;
+    samplebank[33].base_address = tmp;
     samplebank[33].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[33].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[33].note_root = 36;
@@ -401,6 +435,7 @@ int32_t samplebank_init(const char *path)
     // C3
     if ((tmp = fh_read_file("fp90_upright_c3.wav")) == NULL)
         return 1;
+    samplebank[34].base_address = tmp;
     samplebank[34].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[34].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[34].note_root = 48;
@@ -411,6 +446,7 @@ int32_t samplebank_init(const char *path)
     // C4
     if ((tmp = fh_read_file("fp90_upright_c4.wav")) == NULL)
         return 1;
+    samplebank[35].base_address = tmp;
     samplebank[35].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[35].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[35].note_root = 60;
@@ -421,6 +457,7 @@ int32_t samplebank_init(const char *path)
     // C5
     if ((tmp = fh_read_file("fp90_upright_c5.wav")) == NULL)
         return 1;
+    samplebank[36].base_address = tmp;
     samplebank[36].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[36].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[36].note_root = 72;
@@ -431,6 +468,7 @@ int32_t samplebank_init(const char *path)
     // C6
     if ((tmp = fh_read_file("fp90_upright_c6.wav")) == NULL)
         return 1;
+    samplebank[37].base_address = tmp;
     samplebank[37].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[37].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[37].note_root = 84;
@@ -441,6 +479,7 @@ int32_t samplebank_init(const char *path)
     // C7
     if ((tmp = fh_read_file("fp90_upright_c7.wav")) == NULL)
         return 1;
+    samplebank[38].base_address = tmp;
     samplebank[38].data = tmp->data + WAV_HEADER_SIZE;
     samplebank[38].length = (tmp->size - WAV_HEADER_SIZE)/2;
     samplebank[38].note_root = 96;
@@ -451,3 +490,11 @@ int32_t samplebank_init(const char *path)
     return 0;
 }
 
+int32_t samplebank_close(void)
+{
+    int32_t n;
+    for (n = 0; n < SAMPLEBANK_NUM_SAMPLES; n++) {
+        fh_free(samplebank[n].base_address);
+    }
+    return 0;
+}

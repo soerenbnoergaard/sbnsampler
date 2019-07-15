@@ -5,7 +5,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "file_helpers.h"
+
 typedef struct {
+    binary_data_t *base_address;
     int16_t *data;
     size_t length;
     uint8_t note_root;

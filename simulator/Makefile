@@ -1,6 +1,12 @@
 .PHONY: all clean cleanall
 
+SHARED = 0
+
+ifeq ($(SHARED), 1)
+TARGET = simulator.so
+else
 TARGET = simulator
+endif
 
 APP_DIR = ../app/
 
@@ -37,8 +43,13 @@ CC = $(BIN_DIR)gcc
 LD = $(BIN_DIR)ld
 RM = rm -rf
 
+ifeq ($(SHARED), 1)
+CCARGS = -Wall -O0 -g3 -fPIC
+LDARGS = -Wall -O0 -g3 -shared
+else
 CCARGS = -Wall -O0 -g3
 LDARGS = -Wall -O0 -g3
+endif
 
 Q = @
 

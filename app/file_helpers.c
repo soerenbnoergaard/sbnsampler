@@ -18,6 +18,15 @@ int32_t fh_set_path(const char *path)
     }
 }
 
+int32_t fh_free(binary_data_t *buffer)
+{
+    if (buffer != NULL) {
+        free(buffer);
+        buffer = NULL;
+    }
+    return 0;
+}
+
 //Returns a binary_data_t structure if reading the file was OK.
 //In case of an error it always returns NULL.
 binary_data_t *fh_read_file(const char *filename) {

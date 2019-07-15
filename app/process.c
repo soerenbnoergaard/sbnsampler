@@ -46,8 +46,7 @@ int32_t process_init(const char *samplebank_path)
 
 int32_t process_close(void)
 {
-    // TODO: Consider freeing the sound bank here.
-    return 0;
+    return preset_close();
 }
 
 int32_t process_tick(void)

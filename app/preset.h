@@ -11,5 +11,6 @@
 extern preset_t presets[NUM_PRESETS];
 
 int32_t preset_init(const char *path);
+int32_t preset_close(void);
 
 #endif
