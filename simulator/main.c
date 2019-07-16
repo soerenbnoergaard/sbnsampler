@@ -11,16 +11,16 @@
 
 static int32_t simulation_length = 0;
 
-int32_t sim_add_midi(int32_t position, uint8_t status, uint8_t data0, uint8_t data1)
-{
-    return 0;
-}
-
 int32_t sim_init(void)
 {
     if (process_init("../app/sound") != 0) {
         return 1;
     }
+
+    if (hardware_init() != 0) {
+        return 1;
+    }
+
     return 0;
 }
 
@@ -36,6 +36,11 @@ int32_t sim_close(void)
     if (process_close() != 0) {
         return 1;
     }
+
+    if (hardware_close() != 0) {
+        return 1;
+    }
+
     return 0;
 }
 
@@ -44,10 +49,6 @@ int32_t sim_run(void)
     int32_t err;
     int32_t num_fails = 0;
     int32_t num_ticks = 0;
-
-    if (hardware_init() != 0) {
-        return 1;
-    }
 
     do {
         err = 0;

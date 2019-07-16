@@ -4,8 +4,18 @@
 
 static int32_t sample_counter;
 static int32_t sim_midi_counter;
-midi_message_t sim_midi_messages[128];
-int32_t sim_midi_positions[128];
+static midi_message_t sim_midi_messages[128];
+static int32_t sim_midi_positions[128];
+
+// SIMULATION ONLY FUNCTION - EXPOSED THROUGH THE DLL!
+int32_t _midi_enqueue(int32_t index, int32_t position, uint8_t status, uint8_t data0, uint8_t data1)
+{
+    sim_midi_positions[index] = position;
+    sim_midi_messages[index].status = status;
+    sim_midi_messages[index].data[0] = data0;
+    sim_midi_messages[index].data[1] = data1;
+    return 0;
+}
 
 int32_t midi_init(void)
 {
@@ -16,17 +26,6 @@ int32_t midi_init(void)
     for (n = 0; n < 128; n++) {
         sim_midi_positions[n] = -1;
     }
-
-    // Add messages
-    sim_midi_positions[0] = 0;
-    sim_midi_messages[0].status = 0x90;
-    sim_midi_messages[0].data[0] = 63;
-    sim_midi_messages[0].data[1] = 127;
-
-    sim_midi_positions[1] = 22050;
-    sim_midi_messages[1].status = 0x80;
-    sim_midi_messages[1].data[0] = 63;
-    sim_midi_messages[1].data[1] = 0;
     return 0;
 }
 
