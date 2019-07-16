@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #define WAV_HEADER_SIZE 44
-#define WAV_HEADER_SUBCHUNK2SIZE_POSITION 40 // 4 bytes, LE
+#define WAV_HEADER_SUBCHUNK2SIZE_POSITION 40
 const int8_t wav_header_44100_mono_16le[WAV_HEADER_SIZE] = {
     0x52, 0x49, 0x46, 0x46, 0x24, 0xB0, 0x06, 0x00,
     0x57, 0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20,

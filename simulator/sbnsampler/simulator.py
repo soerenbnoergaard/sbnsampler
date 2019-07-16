@@ -25,3 +25,7 @@ close.restype = c_int32
 run = _so.sim_run
 run.argtypes = []
 run.restype = c_int32
+
+add_midi = _so.sim_add_midi
+add_midi.argtypes = [c_int32, c_uint8, c_uint8, c_uint8]
+add_midi.restype = c_int32

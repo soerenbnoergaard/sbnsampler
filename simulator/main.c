@@ -9,7 +9,12 @@
 
 #define MAX_NUM_RETRIES 512
 
-static int32_t simulation_length = 5*SAMPLE_RATE_Hz;
+static int32_t simulation_length = 0;
+
+int32_t sim_add_midi(int32_t position, uint8_t status, uint8_t data0, uint8_t data1)
+{
+    return 0;
+}
 
 int32_t sim_init(void)
 {
