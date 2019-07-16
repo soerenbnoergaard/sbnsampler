@@ -9,6 +9,7 @@ TARGET = simulator
 endif
 
 APP_DIR = ../app/
+OBJ_DIR = ./_objects/
 
 INCLUDES = -I$(APP_DIR)
 
@@ -34,7 +35,7 @@ SOURCES += $(APP_DIR)dac_dummy.c
 
 SENSITIVITY = $(wildcard *.h) $(wildcard $(APP_DIR)*.h) Makefile
 
-OBJECTS = $(notdir $(SOURCES:.c=.o))
+OBJECTS = $(addprefix $(OBJ_DIR), $(notdir $(SOURCES:.c=.o)))
 
 LIBS =
 
@@ -55,22 +56,27 @@ Q = @
 
 all: $(TARGET)
 
+$(TARGET): $(OBJECTS)
+	$(Q)echo "    LD  $(TARGET)"
+	$(Q)$(CC) $(LDARGS) -o $@ $(LIBS) $(OBJECTS)
+
+$(OBJ_DIR)%.o: %.c $(SENSITIVITY) | $(OBJ_DIR)
+	$(Q)echo "    CC  $<"
+	$(Q)$(CC) $(CCARGS) $(INCLUDES) -o $@ -c $<
+
+$(OBJ_DIR)%.o: $(APP_DIR)%.c $(SENSITIVITY) | $(OBJ_DIR)
+	$(Q)echo "    CC  $<"
+	$(Q)$(CC) $(CCARGS) $(INCLUDES) -o $@ -c $<
+
+$(OBJ_DIR):
+	$(Q)echo "    MKDIR $@"
+	$(Q)mkdir $@
+
 clean:
 	$(Q)echo "    CLEAN"
-	$(Q)$(RM) $(OBJECTS)
+	$(Q)$(RM) $(OBJ_DIR)
 
 cleanall: clean
 	$(Q)echo "    CLEANALL"
 	$(Q)$(RM) $(TARGET)
 
-$(TARGET): $(OBJECTS)
-	$(Q)echo "    LD  $(TARGET)"
-	$(Q)$(CC) $(LDARGS) -o $@ $(LIBS) $(OBJECTS)
-
-%.o: %.c $(SENSITIVITY)
-	$(Q)echo "    CC  $<"
-	$(Q)$(CC) $(CCARGS) $(INCLUDES) -o $@ -c $<
-
-%.o: $(APP_DIR)%.c $(SENSITIVITY)
-	$(Q)echo "    CC  $<"
-	$(Q)$(CC) $(CCARGS) $(INCLUDES) -o $@ -c $<
