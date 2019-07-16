@@ -8,6 +8,3 @@ sim.init()
 sim.set_length(44100 * 5)
 sim.run()
 sim.close()
-
-y = np.fromfile("output.bin", dtype="<h")
-wavfile.write("output.wav", 44100, y)
