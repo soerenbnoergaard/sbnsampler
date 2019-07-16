@@ -29,9 +29,9 @@ SOURCES += $(APP_DIR)file_helpers.c
 SOURCES += $(APP_DIR)hardware.c
 
 # Hardware dependent
-SOURCES += $(APP_DIR)gpio_dummy.c
-SOURCES += $(APP_DIR)midi_dummy.c
-SOURCES += $(APP_DIR)dac_dummy.c
+SOURCES += gpio.c
+SOURCES += midi.c
+SOURCES += dac.c
 
 SENSITIVITY = $(wildcard *.h) $(wildcard $(APP_DIR)*.h) Makefile
 
