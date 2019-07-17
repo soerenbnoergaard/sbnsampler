@@ -45,8 +45,8 @@ LD = $(BIN_DIR)ld
 RM = rm -rf
 
 ifeq ($(SHARED), 1)
-CCARGS = -Wall -O0 -g3 -fPIC
-LDARGS = -Wall -O0 -g3 -shared
+CCARGS = -Wall -O0 -g3 -fPIC -fno-gnu-unique
+LDARGS = -Wall -O0 -g3 -shared -fno-gnu-unique
 else
 CCARGS = -Wall -O0 -g3
 LDARGS = -Wall -O0 -g3
