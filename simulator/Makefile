@@ -9,7 +9,7 @@ TARGET = simulator
 endif
 
 APP_DIR = ../app/
-OBJ_DIR = ./_objects/
+OBJ_DIR = ./__objects__/
 
 INCLUDES = -I$(APP_DIR)
 
