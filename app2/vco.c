@@ -47,12 +47,8 @@ static status_t load(const char *filename, sample_t *destination)
         return STATUS_ERROR;
     }
 
-    puts("HERE1");
-
     size -= WAV_HEADER_SIZE;
     destination->data = (int16_t *)malloc(size);
-
-    puts("HERE2");
 
     if (destination->data == NULL) {
         error("Failed to allocate memory");
@@ -91,10 +87,10 @@ status_t reset(vco_t *osc)
 
 static status_t load_vco_volca(void)
 {
-    vco_t *vco = &vco[0];
+    vco_t *vco = &oscillators[0];
     sample_t *s;
 
-    s = &vco->samples[0]; 
+    s = &vco->samples[0];
     if (load("../app/sound/volca_c4.wav", s) != STATUS_OK) {
         return STATUS_ERROR;
     }

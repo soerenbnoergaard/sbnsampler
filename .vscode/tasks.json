@@ -6,20 +6,29 @@
         {
             "label": "Build app",
             "type": "shell",
-            "command": "make app",
+            "command": "make -C app",
             // "group": {
             //     "kind": "build",
             //     "isDefault": true
             // },
         },
         {
-            "label": "Build simulator",
+            "label": "Build app2",
             "type": "shell",
-            "command": "make -C simulator",
+            "command": "make -C app2",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
+        },
+        {
+            "label": "Build simulator",
+            "type": "shell",
+            "command": "make -C simulator",
+            // "group": {
+            //     "kind": "build",
+            //     "isDefault": true
+            // },
         },
         {
             "label": "Open workbooks",

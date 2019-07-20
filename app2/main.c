@@ -2,19 +2,16 @@
 #include "utils.h"
 #include "voice.h"
 
-// FIXME: Something in vco.c:load() causes a segfault (calling malloc())
-// Get info by running `valgrind ./sbnsampler`
-
 static status_t init(void)
 {
     if (vco_init() != STATUS_OK) {
         error("Error initializing VCO");
         return STATUS_ERROR;
     }
-    /* if (voice_init() != STATUS_OK) { */
-    /*     error("Error initializing voices"); */
-    /*     return STATUS_ERROR; */
-    /* } */
+    if (voice_init() != STATUS_OK) {
+        error("Error initializing voices");
+        return STATUS_ERROR;
+    }
     return STATUS_OK;
 }
 

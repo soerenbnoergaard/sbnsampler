@@ -19,6 +19,14 @@
             "target": "./simulator",
             "cwd": "${workspaceRoot}/simulator",
             "valuesFormatting": "parseText"
+        },
+        {
+            "name": "Launch app2",
+            "type": "gdb",
+            "request": "launch",
+            "target": "./sbnsampler",
+            "cwd": "${workspaceRoot}/app2",
+            "valuesFormatting": "parseText"
         }
     ]
 }
