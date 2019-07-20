@@ -34,5 +34,19 @@ voice_t *voice_get_handle(int32_t n)
 
 int16_t voice_get_sample(voice_t *v)
 {
-    return vco_get_sample(v->vco);
+    int16_t x = 0;
+
+    switch (v->state) {
+    case VOICE_STATE_IDLE:
+        break;
+
+    case VOICE_STATE_RUNNING:
+        x = vco_get_sample(v->vco);
+        break;
+
+    default:
+        break;
+    }
+
+    return x;
 }

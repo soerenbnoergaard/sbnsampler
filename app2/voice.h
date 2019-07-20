@@ -8,7 +8,7 @@
 
 typedef enum {
     VOICE_STATE_IDLE,
-    VOICE_STATE_BUSY
+    VOICE_STATE_RUNNING
 } voice_state_t;
 
 // Voice type

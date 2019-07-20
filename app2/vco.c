@@ -82,6 +82,7 @@ status_t reset(vco_t *osc)
         s->data = NULL;
         s->loop_enabled = false;
     }
+    osc->sample_index = 0;
     return STATUS_OK;
 }
 

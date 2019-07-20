@@ -25,6 +25,7 @@ typedef struct {
 typedef struct {
     sample_t samples[NUM_SAMPLES_PER_VCO];
     int32_t num_samples;
+    int32_t sample_index;
 } vco_t;
 
 status_t vco_init(void);
