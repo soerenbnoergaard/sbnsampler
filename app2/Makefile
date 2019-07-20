@@ -2,6 +2,9 @@
 
 TARGET = sbnsampler
 OBJ_DIR = ./__objects__/
+HAL_DIR = ./sim/
+
+INCLUDES = -I.
 
 # Project main
 SOURCES = main.c
@@ -11,6 +14,7 @@ SOURCES += vco.c
 SOURCES += voice.c
 
 # Hardware dependent
+SOURCES += $(HAL_DIR)dac.c
 
 SENSITIVITY = $(wildcard *.h) Makefile
 OBJECTS = $(addprefix $(OBJ_DIR), $(notdir $(SOURCES:.c=.o)))
@@ -22,7 +26,7 @@ CC = $(BIN_DIR)gcc
 LD = $(BIN_DIR)ld
 RM = rm -rf
 
-CCARGS = -Wall -O0 -g3
+CCARGS = -Wall -O0 -g3 $(INCLUDES)
 LDARGS = -Wall -O0 -g3
 
 Q = @
@@ -42,6 +46,10 @@ $(TARGET): $(OBJECTS)
 	$(Q)$(CC) $(LDARGS) -o $@ $(LIBS) $(OBJECTS)
 
 $(OBJ_DIR)%.o: %.c $(SENSITIVITY) | $(OBJ_DIR)
+	$(Q)echo "    CC  $<"
+	$(Q)$(CC) $(CCARGS) -o $@ -c $<
+
+$(OBJ_DIR)%.o: $(HAL_DIR)%.c $(SENSITIVITY) | $(OBJ_DIR)
 	$(Q)echo "    CC  $<"
 	$(Q)$(CC) $(CCARGS) -o $@ -c $<
 

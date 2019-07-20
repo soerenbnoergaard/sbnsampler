@@ -9,7 +9,9 @@ __objects__
 .vscode/ipch
 
 app/sbnsampler
+
 app2/sbnsampler
+app2/*.wav
 
 notebooks/.ipynb_checkpoints
 notebooks/*.wav
