@@ -25,12 +25,11 @@ typedef struct {
 typedef struct {
     sample_t samples[NUM_SAMPLES_PER_VCO];
     int32_t num_samples;
-    int32_t sample_index;
 } vco_t;
 
 status_t vco_init(void);
 status_t vco_close(void);
 vco_t *vco_get_handle(int32_t n);
-int16_t vco_get_sample(vco_t *osc);
+int16_t vco_get_sample(sample_t *s, int32_t index, status_t *status);
 
 #endif

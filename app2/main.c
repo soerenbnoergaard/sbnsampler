@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include "utils.h"
+#include "vco.h"
 #include "voice.h"
 #include "dac.h"
+#include "midi.h"
+#include "ctrl.h"
+
+#define SIMULATION_LENGTH 44100
 
 static status_t init(void)
 {
@@ -15,6 +20,14 @@ static status_t init(void)
     }
     if (dac_init("default", SAMPLE_RATE_Hz) != STATUS_OK) {
         error("Error initializing DAC");
+        return STATUS_ERROR;
+    }
+    if (midi_init() != STATUS_OK) {
+        error("Error initializing MIDI");
+        return STATUS_ERROR;
+    }
+    if (ctrl_init() != STATUS_OK) {
+        error("Error initializing control path");
         return STATUS_ERROR;
     }
     return STATUS_OK;
@@ -34,6 +47,14 @@ static status_t close(void)
         error("Error closing DAC");
         return STATUS_ERROR;
     }
+    if (midi_close() != STATUS_OK) {
+        error("Error closing MIDI");
+        return STATUS_ERROR;
+    }
+    if (ctrl_close() != STATUS_OK) {
+        error("Error closing control path");
+        return STATUS_ERROR;
+    }
     return STATUS_OK;
 }
 
@@ -49,9 +70,15 @@ int main(void)
         return 1;
     }
 
+    // Simulation only: Add MIDI message
+    midi_input(0x90, 60, 127);
+
     // Data path
-    for (i = 0; i < 1000; i++) {
+    for (i = 0; i < SIMULATION_LENGTH; i++) {
         x = 0;
+
+        // Control path
+        ctrl_tick();
 
         // Voice data paths
         for (n = 0; n < NUM_VOICES; n++) {

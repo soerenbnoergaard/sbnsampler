@@ -10,10 +10,13 @@
 #define BUFFER_SIZE 128
 
 #define error(s) fprintf(stderr, "%s\n", (s))
+#define here(s) fprintf(stdout, "%s:%d %s\n", __FILE__, __LINE__, s)
 
 typedef enum {
     STATUS_OK,
     STATUS_ERROR,
+    STATUS_NOT_READY,
+    STATUS_NO_SAMPLES
 } status_t;
 
 

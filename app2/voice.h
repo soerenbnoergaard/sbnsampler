@@ -8,15 +8,21 @@
 
 typedef enum {
     VOICE_STATE_IDLE,
-    VOICE_STATE_RUNNING
+    VOICE_STATE_STARTING,
+    VOICE_STATE_RESTARTING,
+    VOICE_STATE_RUNNING,
+    VOICE_STATE_STOPPED,
+    VOICE_STATE_RELEASED
 } voice_state_t;
 
 // Voice type
 //     A voice consists of an oscillator playing a specified note
 typedef struct {
     voice_state_t state;
-    vco_t *vco;
+    sample_t *source;
+    int32_t source_index;
     uint8_t note;
+    uint8_t velocity;
 } voice_t;
 
 status_t voice_init(void);

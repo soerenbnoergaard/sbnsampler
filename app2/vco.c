@@ -82,7 +82,6 @@ status_t reset(vco_t *osc)
         s->data = NULL;
         s->loop_enabled = false;
     }
-    osc->sample_index = 0;
     return STATUS_OK;
 }
 
@@ -139,7 +138,19 @@ vco_t *vco_get_handle(int32_t n)
     return &oscillators[n];
 }
 
-int16_t vco_get_sample(vco_t *osc)
+int16_t vco_get_sample(sample_t *s, int32_t index, status_t *status)
 {
-    return 0;
+    int16_t x;
+
+    if ((0 <= index) && (index < s->length)) {
+        *status = STATUS_OK;
+        x = s->data[index];
+    }
+    else  {
+        *status = STATUS_NO_SAMPLES;
+        x = 0;
+    }
+
+
+    return x;
 }

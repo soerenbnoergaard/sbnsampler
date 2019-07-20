@@ -12,9 +12,11 @@ SOURCES = main.c
 # Project files
 SOURCES += vco.c
 SOURCES += voice.c
+SOURCES += ctrl.c
 
 # Hardware dependent
 SOURCES += $(HAL_DIR)dac.c
+SOURCES += $(HAL_DIR)midi.c
 
 SENSITIVITY = $(wildcard *.h) Makefile
 OBJECTS = $(addprefix $(OBJ_DIR), $(notdir $(SOURCES:.c=.o)))
