@@ -17,6 +17,7 @@ status_t voice_init(void)
         v->state = VOICE_STATE_IDLE;
         v->source = &vco_get_handle(0)->samples[0];
         v->source_index = 0;
+        v->index = 0;
     }
 
     return STATUS_OK;
@@ -48,10 +49,10 @@ int16_t voice_get_sample(voice_t *v)
         break;
 
     case VOICE_STATE_RUNNING:
-        // TODO: Change source_index to transposed_index/output_index/etc
-        x = vco_get_sample(v->source, v->source_index, &status);
+        x = vco_get_sample(v->source, v->index, &status);
         if (status == STATUS_OK) {
             v->source_index += 1;
+            v->index += 1;
         }
         else {
             v->state = VOICE_STATE_IDLE;
