@@ -4,8 +4,9 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 
-#define error(s) fprintf(stderr, "%s\n", s)
+#define error(s) fprintf(stderr, "%s\n", (s))
 #define SAMPLE_RATE_Hz 44100
 
 typedef enum {

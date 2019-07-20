@@ -8,6 +8,7 @@ SOURCES = main.c
 
 # Project files
 SOURCES += vco.c
+SOURCES += voice.c
 
 # Hardware dependent
 
@@ -21,8 +22,8 @@ CC = $(BIN_DIR)gcc
 LD = $(BIN_DIR)ld
 RM = rm -rf
 
-CCARGS = -Wall -O2
-LDARGS = -Wall -O2
+CCARGS = -Wall -O0 -g3
+LDARGS = -Wall -O0 -g3
 
 Q = @
 
