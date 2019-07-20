@@ -3,8 +3,8 @@
 
 #include "utils.h"
 
-#define NUM_SAMPLES_PER_VCO 128
-#define NUM_OSCILLATORS 1
+#define NUM_SAMPLES_PER_COLLECTION 128
+#define NUM_COLLECTIONS 1
 
 // Sample type.
 //     A sample consists of audio data valid for a range of midi notes. It may be
@@ -20,16 +20,24 @@ typedef struct {
     int32_t loop_stop;
 } sample_t;
 
-// Oscillator type.
-//     An oscillator consists of a number of samples spanning the keyboard.
+// Sample collection type.
+//     A sample collection consists of a number of samples spanning the keyboard.
 typedef struct {
-    sample_t samples[NUM_SAMPLES_PER_VCO];
+    sample_t samples[NUM_SAMPLES_PER_COLLECTION];
     int32_t num_samples;
+} sample_collection_t;
+
+// VCO type
+//    A VCO contains everything necessary for a voice to contain a sound source. 
+typedef struct {
+    sample_t *sample;
+    uint32_t sample_index;
+    uint8_t note;
 } vco_t;
 
 status_t vco_init(void);
 status_t vco_close(void);
-vco_t *vco_get_handle(int32_t n);
-int16_t vco_get_sample(sample_t *s, int32_t index, status_t *status);
+status_t vco_setup(vco_t *vco, uint8_t note);
+int16_t vco_get_sample(vco_t *vco, status_t *status);
 
 #endif

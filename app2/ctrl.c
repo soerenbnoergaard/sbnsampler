@@ -83,8 +83,10 @@ static status_t note_on(midi_message_t m)
     }
 
     // Prepare the voice for playback
+    // TODO: consider moving to `voice_setup()`
     v->note = m.data[0];
     v->velocity = m.data[1];
+    vco_setup(&v->vco, v->note);
 
     if (stolen) {
         v->state = VOICE_STATE_RESTARTING;

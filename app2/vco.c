@@ -22,7 +22,7 @@
 // Types ///////////////////////////////////////////////////////////////////////
 
 // Globals /////////////////////////////////////////////////////////////////////
-static vco_t oscillators[NUM_OSCILLATORS];
+static sample_collection_t sample_collections[NUM_COLLECTIONS];
 
 // Private functions ///////////////////////////////////////////////////////////
 static status_t filesize(const char *filename, int32_t *filesize)
@@ -70,12 +70,12 @@ static status_t load(const char *filename, sample_t *destination)
     return STATUS_OK;
 }
 
-status_t reset(vco_t *osc)
+status_t reset(sample_collection_t *collection)
 {
     int32_t n;
     sample_t *s;
-    for (n = 0; n < osc->num_samples; n++) {
-        s = &osc->samples[n];
+    for (n = 0; n < collection->num_samples; n++) {
+        s = &collection->samples[n];
         if (s->data != NULL) {
             free(s->data);
         }
@@ -87,13 +87,15 @@ status_t reset(vco_t *osc)
 
 static status_t load_vco_volca(void)
 {
-    vco_t *vco = &oscillators[0];
+    sample_collection_t *collection = &sample_collections[0];
     sample_t *s;
 
-    s = &vco->samples[0];
+    s = &collection->samples[0];
+    collection->num_samples = 1;
     if (load("../app/sound/volca_c4.wav", s) != STATUS_OK) {
         return STATUS_ERROR;
     }
+
     s->note_root = 60;
     s->note_max = 60;
     s->note_min = 49;
@@ -109,8 +111,8 @@ status_t vco_init(void)
     int32_t n;
 
     // Reset all sample slots
-    for (n = 0; n < NUM_OSCILLATORS; n++) {
-        reset(&oscillators[n]);
+    for (n = 0; n < NUM_COLLECTIONS; n++) {
+        reset(&sample_collections[n]);
     }
 
     if (load_vco_volca() != STATUS_OK) {
@@ -125,32 +127,59 @@ status_t vco_close(void)
     int32_t n;
 
     // Free all allocated slots
-    for (n = 0; n < NUM_OSCILLATORS; n++) {
-        reset(&oscillators[n]);
+    for (n = 0; n < NUM_COLLECTIONS; n++) {
+        reset(&sample_collections[n]);
     }
 
     return STATUS_OK;
 }
 
-vco_t *vco_get_handle(int32_t n)
+status_t vco_setup(vco_t *vco, uint8_t note)
 {
-    assert((0 <= n) && (n < NUM_OSCILLATORS));
-    return &oscillators[n];
+    int32_t n;
+    sample_collection_t *collection = &sample_collections[0];
+    sample_t *sample;
+
+    // Find sample in sample collection
+    for (n = 0; n < collection->num_samples; n++) {
+        sample = &collection->samples[n];
+        if ((sample->note_min <= note) && (note <= sample->note_max)) {
+            break;
+        }
+        else {
+            sample = NULL;
+        }
+    }
+
+    if (sample == NULL) {
+        error("Sample not found in sample collection");
+        return STATUS_ERROR;
+    }
+
+    // Initialize VCO
+    vco->sample = sample;
+    vco->sample_index = 0;
+    vco->note = note;
+
+    return STATUS_OK;
 }
 
-int16_t vco_get_sample(sample_t *s, int32_t index, status_t *status)
+int16_t vco_get_sample(vco_t *vco, status_t *status)
 {
+    // TODO: Transpose the sample
+    // TODO: Loop the sample
+
     int16_t x;
 
-    if ((0 <= index) && (index < s->length)) {
+    if (vco->sample_index < vco->sample->length) {
         *status = STATUS_OK;
-        x = s->data[index];
+        x = vco->sample->data[vco->sample_index];
+        vco->sample_index += 1;
     }
-    else  {
+    else {
         *status = STATUS_NO_SAMPLES;
         x = 0;
     }
-
 
     return x;
 }

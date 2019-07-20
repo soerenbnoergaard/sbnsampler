@@ -19,9 +19,8 @@ typedef enum {
 //     A voice consists of an oscillator playing a specified note
 typedef struct {
     voice_state_t state;
-    sample_t *source;
-    int32_t source_index;
-    int32_t index;
+    vco_t vco;
+
     uint8_t note;
     uint8_t velocity;
 } voice_t;
