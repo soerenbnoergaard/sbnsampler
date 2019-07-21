@@ -1,21 +1,33 @@
 #ifndef VOICE_H
 #define VOICE_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <assert.h>
+#include "utils.h"
+#include "vco.h"
 
-#include "voice_types.h"
+#define NUM_VOICES 4
 
-// Defines
-#define NUM_VOICES 8
+typedef enum {
+    VOICE_STATE_IDLE,
+    VOICE_STATE_STARTING,
+    VOICE_STATE_RESTARTING,
+    VOICE_STATE_RUNNING,
+    VOICE_STATE_STOPPED,
+    VOICE_STATE_RELEASED
+} voice_state_t;
 
-// Global variables (initialized elsewhere)
-extern voice_t voices[NUM_VOICES];
+// Voice type
+//     A voice consists of an oscillator playing a specified note
+typedef struct {
+    voice_state_t state;
+    vco_t vco;
 
-// Prototypes
-int32_t voice_init(void);
-int32_t voice_reset(voice_t *v);
+    uint8_t note;
+    uint8_t velocity;
+} voice_t;
 
+status_t voice_init(void);
+status_t voice_close(void);
+voice_t *voice_get_handle(int32_t n);
+int16_t voice_get_sample(voice_t *v);
 
 #endif

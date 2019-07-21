@@ -1,41 +1,36 @@
 .PHONY: all clean cleanall
 
 TARGET = sbnsampler
+OBJ_DIR = ./__objects__/
+HAL_DIR = ./sim/
+
+INCLUDES = -I.
 
 # Project main
 SOURCES = main.c
 
 # Project files
-SOURCES += process.c
-SOURCES += samplebank.c
+SOURCES += vco.c
 SOURCES += voice.c
-SOURCES += polyfilter.c
+SOURCES += ctrl.c
 SOURCES += polyfilter_coeffs.c
-SOURCES += vcf.c
-SOURCES += adsr.c
-SOURCES += preset.c
-SOURCES += file_helpers.c
-SOURCES += hardware.c
 
 # Hardware dependent
-SOURCES += dac.c
-SOURCES += gpio.c
-SOURCES += midi.c 
-SOURCES += midi_stanford.c
+SOURCES += $(HAL_DIR)dac.c
+SOURCES += $(HAL_DIR)midi.c
 
 SENSITIVITY = $(wildcard *.h) Makefile
+OBJECTS = $(addprefix $(OBJ_DIR), $(notdir $(SOURCES:.c=.o)))
 
-OBJECTS = $(SOURCES:.c=.o)
+LIBS = 
 
-LIBS = -lasound
-
-BIN_DIR = ../buildroot/output/host/usr/bin/
-CC = $(BIN_DIR)arm-linux-gcc
-LD = $(BIN_DIR)arm-linux-ld
+BIN_DIR = 
+CC = $(BIN_DIR)gcc
+LD = $(BIN_DIR)ld
 RM = rm -rf
 
-CCARGS = -Wall -O2
-LDARGS = -Wall -O2
+CCARGS = -Wall -O0 -g3 $(INCLUDES)
+LDARGS = -Wall -O0 -g3
 
 Q = @
 
@@ -53,7 +48,14 @@ $(TARGET): $(OBJECTS)
 	$(Q)echo "    LD  $(TARGET)"
 	$(Q)$(CC) $(LDARGS) -o $@ $(LIBS) $(OBJECTS)
 
-%.o: %.c $(SENSITIVITY)
+$(OBJ_DIR)%.o: %.c $(SENSITIVITY) | $(OBJ_DIR)
 	$(Q)echo "    CC  $<"
 	$(Q)$(CC) $(CCARGS) -o $@ -c $<
 
+$(OBJ_DIR)%.o: $(HAL_DIR)%.c $(SENSITIVITY) | $(OBJ_DIR)
+	$(Q)echo "    CC  $<"
+	$(Q)$(CC) $(CCARGS) -o $@ -c $<
+
+$(OBJ_DIR):
+	$(Q)echo "    MKDIR $@"
+	$(Q)mkdir $(OBJ_DIR)

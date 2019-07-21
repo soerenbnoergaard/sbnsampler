@@ -1,57 +1,106 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "utils.h"
-#include "hardware.h"
-#include "process.h"
+#include "vco.h"
+#include "voice.h"
+#include "dac.h"
+#include "midi.h"
+#include "ctrl.h"
 
-// FIXME: Sustain pedal related note repeat: (1) change to preset 4
-// [SOLVED?]
-//        (2) hold sustain
-//        (3) press D (middle)
-//        (4) press C (middle)
-//        (5) release D.
-//        Issue: After (5), D is restarting
-//        This is not very reproducable!
+#define SIMULATION_LENGTH 44100*10
 
-#define MAX_NUM_RETRIES 512
-
-int32_t main(void)
+static status_t init(void)
 {
-    int32_t err;
-    int32_t num_fails = 0;
+    if (vco_init() != STATUS_OK) {
+        error("Error initializing VCO");
+        return STATUS_ERROR;
+    }
+    if (voice_init() != STATUS_OK) {
+        error("Error initializing voice");
+        return STATUS_ERROR;
+    }
+    if (dac_init("default", SAMPLE_RATE_Hz) != STATUS_OK) {
+        error("Error initializing DAC");
+        return STATUS_ERROR;
+    }
+    if (midi_init() != STATUS_OK) {
+        error("Error initializing MIDI");
+        return STATUS_ERROR;
+    }
+    if (ctrl_init() != STATUS_OK) {
+        error("Error initializing control path");
+        return STATUS_ERROR;
+    }
+    return STATUS_OK;
+}
 
-    if (process_init("sound") != 0) {
+static status_t close(void)
+{
+    if (vco_close() != STATUS_OK) {
+        error("Error closing VCO");
+        return STATUS_ERROR;
+    }
+    if (voice_close() != STATUS_OK) {
+        error("Error closing voice");
+        return STATUS_ERROR;
+    }
+    if (dac_close() != STATUS_OK) {
+        error("Error closing DAC");
+        return STATUS_ERROR;
+    }
+    if (midi_close() != STATUS_OK) {
+        error("Error closing MIDI");
+        return STATUS_ERROR;
+    }
+    if (ctrl_close() != STATUS_OK) {
+        error("Error closing control path");
+        return STATUS_ERROR;
+    }
+    return STATUS_OK;
+}
+
+static status_t simulation(void)
+{
+    int32_t i;
+    int32_t n;
+    int16_t x;
+    voice_t *v;
+    status_t st;
+
+    // Data path
+    for (i = 0; i < SIMULATION_LENGTH; i++) {
+        x = 0;
+
+        // Control path
+        ctrl_tick();
+
+        // Voice data paths
+        for (n = 0; n < NUM_VOICES; n++) {
+            v = voice_get_handle(n);
+            x += voice_get_sample(v);
+        }
+
+        // Accumulated data path
+        st = dac_write(x);
+        if (st != STATUS_OK) {
+            error("Error writing to DAC");
+            break;
+        }
+    }
+    return STATUS_OK;
+}
+
+int main(void)
+{
+
+    if (init() != STATUS_OK) {
         return 1;
     }
 
-    if (hardware_init() != 0) {
+    if (simulation() != STATUS_OK) {
         return 1;
     }
 
-    do {
-        err = 0;
-        err += hardware_tick();
-        err += process_tick();
-
-        if (err == 0) {
-            continue;
-        }
-
-        // Re-initialize hardware if the signal path fails
-        num_fails += 1;
-        if (hardware_close() != 0) {
-            return 1;
-        }
-        if (hardware_init() != 0) {
-            return 1;
-        }
-
-    } while (num_fails < MAX_NUM_RETRIES);
-
-    if (process_close() != 0) {
+    if (close() != STATUS_OK) {
         return 1;
     }
 
