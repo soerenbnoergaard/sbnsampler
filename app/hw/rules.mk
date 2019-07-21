@@ -1,5 +1,6 @@
 SOURCES += dac.c
 SOURCES += midi.c
+SOURCES += gpio.c
 
 LIBS = -lasound
 BIN_DIR = ../buildroot/output/host/usr/bin/

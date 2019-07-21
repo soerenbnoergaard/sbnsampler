@@ -1,4 +1,5 @@
 #include "dac.h"
+#include "gpio.h"
 #include <alsa/asoundlib.h>
 
 // Globals /////////////////////////////////////////////////////////////////////
@@ -11,11 +12,13 @@ static int32_t buffer_index;
 status_t write_buffer(void)
 {
     int32_t err;
+    gpio5_set();
     if ((err = snd_pcm_writei(playback_handle, buffer, BUFFER_SIZE)) != BUFFER_SIZE) {
         fprintf(stderr, "write to audio interface failed (%s)\n", snd_strerror(err));
         return STATUS_ERROR;
     }
 
+    gpio5_clear();
     return STATUS_OK;
 }
 
