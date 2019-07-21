@@ -6,7 +6,7 @@
 #include "midi.h"
 #include "ctrl.h"
 
-#define SIMULATION_LENGTH 44100*3
+#define SIMULATION_LENGTH 44100*10
 
 static status_t init(void)
 {

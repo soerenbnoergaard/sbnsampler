@@ -1,4 +1,5 @@
 #include "vco.h"
+#include "polyfilter_coeffs.h"
 
 #include <malloc.h>
 #include <sys/stat.h>
@@ -169,6 +170,85 @@ status_t reset(sample_collection_t *collection)
     return STATUS_OK;
 }
 
+static ppf_t *find_transposition(int32_t num_steps)
+{
+    // Find the necessary polyphase filter to obtain the transposition
+    if ((PPF_TRANSPOSE_MIN < num_steps) && (num_steps < PPF_TRANSPOSE_MAX)) {
+        return &ppf[PPF_ZERO_TRANSPOSE_OFFSET + num_steps];
+    }
+
+    return NULL;
+}
+
+int16_t transpose(vco_t *vco, status_t *status)
+{
+    // Polyphase re-sampling filter
+    // Variable names after Lyons - Understanding Digital Signal Processing.
+
+    float y;
+    int32_t k; // Sub-filter coefficient selector
+    int32_t l; // Delay-line index
+    uint32_t N = PPF_NUM_TABS;
+
+    // Short-hand names for voice variables
+    int16_t *x = vco->sample_delay_line;
+    int32_t n = vco->sample_index;
+    int32_t m = vco->index;
+    int32_t L = vco->interpolation_rate;
+    int32_t M = vco->decimation_rate;
+    float *h = vco->coeffs;
+
+    // Assume everything is OK
+    *status = STATUS_OK;
+
+    // Compute input buffer index
+    n = (m * M) / L;
+
+    // Update delay line if `n` has changed.
+    // Index into delay line == number of delays
+    if (n != vco->sample_index) {
+        for (l = N-1; l >= 1; l--) {
+            x[l] = x[l-1];
+        }
+
+        if (vco->sample->loop_enabled) {
+            // LOOPED
+
+            if (n > vco->sample->loop_stop) {
+                m -= ((vco->sample->loop_stop - vco->sample->loop_start) * L) / M;
+            }
+        }
+        else {
+            // NOT LOOPED
+
+            if (n >= vco->sample->length - 1) {
+                // No more input-samples
+                *status = STATUS_NO_SAMPLES;
+                return 0;
+            }
+        }
+
+        x[0] = vco->sample->data[n];
+    }
+
+    // Compute polyphase sub-filter selector
+    k = (m * M) % L;
+
+    // Execute filter difference equation
+    y = 0;
+    for (l = 0; l < N; l++) {
+        y += (L * h[L*l + k] * (float)x[l]);
+    }
+
+    // Update voice names from internal variables
+    // Increase output buffer index, `m`
+    vco->sample_index = n;
+    vco->index = m + 1;
+
+    // Return resulting sample
+    return (int16_t)y;
+}
+
 // Public functions ////////////////////////////////////////////////////////////
 status_t vco_init(void)
 {
@@ -215,6 +295,7 @@ status_t vco_setup(vco_t *vco, uint8_t note)
     int32_t n;
     sample_collection_t *collection = &sample_collections[0];
     sample_t *sample;
+    ppf_t *ppf;
 
     // Find sample in sample collection
     for (n = 0; n < collection->num_samples; n++) {
@@ -232,30 +313,36 @@ status_t vco_setup(vco_t *vco, uint8_t note)
         return STATUS_ERROR;
     }
 
+    // Find transposition
+    ppf = find_transposition(note - sample->note_root);
+    if (ppf == NULL) {
+        error("Transposition out of range");
+        return STATUS_ERROR;
+    }
+    puts("Found transposition!");
+
     // Initialize VCO
+    // Sound sample
     vco->sample = sample;
     vco->sample_index = 0;
+    for (n = 0; n < PPF_NUM_TABS; n++) {
+        vco->sample_delay_line[n] = 0;
+    }
+
+    // Note and transposition info
     vco->note = note;
+    vco->index = 0;
+    vco->coeffs = ppf->h;
+    vco->interpolation_rate = ppf->L;
+    vco->decimation_rate = ppf->M;
 
     return STATUS_OK;
 }
 
 int16_t vco_get_sample(vco_t *vco, status_t *status)
 {
-    // TODO: Transpose the sample
-    // TODO: Loop the sample
-
     int16_t x;
-
-    if (vco->sample_index < vco->sample->length) {
-        *status = STATUS_OK;
-        x = vco->sample->data[vco->sample_index];
-        vco->sample_index += 1;
-    }
-    else {
-        *status = STATUS_NO_SAMPLES;
-        x = 0;
-    }
+    x = transpose(vco, status);
 
     return x;
 }

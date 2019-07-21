@@ -93,7 +93,6 @@ static ppf_t *find_transposition(voice_t *v)
     return NULL;
 }
 
-
 static int32_t note_on(midi_message_t m)
 {
     bool voice_stolen = false;

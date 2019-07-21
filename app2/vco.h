@@ -2,6 +2,7 @@
 #define VCO_H
 
 #include "utils.h"
+#include "polyfilter_coeffs.h"
 
 #define NUM_SAMPLES_PER_COLLECTION 128
 #define NUM_COLLECTIONS 128
@@ -30,9 +31,17 @@ typedef struct {
 // VCO type
 //    A VCO contains everything necessary for a voice to contain a sound source. 
 typedef struct {
-    sample_t *sample;
-    uint32_t sample_index;
+    // Sound sample
+    sample_t *sample; // x
+    uint32_t sample_index; // n
+    int16_t sample_delay_line[PPF_NUM_TABS];
+
+    // Note and transposition info
     uint8_t note;
+    int32_t index; // m
+    float *coeffs; // h
+    int32_t interpolation_rate; // L
+    int32_t decimation_rate; // M
 } vco_t;
 
 status_t vco_init(void);

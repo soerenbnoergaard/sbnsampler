@@ -13,6 +13,7 @@ SOURCES = main.c
 SOURCES += vco.c
 SOURCES += voice.c
 SOURCES += ctrl.c
+SOURCES += polyfilter_coeffs.c
 
 # Hardware dependent
 SOURCES += $(HAL_DIR)dac.c
