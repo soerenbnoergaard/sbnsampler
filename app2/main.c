@@ -70,9 +70,6 @@ int main(void)
         return 1;
     }
 
-    // Simulation only: Add MIDI message
-    midi_input(0x90, 60, 127);
-
     // Data path
     for (i = 0; i < SIMULATION_LENGTH; i++) {
         x = 0;

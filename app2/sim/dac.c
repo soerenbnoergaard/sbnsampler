@@ -32,7 +32,7 @@ status_t write_buffer()
 status_t dac_init(const char *interface, uint32_t sample_rate_Hz)
 {
     subchunk_2_size = 0;
-    output_file = fopen("output.wav", "wb");
+    output_file = fopen("dac.wav", "wb");
     if (output_file == NULL) {
         return STATUS_ERROR;
     }
