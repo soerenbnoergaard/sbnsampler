@@ -6,7 +6,7 @@
 #include "midi.h"
 #include "ctrl.h"
 
-#define SIMULATION_LENGTH 44100*10
+static int32_t duration;
 
 static status_t init(void)
 {
@@ -58,16 +58,16 @@ static status_t close(void)
     return STATUS_OK;
 }
 
-static status_t simulation(void)
+static status_t run(void)
 {
     int32_t i;
     int32_t n;
     int16_t x;
     voice_t *v;
-    status_t st;
+    status_t status;
 
     // Data path
-    for (i = 0; i < SIMULATION_LENGTH; i++) {
+    for (i = 0; (duration == 0) || (i < duration); i++) {
         x = 0;
 
         // Control path
@@ -80,23 +80,35 @@ static status_t simulation(void)
         }
 
         // Accumulated data path
-        st = dac_write(x);
-        if (st != STATUS_OK) {
+        status = dac_write(x);
+        if (status != STATUS_OK) {
             error("Error writing to DAC");
+            // TODO: Restart DAC if this happens
             break;
         }
     }
     return STATUS_OK;
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    // First argument: Number of samples to stop after.
+    // If no argument is supplied, run forever.
+    if (argc > 1) {
+        if (sscanf(argv[1], "%d", &duration) != 1) {
+            error("Could not duration based on argument");
+        }
+        printf("Fixed duration: %d samples\n", duration);
+    }
+    else {
+        duration = 0;
+    }
 
     if (init() != STATUS_OK) {
         return 1;
     }
 
-    if (simulation() != STATUS_OK) {
+    if (run() != STATUS_OK) {
         return 1;
     }
 

@@ -18,7 +18,7 @@ static int16_t buffer[BUFFER_SIZE];
 static int32_t buffer_index;
 
 // Private functions ///////////////////////////////////////////////////////////
-status_t write_buffer()
+status_t write_buffer(void)
 {
     if (output_file == NULL) {
         return STATUS_ERROR;
@@ -61,12 +61,13 @@ status_t dac_close(void)
 
 status_t dac_write(int16_t sample)
 {
+    status_t status = STATUS_OK;
     buffer[buffer_index] = sample;
     buffer_index += 1;
     if (buffer_index >= BUFFER_SIZE) {
-        write_buffer();
+        status = write_buffer();
         buffer_index = 0;
     }
-    return STATUS_OK;
+    return status;
 }
 

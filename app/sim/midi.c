@@ -1,5 +1,7 @@
 #include "midi.h"
 
+#define MAX_SIMULATION_LENGTH 30*SAMPLE_RATE_Hz
+
 // Globals /////////////////////////////////////////////////////////////////////
 static uint32_t sample_counter;
 static FILE *input_file;
@@ -75,6 +77,11 @@ status_t midi_get(midi_message_t *m)
     }
 
     sample_counter += 1;
+
+    if (sample_counter > MAX_SIMULATION_LENGTH) {
+        error("Exceeded maximum simulation length");
+        exit(1);
+    }
     return status;
 }
 

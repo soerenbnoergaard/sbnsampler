@@ -114,7 +114,7 @@ status_t load_from_csv(FILE *input_file, bool parse)
         free(line);
 
         if (ret == record_size) {
-            printf("Loading sample: %s\n", record.filename);
+            /* printf("Loading sample: %s\n", record.filename); */
 
             // Verify inputs
             N = record.collection_id;
@@ -319,7 +319,6 @@ status_t vco_setup(vco_t *vco, uint8_t note)
         error("Transposition out of range");
         return STATUS_ERROR;
     }
-    puts("Found transposition!");
 
     // Initialize VCO
     // Sound sample

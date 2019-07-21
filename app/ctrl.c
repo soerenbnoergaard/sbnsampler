@@ -44,13 +44,12 @@ static voice_t *find_voice(uint8_t note, bool enable_stealing, bool *voice_stole
                 n_steal = n;
             }
 
-            // TODO: When transposition filter is in place, re-enable this
-            /* if (n_oldest < 0) { */
-            /*     n_oldest = n; */
-            /* } */
-            /* else if (v->ppf_idx > voices_get(n_oldest)->ppf_idx) { */
-            /*     n_oldest = n; */
-            /* } */
+            if (n_oldest < 0) {
+                n_oldest = n;
+            }
+            else if (v->vco.index > voice_get_handle(n_oldest)->vco.index) {
+                n_oldest = n;
+            }
             break;
         }
     }
