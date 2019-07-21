@@ -100,6 +100,17 @@ static status_t note_on(midi_message_t m)
 
 static status_t note_off(midi_message_t m)
 {
+    int32_t n;
+    voice_t *v;
+
+    // Find the voice with the note active and stop it.
+    for (n = 0; n < NUM_VOICES; n++) {
+        v = voice_get_handle(n);
+        if (v->note == m.data[0]) {
+            v->state = VOICE_STATE_STOPPED;
+        }
+    }
+
     return STATUS_OK;
 }
 
