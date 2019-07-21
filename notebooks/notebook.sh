@@ -2,6 +2,7 @@
 
 PY="python3"
 PIP="pip3"
+JUPYTER="jupyter"
 VENV_DIR="venv"
 ACTIVATE="source $VENV_DIR/bin/activate"
 DEACTIVATE="deactivate"
@@ -28,7 +29,8 @@ fi
 if [ $CMD == "init" ]; then
     $PY -m venv $VENV_DIR
     $ACTIVATE
-    $PIP install jupyter numpy scipy matplotlib pandas fortran-magic numba cython
+    $PIP install jupyter numpy scipy matplotlib pandas fortran-magic numba cython jupyter_contrib_nbextensions
+    $JUPYTER contrib nbextension install --sys-prefix
     $DEACTIVATE
     CMD="run"
 fi
@@ -36,6 +38,6 @@ fi
 # Run jupyter 
 if [ $CMD == "run" ]; then
     $ACTIVATE
-    $PY -m notebook --browser="chromium-browser"
+    $JUPYTER notebook --browser="chromium-browser"
     $DEACTIVATE
 fi
