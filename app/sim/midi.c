@@ -27,6 +27,12 @@ status_t fetch(bool parse)
     }
 
     if (parse) {
+        if (line[0] == '#') {
+            free(line);
+            // Ignore comment and fetch new line
+            return fetch(parse);
+        }
+
         ret = sscanf(line, "%d,%d,%d,%d", &tmp[0], &tmp[1], &tmp[2], &tmp[3]);
         if (ret == 4) {
             record.time = tmp[0];

@@ -2,7 +2,7 @@
 
 TARGET = sbnsampler
 OBJ_DIR = ./__objects__/
-HAL_DIR = ./hw/
+HAL_DIR = ./sim/
 
 INCLUDES = -I.
 

@@ -28,7 +28,7 @@ fi
 if [ $CMD == "init" ]; then
     $PY -m venv $VENV_DIR
     $ACTIVATE
-    $PIP install jupyter numpy scipy matplotlib fortran-magic numba cython
+    $PIP install jupyter numpy scipy matplotlib pandas fortran-magic numba cython
     $DEACTIVATE
     CMD="run"
 fi
