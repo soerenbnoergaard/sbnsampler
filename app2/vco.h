@@ -4,7 +4,7 @@
 #include "utils.h"
 
 #define NUM_SAMPLES_PER_COLLECTION 128
-#define NUM_COLLECTIONS 1
+#define NUM_COLLECTIONS 128
 
 // Sample type.
 //     A sample consists of audio data valid for a range of midi notes. It may be

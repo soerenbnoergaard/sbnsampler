@@ -58,17 +58,13 @@ static status_t close(void)
     return STATUS_OK;
 }
 
-int main(void)
+static status_t simulation(void)
 {
     int32_t i;
     int32_t n;
     int16_t x;
     voice_t *v;
     status_t st;
-
-    if (init() != STATUS_OK) {
-        return 1;
-    }
 
     // Data path
     for (i = 0; i < SIMULATION_LENGTH; i++) {
@@ -89,6 +85,19 @@ int main(void)
             error("Error writing to DAC");
             break;
         }
+    }
+    return STATUS_OK;
+}
+
+int main(void)
+{
+
+    if (init() != STATUS_OK) {
+        return 1;
+    }
+
+    if (simulation() != STATUS_OK) {
+        return 1;
     }
 
     if (close() != STATUS_OK) {
