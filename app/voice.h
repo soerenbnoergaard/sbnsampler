@@ -2,6 +2,7 @@
 #define VOICE_H
 
 #include "utils.h"
+#include "midi.h"
 #include "vco.h"
 #include "vcf.h"
 #include "adsr.h"
@@ -21,6 +22,8 @@ typedef enum {
 //     A voice consists of an oscillator playing a specified note
 typedef struct {
     voice_state_t state;
+    midi_message_t midi;
+
     vco_t vco;
     vcf_t vcf;
     adsr_t env1;

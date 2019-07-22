@@ -117,7 +117,7 @@ static status_t run(void)
         }
 
         // Accumulated data path
-        status = dac_write(x);
+        status = dac_write(y);
         if (status != STATUS_OK) {
             return STATUS_ERROR;
         }

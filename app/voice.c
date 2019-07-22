@@ -124,6 +124,9 @@ int16_t voice_get_sample(voice_t *v)
         break;
 
     case VOICE_STATE_STARTING:
+        v->note = v->midi.data[0];
+        v->velocity = v->midi.data[1];
+
         adsr_start(&v->env1);
         vco_setup(&v->vco, v->note);
         vcf_setup(&v->vcf);
