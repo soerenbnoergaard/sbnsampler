@@ -3,6 +3,7 @@
 
 #include "utils.h"
 #include "vco.h"
+#include "vcf.h"
 #include "adsr.h"
 
 #define NUM_VOICES 8
@@ -21,6 +22,7 @@ typedef enum {
 typedef struct {
     voice_state_t state;
     vco_t vco;
+    vcf_t vcf;
     adsr_t env1;
 
     uint8_t note;

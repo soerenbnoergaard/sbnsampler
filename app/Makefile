@@ -19,6 +19,7 @@ SOURCES = main.c
 # Project files
 SOURCES += vco.c
 SOURCES += vca.c
+SOURCES += vcf.c
 SOURCES += voice.c
 SOURCES += ctrl.c
 SOURCES += polyfilter_coeffs.c

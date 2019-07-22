@@ -82,7 +82,7 @@ static status_t note_on(midi_message_t m)
         return STATUS_ERROR;
     }
 
-    // Prepare the voice for playback
+    // TODO: If stolen, update note and velocity _after_ the note has run out.
     v->note = m.data[0];
     v->velocity = m.data[1];
 
@@ -91,6 +91,7 @@ static status_t note_on(midi_message_t m)
         v->state = VOICE_STATE_RESTARTING;
     }
     else {
+        // Prepare the voice for playback
         v->state = VOICE_STATE_STARTING;
     }
 

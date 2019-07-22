@@ -6,6 +6,7 @@
 #include "midi.h"
 #include "gpio.h"
 #include "ctrl.h"
+#include "vca.h"
 
 // Globals /////////////////////////////////////////////////////////////////////
 static int32_t duration;
@@ -95,12 +96,13 @@ static status_t run(void)
     int32_t i;
     int32_t n;
     int16_t x;
+    int16_t y;
     voice_t *v;
     status_t status;
 
     // Data path
     for (i = 0; (!simulation) || (i < duration); i++) {
-        x = 0;
+        y = 0;
 
         // Control path
         ctrl_tick();
@@ -108,7 +110,10 @@ static status_t run(void)
         // Voice data paths
         for (n = 0; n < NUM_VOICES; n++) {
             v = voice_get_handle(n);
-            x += 0.2 * voice_get_sample(v);
+
+            x = voice_get_sample(v);
+            x = vca(x, 31);
+            y += x;
         }
 
         // Accumulated data path
