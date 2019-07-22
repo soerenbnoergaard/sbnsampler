@@ -7,6 +7,7 @@
 #include "gpio.h"
 #include "ctrl.h"
 #include "vca.h"
+#include "panel.h"
 
 // Globals /////////////////////////////////////////////////////////////////////
 static int32_t duration;
@@ -53,6 +54,10 @@ static status_t init(void)
         error("Error initializing control path");
         return STATUS_ERROR;
     }
+    if (panel_init() != STATUS_OK) {
+        error("Error initializing panel");
+        return STATUS_ERROR;
+    }
 
     if (init_on_crash() != STATUS_OK) {
         return STATUS_ERROR;
@@ -81,6 +86,10 @@ static status_t close(void)
     }
     if (ctrl_close() != STATUS_OK) {
         error("Error closing control path");
+        return STATUS_ERROR;
+    }
+    if (panel_close() != STATUS_OK) {
+        error("Error closing panel ");
         return STATUS_ERROR;
     }
 
@@ -115,6 +124,8 @@ static status_t run(void)
             x = vca(x, 31);
             y += x;
         }
+
+        y = vca(y, panel_get(PANEL_VOLUME));
 
         // Accumulated data path
         status = dac_write(y);

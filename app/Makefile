@@ -24,6 +24,7 @@ SOURCES += voice.c
 SOURCES += ctrl.c
 SOURCES += polyfilter_coeffs.c
 SOURCES += adsr.c
+SOURCES += panel.c
 
 SENSITIVITY = $(wildcard *.h) Makefile
 OBJECTS = $(addprefix $(OBJ_DIR), $(notdir $(SOURCES:.c=.o)))

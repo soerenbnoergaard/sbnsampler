@@ -1,24 +1,11 @@
 #include "ctrl.h"
 #include "midi.h"
 #include "voice.h"
-
-// TODO: Move to panel
-#define ENABLE_STEALING true
-
-#define CC_PRESET 0x50
-#define CC_VOLUME 0x46
-#define CC_CUTOFF_VELOCITY 0x0a
-#define CC_SUSTAIN 0x40
-#define CC_CUTOFF 0x4a
-#define CC_RESONANCE 0x47
-
-#define CC_AMP_ATTACK 0x53
-#define CC_AMP_DECAY 0x59
-#define CC_AMP_SUSTAIN 0x55
-#define CC_AMP_RELEASE 0x52
+#include "panel.h"
 
 #define NOTE_ON 0x90
 #define NOTE_OFF 0x80
+#define CC 0xb0
 
 // Globals /////////////////////////////////////////////////////////////////////
 
@@ -76,7 +63,7 @@ static status_t note_on(midi_message_t m)
     bool stolen;
 
     // Find an available voice
-    v = find_voice(m.data[0], ENABLE_STEALING, &stolen);
+    v = find_voice(m.data[0], panel_get(PANEL_ENABLE_STEALING), &stolen);
     if (v == NULL) {
         error("No voice available");
         return STATUS_ERROR;
@@ -127,6 +114,10 @@ static status_t input(midi_message_t m)
 
     case NOTE_OFF:
         note_off(m);
+        break;
+
+    case CC:
+        panel_set(m.data[0], m.data[1]);
         break;
 
     default:

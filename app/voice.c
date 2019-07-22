@@ -1,14 +1,26 @@
 #include "voice.h"
 #include "vca.h"
+#include "panel.h"
+
 
 // Globals /////////////////////////////////////////////////////////////////////
 static voice_t voices[NUM_VOICES];
 
 // Private functions ///////////////////////////////////////////////////////////
-int16_t datapath(voice_t *v, status_t *status)
-{
-    // TODO: Move parameters to panel
 
+static uint8_t add_and_saturate(uint8_t x, uint8_t y)
+{
+    return (x+y>127) ? 127 : x+y;
+}
+
+static uint8_t multiply(uint8_t x, uint8_t y)
+{
+    uint16_t acc = (uint16_t)x * (uint16_t)y;
+    return acc>>7;
+}
+
+static int16_t datapath(voice_t *v, status_t *status)
+{
     int16_t x = 0;
     uint8_t param1;
     uint8_t param2;
@@ -19,8 +31,9 @@ int16_t datapath(voice_t *v, status_t *status)
         return 0;
     }
 
-    param1 = v->velocity;
+    param1 = add_and_saturate(panel_get(PANEL_CUTOFF), multiply(panel_get(PANEL_CUTOFF_VELOCITY), v->velocity));
     param2 = 0;
+
     x = vcf_filter(x, v->vcf.w1, param1, param2);
 
     param1 = adsr_get(&v->env1);
@@ -30,10 +43,16 @@ int16_t datapath(voice_t *v, status_t *status)
     return x;
 }
 
-status_t control(voice_t *v)
+static status_t control(voice_t *v)
 {
-    // TODO: Fetch settings from front panel
-    if (adsr_setup(&v->env1, 0, 0, 127, 63) != STATUS_OK) {
+    status_t status;
+    status = adsr_setup(&v->env1,
+                        panel_get(PANEL_ENV1_ATTACK),
+                        panel_get(PANEL_ENV1_DECAY),
+                        panel_get(PANEL_ENV1_SUSTAIN),
+                        panel_get(PANEL_ENV1_RELEASE));
+
+    if (status != STATUS_OK) {
         return STATUS_ERROR;
     }
 
@@ -43,7 +62,7 @@ status_t control(voice_t *v)
     return STATUS_OK;
 }
 
-status_t get_sample(voice_t *v, status_t *status)
+static status_t get_sample(voice_t *v, status_t *status)
 {
     int16_t x;
 
@@ -60,19 +79,13 @@ status_t get_sample(voice_t *v, status_t *status)
     return x;
 }
 
-bool released(voice_t *v)
+static bool released(voice_t *v)
 {
     if (!adsr_is_stopped(&v->env1)) {
         return false;
     }
 
     return true;
-}
-
-status_t quick_release(voice_t *v)
-{
-    adsr_stop_quick(&v->env1);
-    return STATUS_OK;
 }
 
 // Public functions ////////////////////////////////////////////////////////////
