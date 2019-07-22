@@ -1,8 +1,15 @@
 .PHONY: all clean cleanall
 
-TARGET = sbnsampler
+SIM = 1
+ifeq ($(SIM), 1)
+	HAL_DIR = ./sim/
+	TARGET = sbnsamplersim
+else
+	HAL_DIR = ./hw/
+	TARGET = sbnsampler
+endif
+
 OBJ_DIR = ./__objects__/
-HAL_DIR = ./sim/
 
 INCLUDES = -I.
 
@@ -11,9 +18,11 @@ SOURCES = main.c
 
 # Project files
 SOURCES += vco.c
+SOURCES += vca.c
 SOURCES += voice.c
 SOURCES += ctrl.c
 SOURCES += polyfilter_coeffs.c
+SOURCES += adsr.c
 
 SENSITIVITY = $(wildcard *.h) Makefile
 OBJECTS = $(addprefix $(OBJ_DIR), $(notdir $(SOURCES:.c=.o)))

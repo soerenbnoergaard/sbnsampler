@@ -12,6 +12,7 @@ __objects__
 app_old/sbnsampler
 
 app/sbnsampler
+app/sbnsamplersim
 app/dac.wav
 
 notebooks/.ipynb_checkpoints

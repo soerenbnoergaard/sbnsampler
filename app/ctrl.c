@@ -108,7 +108,7 @@ static status_t note_off(midi_message_t m)
     for (n = 0; n < NUM_VOICES; n++) {
         v = voice_get_handle(n);
         if (v->note == m.data[0]) {
-            v->state = VOICE_STATE_STOPPED;
+            voice_stop(v);
         }
     }
 
