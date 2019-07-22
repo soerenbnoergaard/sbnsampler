@@ -73,7 +73,7 @@ static status_t load(const char *filename, sample_t *destination)
     return STATUS_OK;
 }
 
-status_t load_from_csv(FILE *input_file, bool parse)
+static status_t load_from_csv(FILE *input_file, bool parse)
 {
     char *line = NULL;
     size_t length = 0;
@@ -154,19 +154,28 @@ status_t load_from_csv(FILE *input_file, bool parse)
     return STATUS_OK;
 }
 
-status_t reset(sample_collection_t *collection)
+static status_t reset_sample(sample_t *s)
+{
+    if (s->data != NULL) {
+        free(s->data);
+    }
+    s->data = NULL;
+    s->loop_enabled = false;
+
+    return STATUS_OK;
+}
+
+static status_t reset_collection(sample_collection_t *collection)
 {
     int32_t n;
-    sample_t *s;
-    for (n = 0; n < collection->num_samples; n++) {
-        s = &collection->samples[n];
-        if (s->data != NULL) {
-            free(s->data);
-        }
-        s->data = NULL;
-        s->loop_enabled = false;
-    }
     collection->num_samples = 0;
+
+    for (n = 0; n < collection->num_samples; n++) {
+        if (reset_sample(&collection->samples[n]) != STATUS_OK) {
+            return STATUS_ERROR;
+        }
+    }
+
     return STATUS_OK;
 }
 
@@ -180,7 +189,7 @@ static ppf_t *find_transposition(int32_t num_steps)
     return NULL;
 }
 
-int16_t transpose(vco_t *vco, status_t *status)
+static int16_t transpose(vco_t *vco, status_t *status)
 {
     // Polyphase re-sampling filter
     // Variable names after Lyons - Understanding Digital Signal Processing.
@@ -257,7 +266,7 @@ status_t vco_init(void)
 
     // Reset all sample slots
     for (n = 0; n < NUM_COLLECTIONS; n++) {
-        reset(&sample_collections[n]);
+        reset_collection(&sample_collections[n]);
     }
 
     // Load samples from CSV file
@@ -284,7 +293,7 @@ status_t vco_close(void)
 
     // Free all allocated slots
     for (n = 0; n < NUM_COLLECTIONS; n++) {
-        reset(&sample_collections[n]);
+        reset_collection(&sample_collections[n]);
     }
 
     return STATUS_OK;

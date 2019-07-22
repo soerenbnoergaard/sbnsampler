@@ -17,15 +17,15 @@ status_t adsr_start(adsr_t *adsr)
     return STATUS_OK;
 }
 
-status_t adsr_restart(adsr_t *adsr)
-{
-    adsr->state = ADSR_STATE_QUICK_RELEASE;
-    return STATUS_OK;
-}
-
 status_t adsr_stop(adsr_t *adsr)
 {
     adsr->state = ADSR_STATE_RELEASE;
+    return STATUS_OK;
+}
+
+status_t adsr_stop_quick(adsr_t *adsr)
+{
+    adsr->state = ADSR_STATE_QUICK_RELEASE;
     return STATUS_OK;
 }
 
@@ -103,7 +103,7 @@ status_t adsr_tick(adsr_t *adsr)
             adsr->step += 1;
         }
         else {
-            adsr->state = ADSR_STATE_IDLE;
+            adsr->state = ADSR_STATE_STOPPED;
         }
 
         break;

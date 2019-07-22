@@ -2,6 +2,7 @@
 #include "midi.h"
 #include "voice.h"
 
+// TODO: Move to panel
 #define ENABLE_STEALING true
 
 #define CC_PRESET 0x50
@@ -82,14 +83,11 @@ static status_t note_on(midi_message_t m)
     }
 
     // Prepare the voice for playback
-    // TODO: consider moving to `voice_setup()`
     v->note = m.data[0];
     v->velocity = m.data[1];
-    if (vco_setup(&v->vco, v->note) != STATUS_OK) {
-        return STATUS_ERROR;
-    }
 
     if (stolen) {
+        voice_restart(v);
         v->state = VOICE_STATE_RESTARTING;
     }
     else {
@@ -107,7 +105,7 @@ static status_t note_off(midi_message_t m)
     // Find the voice with the note active and stop it.
     for (n = 0; n < NUM_VOICES; n++) {
         v = voice_get_handle(n);
-        if (v->note == m.data[0]) {
+        if ((v->note == m.data[0]) && (v->state != VOICE_STATE_IDLE)) {
             voice_stop(v);
         }
     }

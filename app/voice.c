@@ -36,6 +36,23 @@ status_t control(voice_t *v)
     return STATUS_OK;
 }
 
+status_t get_sample(voice_t *v, status_t *status)
+{
+    int16_t x;
+
+    x = datapath(v, status);
+    if (*status != STATUS_OK) {
+        return 0;
+    }
+
+    *status = control(v);
+    if (*status != STATUS_OK) {
+        return 0;
+    }
+
+    return x;
+}
+
 bool released(voice_t *v)
 {
     if (!adsr_is_stopped(&v->env1)) {
@@ -43,6 +60,12 @@ bool released(voice_t *v)
     }
 
     return true;
+}
+
+status_t quick_release(voice_t *v)
+{
+    adsr_stop_quick(&v->env1);
+    return STATUS_OK;
 }
 
 // Public functions ////////////////////////////////////////////////////////////
@@ -66,8 +89,16 @@ status_t voice_close(void)
 
 status_t voice_stop(voice_t *v)
 {
+    here("Voice stop");
     adsr_stop(&v->env1);
     v->state = VOICE_STATE_STOPPED;
+    return STATUS_OK;
+}
+
+status_t voice_restart(voice_t *v)
+{
+    adsr_stop_quick(&v->env1);
+    v->state = VOICE_STATE_RESTARTING;
     return STATUS_OK;
 }
 
@@ -87,42 +118,35 @@ int16_t voice_get_sample(voice_t *v)
         break;
 
     case VOICE_STATE_STARTING:
-    case VOICE_STATE_RESTARTING:
-        v->state = VOICE_STATE_RUNNING;
+        here("Starting");
         adsr_start(&v->env1);
+
+        status = vco_setup(&v->vco, v->note);
+        v->state = VOICE_STATE_RUNNING;
+
         break;
 
     case VOICE_STATE_RUNNING:
-        x = datapath(v, &status);
-        if (status != STATUS_OK) {
-            v->state = VOICE_STATE_IDLE;
-            break;
-        }
-
-        status = control(v);
-        if (status != STATUS_OK) {
-            v->state = VOICE_STATE_IDLE;
-            break;
-        }
-
+        x = get_sample(v, &status);
         break;
 
     case VOICE_STATE_STOPPED:
         if (released(v)) {
             v->state = VOICE_STATE_RELEASED;
-        }
-
-        x = datapath(v, &status);
-        if (status != STATUS_OK) {
-            v->state = VOICE_STATE_IDLE;
             break;
         }
 
-        status = control(v);
-        if (status != STATUS_OK) {
-            v->state = VOICE_STATE_IDLE;
+        x = get_sample(v, &status);
+        break;
+
+    case VOICE_STATE_RESTARTING:
+        if (released(v)) {
+            here("Restarting");
+            v->state = VOICE_STATE_STARTING;
             break;
         }
+
+        x = get_sample(v, &status);
         break;
 
     case VOICE_STATE_RELEASED:
@@ -134,5 +158,10 @@ int16_t voice_get_sample(voice_t *v)
         break;
     }
 
+    if (status != STATUS_OK) {
+        here("status!=OK");
+        v->state = VOICE_STATE_IDLE;
+        x = 0;
+    }
     return x;
 }

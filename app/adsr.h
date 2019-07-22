@@ -26,8 +26,8 @@ typedef struct {
 
 status_t adsr_setup(adsr_t *adsr, uint8_t attack, uint8_t decay, uint8_t sustain, uint8_t release);
 status_t adsr_start(adsr_t *adsr);
-status_t adsr_restart(adsr_t *adsr);
 status_t adsr_stop(adsr_t *adsr);
+status_t adsr_stop_quick(adsr_t *adsr);
 status_t adsr_tick(adsr_t *adsr);
 uint8_t adsr_get(adsr_t *adsr);
 bool adsr_is_stopped(adsr_t *adsr);
