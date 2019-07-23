@@ -132,14 +132,14 @@ static status_t run(void)
             x = vco_get_sample(&v->vco, &status, (v->state != VOICE_STATE_IDLE));
 
             // VCF
-            param1 = mmath_add_and_saturate(panel_get(PANEL_CUTOFF),
-                                            mmath_multiply(panel_get(PANEL_CUTOFF_VELOCITY),
-                                                           v->velocity));
+            param1 = mmath_multiply(panel_get(PANEL_ENV2_AMOUNT), adsr_get(&v->env2));
+            param1 = mmath_add_and_saturate(panel_get(PANEL_CUTOFF), param1);
+                                            
             param2 = 0;
             x = vcf_filter(x, v->vcf.w1, param1, param2);
 
             // VCA
-            param1 = adsr_get(&v->env1);
+            param1 = mmath_multiply(panel_get(PANEL_ENV1_AMOUNT), adsr_get(&v->env1));
             x = vca(x, param1);
 
             // Output
@@ -147,7 +147,6 @@ static status_t run(void)
             y += x;
         }
 
-        y = vca(y, panel_get(PANEL_VOLUME));
 
         // Accumulated data path
         status = dac_write(y);

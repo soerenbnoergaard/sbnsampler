@@ -15,7 +15,7 @@ status_t panel_init(void)
         parameters[n] = 0;
     }
 
-    panel_set(PANEL_VOLUME, 127);
+    panel_set(PANEL_ENV1_AMOUNT, 127);
     panel_set(PANEL_PRESET, 0);
     panel_set(PANEL_ENABLE_STEALING, 127);
 

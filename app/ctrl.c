@@ -22,6 +22,9 @@ static bool tailed_off(voice_t *v)
     if (!adsr_is_stopped(&v->env1)) {
         return false;
     }
+    if (!adsr_is_stopped(&v->env2)) {
+        return false;
+    }
     return true;
 }
 
@@ -34,6 +37,7 @@ static status_t voice_stop(voice_t *v)
 static status_t voice_restart(voice_t *v)
 {
     adsr_stop_quick(&v->env1);
+    adsr_stop_quick(&v->env2);
     v->state = VOICE_STATE_RESTARTING;
     return STATUS_OK;
 }
@@ -195,6 +199,7 @@ status_t ctrl_voice_tick(voice_t *v)
         v->velocity = v->midi.data[1];
 
         adsr_start(&v->env1);
+        adsr_start(&v->env2);
         vco_setup(&v->vco, v->note);
         vcf_setup(&v->vcf);
 
@@ -214,6 +219,7 @@ status_t ctrl_voice_tick(voice_t *v)
     case VOICE_STATE_STOPPED:
         if (released(v)) {
             adsr_stop(&v->env1);
+            adsr_stop(&v->env2);
             v->state = VOICE_STATE_RELEASED;
             break;
         }
@@ -239,6 +245,16 @@ status_t ctrl_voice_tick(voice_t *v)
     assert(status == STATUS_OK);
 
     status = adsr_tick(&v->env1);
+    assert(status == STATUS_OK);
+
+    status = adsr_setup(&v->env2,
+                        panel_get(PANEL_ENV2_ATTACK),
+                        panel_get(PANEL_ENV2_DECAY),
+                        panel_get(PANEL_ENV2_SUSTAIN),
+                        panel_get(PANEL_ENV2_RELEASE));
+    assert(status == STATUS_OK);
+
+    status = adsr_tick(&v->env2);
     assert(status == STATUS_OK);
 
     return STATUS_OK;

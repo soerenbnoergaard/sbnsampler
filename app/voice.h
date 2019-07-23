@@ -7,7 +7,7 @@
 #include "vcf.h"
 #include "adsr.h"
 
-#define NUM_VOICES 8
+#define NUM_VOICES 6
 
 typedef enum {
     VOICE_STATE_IDLE,
@@ -27,6 +27,7 @@ typedef struct {
     vco_t vco;
     vcf_t vcf;
     adsr_t env1;
+    adsr_t env2;
 
     uint8_t note;
     uint8_t velocity;
