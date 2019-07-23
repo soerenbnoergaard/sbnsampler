@@ -10,11 +10,11 @@
 
 // VCF
 #define PANEL_CUTOFF 0x0a
-#define PANEL_RESONANCE 0x47
+#define PANEL_RESONANCE 0x2c // Not implemented
 
 // Envelope 1
 #define PANEL_ENV1_AMOUNT 0x46
-#define PANEL_ENV1_VELOCITY 0x14 // Not mapped
+#define PANEL_ENV1_VELOCITY 0x14 // Not mapped to key
 #define PANEL_ENV1_ATTACK 0x53
 #define PANEL_ENV1_DECAY 0x59
 #define PANEL_ENV1_SUSTAIN 0x55

@@ -10,6 +10,7 @@
 #include "adsr.h"
 #include "panel.h"
 #include "mmath.h"
+#include "preset.h"
 
 // Globals /////////////////////////////////////////////////////////////////////
 static int32_t duration;
@@ -111,6 +112,7 @@ static status_t run(void)
     int16_t y;
     voice_t *v;
     status_t status;
+
     uint8_t param1;
     uint8_t param2;
 
@@ -132,9 +134,24 @@ static status_t run(void)
             x = vco_get_sample(&v->vco, &status, (v->state != VOICE_STATE_IDLE));
 
             // VCF
-            param1 = mmath_multiply(panel_get(PANEL_ENV2_AMOUNT), adsr_get(&v->env2));
-            param1 = mmath_add_and_saturate(panel_get(PANEL_CUTOFF), param1);
-                                            
+            // S=velocity sensitivity, A=envelope amount, fc=panel cutoff, V=velocity, e=envelope value
+            // Assuming ranges 0.0 - 1.0 for all parameters (Q7)
+
+            // 1) Case with sensitivity enables: param1 = S*A*V
+            param1 = mmath_multiply(panel_get(PANEL_ENV2_VELOCITY), panel_get(PANEL_ENV2_AMOUNT));
+            param1 = mmath_multiply(param1, v->velocity);
+
+            // 2) Case with sensitivity disabled: param1 += A*(1-S)
+            param1 = mmath_add_and_saturate(param1, mmath_multiply(panel_get(PANEL_ENV2_AMOUNT), 127-panel_get(PANEL_ENV2_VELOCITY)));
+
+            // 3) Scale with the envelope level: param1 *= e
+            param1 = mmath_multiply(param1, adsr_get(&v->env2));
+
+            // 4) Append the panel cutoff: param1 += fc
+            param1 = mmath_add_and_saturate(param1, panel_get(PANEL_CUTOFF));
+
+            // Complete logic equation: param = fc + e*(A*(1-S) + S*A*V)
+
             param2 = 0;
             x = vcf_filter(x, v->vcf.w1, param1, param2);
 
@@ -178,6 +195,8 @@ int main(int argc, char *argv[])
     if (init() != STATUS_OK) {
         return 1;
     }
+
+    preset_load(0);
 
     // Do crash handling when running on hardware.
     // Exit directly when running as simulation.

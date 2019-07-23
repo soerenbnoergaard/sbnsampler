@@ -13,7 +13,7 @@ static struct {
 
 // Private functions ///////////////////////////////////////////////////////////
 
-status_t fetch(bool parse)
+static status_t fetch(bool parse)
 {
     char *line = NULL;
     size_t length = 0;

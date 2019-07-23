@@ -2,10 +2,6 @@
 #include "midi.h"
 #include "panel.h"
 
-#define NOTE_ON 0x90
-#define NOTE_OFF 0x80
-#define CC 0xb0
-
 // Globals /////////////////////////////////////////////////////////////////////
 
 // Private functions ///////////////////////////////////////////////////////////
@@ -135,7 +131,7 @@ static status_t note_off(midi_message_t m)
 static status_t input(midi_message_t m)
 {
     switch (m.status & 0xf0) {
-    case NOTE_ON:
+    case MIDI_NOTE_ON:
         if (m.data[1] > 0) {
             note_on(m);
         }
@@ -144,11 +140,11 @@ static status_t input(midi_message_t m)
         }
         break;
 
-    case NOTE_OFF:
+    case MIDI_NOTE_OFF:
         note_off(m);
         break;
 
-    case CC:
+    case MIDI_CC:
         panel_set(m.data[0], m.data[1]);
         break;
 

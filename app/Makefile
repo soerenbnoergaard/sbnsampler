@@ -26,6 +26,7 @@ SOURCES += polyfilter_coeffs.c
 SOURCES += adsr.c
 SOURCES += panel.c
 SOURCES += mmath.c
+SOURCES += preset.c
 
 SENSITIVITY = $(wildcard *.h) Makefile
 OBJECTS = $(addprefix $(OBJ_DIR), $(notdir $(SOURCES:.c=.o)))

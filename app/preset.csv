@@ -1,0 +1,15 @@
+ID,Status,Data0,Data1,Comment
+0,176,10,0,Cutoff
+0,176,44,0,Resonance
+0,176,70,127,Env1 amount
+0,176,20,0,Env1 velocity
+0,176,83,0,Env1 attack
+0,176,89,100,Env1 decay
+0,176,85,0,Env1 sustain
+0,176,82,30,Env1 release
+0,176,19,127,Env2 amount
+0,176,74,127,Env2 velocity
+0,176,73,0,Env2 attack
+0,176,79,0,Env2 decay
+0,176,75,127,Env2 sustain
+0,176,72,127,Env2 release

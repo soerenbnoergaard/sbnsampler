@@ -1,21 +1,6 @@
 Time,   Status, Data0, Data1
-0,      176,       74,     0 # Cutoff
-#
-10,     176,       70,   127 # Env1 amount
-20,     176,       10,     0 # Env1 velocity
-30,     176,       83,     0 # Env1 attack
-40,     176,       89,     0 # Env1 decay
-50,     176,       85,   127 # Env1 sustain
-60,     176,       82,    30 # Env1 release
-#
-100,    176,       19,   127 # Env2 amount
-110,    176,       20,     0 # Env2 velocity
-120,    176,       73,    10 # Env2 attack
-130,    176,       79,    30 # Env2 decay
-140,    176,       75,     0 # Env2 sustain
-150,    176,       72,   127 # Env2 release
-#
-#60,     176,       64,   127 # Sustain on
-1000,   144,       36,    64 # Note on
+0,      176,       80,     0 # Preset
+1000,   144,       36,     1 # Note on
 100000, 128,       36,     0 # Note off
-#200000, 176,       64,     0 # Sustain off
+101000, 144,       36,   127 # Note on
+200000, 128,       36,     0 # Note off
