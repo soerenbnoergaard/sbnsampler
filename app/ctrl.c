@@ -205,6 +205,7 @@ status_t ctrl_tick(void)
 status_t ctrl_voice_tick(voice_t *v)
 {
     status_t status;
+    int32_t num_errors;
 
     // Voice state machine
     switch (v->state) {
@@ -215,12 +216,18 @@ status_t ctrl_voice_tick(voice_t *v)
         v->note = v->midi.data[0];
         v->velocity = v->midi.data[1];
 
-        adsr_start(&v->env1);
-        adsr_start(&v->env2);
-        vco_setup(&v->vco, panel_get(PANEL_SAMPLE_COLLECTION), v->note);
-        vcf_setup(&v->vcf);
+        num_errors = 0;
+        num_errors += adsr_start(&v->env1) != STATUS_OK;
+        num_errors += adsr_start(&v->env2) != STATUS_OK;
+        num_errors += vcf_setup(&v->vcf) != STATUS_OK;
+        num_errors += vco_setup(&v->vco, panel_get(PANEL_SAMPLE_COLLECTION), v->note) != STATUS_OK;
 
-        v->state = VOICE_STATE_RUNNING;
+        if (num_errors > 0) {
+            v->state = VOICE_STATE_IDLE;
+        }
+        else {
+            v->state = VOICE_STATE_RUNNING;
+        }
         break;
 
     case VOICE_STATE_RUNNING:

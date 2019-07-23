@@ -16,7 +16,7 @@ ID,Status,Data0,Data1,Comment
 0,176,75,127,Env2 sustain
 0,176,72,127,Env2 release
 1,176,21,4,P-BASS
-1,176,22,0,Note stealing
+1,176,22,127,Note stealing
 1,176,10,0,Cutoff
 1,176,44,0,Resonance
 1,176,70,127,Env1 amount
