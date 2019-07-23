@@ -67,6 +67,11 @@ static status_t init(void)
         return STATUS_ERROR;
     }
 
+    if (preset_load(0) != STATUS_OK) {
+        error("Error loading preset");
+        return STATUS_ERROR;
+    };
+
     return STATUS_OK;
 }
 
@@ -195,8 +200,6 @@ int main(int argc, char *argv[])
     if (init() != STATUS_OK) {
         return 1;
     }
-
-    preset_load(0);
 
     // Do crash handling when running on hardware.
     // Exit directly when running as simulation.

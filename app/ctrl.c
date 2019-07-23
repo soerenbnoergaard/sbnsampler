@@ -1,5 +1,6 @@
 #include "ctrl.h"
 #include "midi.h"
+#include "preset.h"
 #include "panel.h"
 
 // Globals /////////////////////////////////////////////////////////////////////
@@ -91,7 +92,7 @@ static status_t note_on(midi_message_t m)
     bool stolen;
 
     // Find an available voice
-    v = find_voice(m.data[0], panel_get(PANEL_ENABLE_STEALING), &stolen);
+    v = find_voice(m.data[0], panel_get(PANEL_ENABLE_STEALING) != 0, &stolen);
     if (v == NULL) {
         error("No voice available");
         return STATUS_ERROR;
@@ -105,6 +106,9 @@ static status_t note_on(midi_message_t m)
         v->state = VOICE_STATE_RESTARTING;
     }
     else {
+        // FIXME: If a voice is not stolen, the old voice should ring out.
+        // Right now, it seems like it is quick-stopping the ADSR.
+
         // Prepare the voice for playback
         v->state = VOICE_STATE_STARTING;
     }
@@ -128,6 +132,12 @@ static status_t note_off(midi_message_t m)
     return STATUS_OK;
 }
 
+static status_t change_sample_collection(uint8_t id)
+{
+    here("Change sample");
+    return STATUS_OK;
+}
+
 static status_t input(midi_message_t m)
 {
     switch (m.status & 0xf0) {
@@ -146,6 +156,17 @@ static status_t input(midi_message_t m)
 
     case MIDI_CC:
         panel_set(m.data[0], m.data[1]);
+
+        switch (m.data[0]) {
+        case PANEL_SAMPLE_COLLECTION:
+            change_sample_collection(m.data[1]);
+            break;
+        case PANEL_PRESET:
+            preset_load(panel_get(PANEL_PRESET));
+            break;
+        default:
+            break;
+        }
         break;
 
     default:
@@ -196,7 +217,7 @@ status_t ctrl_voice_tick(voice_t *v)
 
         adsr_start(&v->env1);
         adsr_start(&v->env2);
-        vco_setup(&v->vco, v->note);
+        vco_setup(&v->vco, panel_get(PANEL_SAMPLE_COLLECTION), v->note);
         vcf_setup(&v->vcf);
 
         v->state = VOICE_STATE_RUNNING;

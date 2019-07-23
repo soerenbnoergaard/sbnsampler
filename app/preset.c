@@ -2,7 +2,7 @@
 #include "panel.h"
 #include "ctrl.h"
 
-#define INPUT_FILE "preset.csv"
+#define INPUT_FILE "presets.csv"
 
 // Globals /////////////////////////////////////////////////////////////////////
 typedef struct {
@@ -56,6 +56,9 @@ status_t preset_load(uint8_t id)
     if (input_file == NULL) {
         error("Preset file not found");
         goto bad_exit;
+    }
+    else {
+        printf("Loading preset %d\n", id);
     }
 
     // Skip header

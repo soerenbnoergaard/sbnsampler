@@ -5,7 +5,8 @@
 
 // General
 #define PANEL_PRESET 0x50
-#define PANEL_ENABLE_STEALING 0x51
+#define PANEL_SAMPLE_COLLECTION 0x15 // Not mapped to key
+#define PANEL_ENABLE_STEALING 0x16 // Not mapped to key
 #define PANEL_SUSTAIN_PEDAL 0x40
 
 // VCF

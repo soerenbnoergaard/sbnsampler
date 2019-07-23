@@ -46,7 +46,7 @@ typedef struct {
 
 status_t vco_init(void);
 status_t vco_close(void);
-status_t vco_setup(vco_t *vco, uint8_t note);
+status_t vco_setup(vco_t *vco, uint8_t collection_id, uint8_t note);
 int16_t vco_get_sample(vco_t *vco, status_t *status, bool active);
 
 #endif

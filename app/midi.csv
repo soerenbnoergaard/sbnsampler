@@ -1,6 +1,7 @@
 Time,   Status, Data0, Data1
-0,      176,       80,     0 # Preset
-1000,   144,       36,     1 # Note on
-100000, 128,       36,     0 # Note off
-101000, 144,       36,   127 # Note on
+0,      176,       80,     1 # Preset
+10,     176,       22,     0 # Note stealing
+1000,   144,       36,    63 # Note on
+50000, 128,       36,     0 # Note off
+51000, 144,       36,    63 # Note on
 200000, 128,       36,     0 # Note off

@@ -299,12 +299,15 @@ status_t vco_close(void)
     return STATUS_OK;
 }
 
-status_t vco_setup(vco_t *vco, uint8_t note)
+status_t vco_setup(vco_t *vco, uint8_t collection_id, uint8_t note)
 {
     int32_t n;
-    sample_collection_t *collection = &sample_collections[0];
+    sample_collection_t *collection;
     sample_t *sample;
     ppf_t *ppf;
+
+    assert(collection_id < NUM_COLLECTIONS);
+    collection = &sample_collections[collection_id];
 
     // Find sample in sample collection
     for (n = 0; n < collection->num_samples; n++) {
