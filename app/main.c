@@ -9,22 +9,13 @@
 #include "vca.h"
 #include "adsr.h"
 #include "panel.h"
+#include "mmath.h"
 
 // Globals /////////////////////////////////////////////////////////////////////
 static int32_t duration;
 static bool simulation;
 
 // Private functions ///////////////////////////////////////////////////////////
-static uint8_t add_and_saturate(uint8_t x, uint8_t y)
-{
-    return (x+y>127) ? 127 : x+y;
-}
-
-static uint8_t multiply(uint8_t x, uint8_t y)
-{
-    uint16_t acc = (uint16_t)x * (uint16_t)y;
-    return acc>>7;
-}
 
 static status_t init_on_crash(void)
 {
@@ -141,7 +132,9 @@ static status_t run(void)
             x = vco_get_sample(&v->vco, &status, (v->state != VOICE_STATE_IDLE));
 
             // VCF
-            param1 = add_and_saturate(panel_get(PANEL_CUTOFF), multiply(panel_get(PANEL_CUTOFF_VELOCITY), v->velocity));
+            param1 = mmath_add_and_saturate(panel_get(PANEL_CUTOFF),
+                                            mmath_multiply(panel_get(PANEL_CUTOFF_VELOCITY),
+                                                           v->velocity));
             param2 = 0;
             x = vcf_filter(x, v->vcf.w1, param1, param2);
 

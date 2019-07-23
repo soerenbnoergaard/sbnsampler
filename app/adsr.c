@@ -13,21 +13,20 @@ status_t adsr_setup(adsr_t *adsr, uint8_t attack, uint8_t decay, uint8_t sustain
 
 status_t adsr_start(adsr_t *adsr)
 {
-    here("adsr start");
     adsr->state = ADSR_STATE_IDLE;
     return STATUS_OK;
 }
 
 status_t adsr_stop(adsr_t *adsr)
 {
-    here("adsr stop");
-    adsr->state = ADSR_STATE_RELEASE;
+    if (adsr->state != ADSR_STATE_STOPPED) {
+        adsr->state = ADSR_STATE_RELEASE;
+    }
     return STATUS_OK;
 }
 
 status_t adsr_stop_quick(adsr_t *adsr)
 {
-    here("adsr stop quick");
     adsr->state = ADSR_STATE_QUICK_RELEASE;
     return STATUS_OK;
 }

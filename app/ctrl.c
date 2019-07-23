@@ -9,9 +9,24 @@
 // Globals /////////////////////////////////////////////////////////////////////
 
 // Private functions ///////////////////////////////////////////////////////////
+static bool released(voice_t *v)
+{
+    if (panel_get(PANEL_SUSTAIN_PEDAL) != 0) {
+        return false;
+    }
+    return true;
+}
+
+static bool tailed_off(voice_t *v)
+{
+    if (!adsr_is_stopped(&v->env1)) {
+        return false;
+    }
+    return true;
+}
+
 static status_t voice_stop(voice_t *v)
 {
-    adsr_stop(&v->env1);
     v->state = VOICE_STATE_STOPPED;
     return STATUS_OK;
 }
@@ -140,15 +155,6 @@ static status_t input(midi_message_t m)
     return STATUS_OK;
 }
 
-static bool released(voice_t *v)
-{
-    if (!adsr_is_stopped(&v->env1)) {
-        return false;
-    }
-
-    return true;
-}
-
 // Public functions ////////////////////////////////////////////////////////////
 status_t ctrl_init(void)
 {
@@ -198,22 +204,26 @@ status_t ctrl_voice_tick(voice_t *v)
     case VOICE_STATE_RUNNING:
         break;
 
-    case VOICE_STATE_STOPPED:
-        if (released(v)) {
-            v->state = VOICE_STATE_RELEASED;
-            break;
-        }
-        break;
-
     case VOICE_STATE_RESTARTING:
-        if (released(v)) {
+        if (tailed_off(v)) {
             v->state = VOICE_STATE_STARTING;
             break;
         }
         break;
 
+    case VOICE_STATE_STOPPED:
+        if (released(v)) {
+            adsr_stop(&v->env1);
+            v->state = VOICE_STATE_RELEASED;
+            break;
+        }
+        break;
+
     case VOICE_STATE_RELEASED:
-        v->state = VOICE_STATE_IDLE;
+        if (tailed_off(v)) {
+            v->state = VOICE_STATE_IDLE;
+            break;
+        }
         break;
 
     default:
