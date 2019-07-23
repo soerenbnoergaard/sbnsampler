@@ -1,6 +1,6 @@
 .PHONY: all clean cleanall
 
-SIM = 1
+SIM = 0
 ifeq ($(SIM), 1)
 	HAL_DIR = ./sim/
 	TARGET = sbnsamplersim

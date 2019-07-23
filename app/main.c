@@ -7,6 +7,7 @@
 #include "gpio.h"
 #include "ctrl.h"
 #include "vca.h"
+#include "adsr.h"
 #include "panel.h"
 
 // Globals /////////////////////////////////////////////////////////////////////
@@ -14,6 +15,17 @@ static int32_t duration;
 static bool simulation;
 
 // Private functions ///////////////////////////////////////////////////////////
+static uint8_t add_and_saturate(uint8_t x, uint8_t y)
+{
+    return (x+y>127) ? 127 : x+y;
+}
+
+static uint8_t multiply(uint8_t x, uint8_t y)
+{
+    uint16_t acc = (uint16_t)x * (uint16_t)y;
+    return acc>>7;
+}
+
 static status_t init_on_crash(void)
 {
     if (dac_init("default", SAMPLE_RATE_Hz) != STATUS_OK) {
@@ -108,6 +120,8 @@ static status_t run(void)
     int16_t y;
     voice_t *v;
     status_t status;
+    uint8_t param1;
+    uint8_t param2;
 
     // Data path
     for (i = 0; (!simulation) || (i < duration); i++) {
@@ -120,7 +134,22 @@ static status_t run(void)
         for (n = 0; n < NUM_VOICES; n++) {
             v = voice_get_handle(n);
 
-            x = voice_get_sample(v);
+            // Voice control path
+            ctrl_voice_tick(v);
+
+            // VCO
+            x = vco_get_sample(&v->vco, &status, (v->state != VOICE_STATE_IDLE));
+
+            // VCF
+            param1 = add_and_saturate(panel_get(PANEL_CUTOFF), multiply(panel_get(PANEL_CUTOFF_VELOCITY), v->velocity));
+            param2 = 0;
+            x = vcf_filter(x, v->vcf.w1, param1, param2);
+
+            // VCA
+            param1 = adsr_get(&v->env1);
+            x = vca(x, param1);
+
+            // Output
             x = vca(x, 31);
             y += x;
         }

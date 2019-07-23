@@ -347,10 +347,15 @@ status_t vco_setup(vco_t *vco, uint8_t note)
     return STATUS_OK;
 }
 
-int16_t vco_get_sample(vco_t *vco, status_t *status)
+int16_t vco_get_sample(vco_t *vco, status_t *status, bool active)
 {
     int16_t x;
-    x = transpose(vco, status);
+    if (active) {
+        x = transpose(vco, status);
+    }
+    else {
+        x = 0;
+    }
 
     return x;
 }

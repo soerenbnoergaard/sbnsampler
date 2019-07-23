@@ -1,6 +1,5 @@
 #include "ctrl.h"
 #include "midi.h"
-#include "voice.h"
 #include "panel.h"
 
 #define NOTE_ON 0x90
@@ -10,6 +9,20 @@
 // Globals /////////////////////////////////////////////////////////////////////
 
 // Private functions ///////////////////////////////////////////////////////////
+static status_t voice_stop(voice_t *v)
+{
+    adsr_stop(&v->env1);
+    v->state = VOICE_STATE_STOPPED;
+    return STATUS_OK;
+}
+
+static status_t voice_restart(voice_t *v)
+{
+    adsr_stop_quick(&v->env1);
+    v->state = VOICE_STATE_RESTARTING;
+    return STATUS_OK;
+}
+
 static voice_t *find_voice(uint8_t note, bool enable_stealing, bool *voice_stolen)
 {
     // Find a suiting voice for the incoming note.
@@ -127,6 +140,15 @@ static status_t input(midi_message_t m)
     return STATUS_OK;
 }
 
+static bool released(voice_t *v)
+{
+    if (!adsr_is_stopped(&v->env1)) {
+        return false;
+    }
+
+    return true;
+}
+
 // Public functions ////////////////////////////////////////////////////////////
 status_t ctrl_init(void)
 {
@@ -153,3 +175,61 @@ status_t ctrl_tick(void)
     return status;
 }
 
+status_t ctrl_voice_tick(voice_t *v)
+{
+    status_t status;
+
+    // Voice state machine
+    switch (v->state) {
+    case VOICE_STATE_IDLE:
+        break;
+
+    case VOICE_STATE_STARTING:
+        v->note = v->midi.data[0];
+        v->velocity = v->midi.data[1];
+
+        adsr_start(&v->env1);
+        vco_setup(&v->vco, v->note);
+        vcf_setup(&v->vcf);
+
+        v->state = VOICE_STATE_RUNNING;
+        break;
+
+    case VOICE_STATE_RUNNING:
+        break;
+
+    case VOICE_STATE_STOPPED:
+        if (released(v)) {
+            v->state = VOICE_STATE_RELEASED;
+            break;
+        }
+        break;
+
+    case VOICE_STATE_RESTARTING:
+        if (released(v)) {
+            v->state = VOICE_STATE_STARTING;
+            break;
+        }
+        break;
+
+    case VOICE_STATE_RELEASED:
+        v->state = VOICE_STATE_IDLE;
+        break;
+
+    default:
+        error("Unhandled voice state!");
+        break;
+    }
+
+    status = adsr_setup(&v->env1,
+                        panel_get(PANEL_ENV1_ATTACK),
+                        panel_get(PANEL_ENV1_DECAY),
+                        panel_get(PANEL_ENV1_SUSTAIN),
+                        panel_get(PANEL_ENV1_RELEASE));
+    assert(status == STATUS_OK);
+
+    status = adsr_tick(&v->env1);
+    assert(status == STATUS_OK);
+
+    return STATUS_OK;
+}

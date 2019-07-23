@@ -34,9 +34,9 @@ typedef struct {
 
 status_t voice_init(void);
 status_t voice_close(void);
-status_t voice_stop(voice_t *v);
-status_t voice_restart(voice_t *v);
+/* status_t voice_stop(voice_t *v); */
+/* status_t voice_restart(voice_t *v); */
 voice_t *voice_get_handle(int32_t n);
-int16_t voice_get_sample(voice_t *v);
+/* int16_t voice_get_sample(voice_t *v); */
 
 #endif
