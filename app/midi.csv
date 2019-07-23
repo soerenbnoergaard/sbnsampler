@@ -2,10 +2,10 @@ Time,   Status, Data0, Data1
 0,      176,       83,     0 # Env1 attack
 10,     176,       89,    50 # Env1 decay
 20,     176,       85,     0 # Env1 sustain
-30,     176,       82,    30 # Env1 release
+30,     176,       82,     0 # Env1 release
 40,     176,       74,    30 # Cutoff
 50,     176,       10,   127 # Cutoff velocity
 #60,     176,       64,   127 # Sustain on
 1000,   144,       36,    64 # Note on
-60000,  128,       36,     0 # Note off
+20000,  128,       36,     0 # Note off
 #200000, 176,       64,     0 # Sustain off

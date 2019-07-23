@@ -2,6 +2,15 @@
 #include "utils.h"
 #include <stdio.h>
 
+// Globals /////////////////////////////////////////////////////////////////////
+
+// Private functions ///////////////////////////////////////////////////////////
+static int32_t slope(uint8_t param)
+{
+    return 8*param + 1;
+}
+
+// Public functions ////////////////////////////////////////////////////////////
 status_t adsr_setup(adsr_t *adsr, uint8_t attack, uint8_t decay, uint8_t sustain, uint8_t release)
 {
     adsr->attack = attack;
@@ -19,15 +28,30 @@ status_t adsr_start(adsr_t *adsr)
 
 status_t adsr_stop(adsr_t *adsr)
 {
-    if (adsr->state != ADSR_STATE_STOPPED) {
+    switch (adsr->state) {
+    case ADSR_STATE_STOPPED:
+        break;
+
+    default:
+        adsr->slope = slope(adsr->release);
+        adsr->step = 0;
         adsr->state = ADSR_STATE_RELEASE;
+        break;
     }
     return STATUS_OK;
 }
 
 status_t adsr_stop_quick(adsr_t *adsr)
 {
-    adsr->state = ADSR_STATE_QUICK_RELEASE;
+    switch (adsr->state) {
+    case ADSR_STATE_STOPPED:
+        break;
+
+    default:
+        adsr->step = 0;
+        adsr->state = ADSR_STATE_QUICK_RELEASE;
+        break;
+    }
     return STATUS_OK;
 }
 
@@ -39,7 +63,7 @@ status_t adsr_tick(adsr_t *adsr)
         adsr->step = 0;
 
         // Calculate attack slope
-        adsr->slope = 8*adsr->attack + 1;
+        adsr->slope = slope(adsr->attack);
         adsr->state = ADSR_STATE_ATTACK;
         break;
 
@@ -53,7 +77,7 @@ status_t adsr_tick(adsr_t *adsr)
         }
         else {
             // Calculate decay slope
-            adsr->slope = 8*adsr->decay + 1;
+            adsr->slope = slope(adsr->decay);
             adsr->step = 0;
             adsr->state = ADSR_STATE_DECAY;
         }
@@ -72,7 +96,7 @@ status_t adsr_tick(adsr_t *adsr)
         }
         else {
             // Calculate release slope
-            adsr->slope = 8*adsr->release + 1;
+            adsr->slope = slope(adsr->release);
             adsr->step = 0;
             adsr->state = ADSR_STATE_SUSTAIN;
         }
