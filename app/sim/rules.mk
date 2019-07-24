@@ -6,6 +6,6 @@ LIBS =
 BIN_DIR = 
 CC = $(BIN_DIR)gcc
 LD = $(BIN_DIR)ld
-CCARGS = -Wall -O0 -g3
-LDARGS = -Wall -O0 -g3
+CCARGS = -Wall -O0 -g3 -pg
+LDARGS = -Wall -O0 -g3 -pg
 

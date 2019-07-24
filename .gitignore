@@ -6,6 +6,8 @@ __objects__
 *.so
 *.pyc
 .~*#
+*.out
+*.log
 
 .vscode/ipch
 

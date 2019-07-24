@@ -1,6 +1,6 @@
-.PHONY: all clean cleanall
+.PHONY: all clean cleanall profile
 
-SIM = 0
+SIM = 1
 ifeq ($(SIM), 1)
 	HAL_DIR = ./sim/
 	TARGET = sbnsamplersim
@@ -63,3 +63,11 @@ $(OBJ_DIR)%.o: $(HAL_DIR)%.c $(SENSITIVITY) | $(OBJ_DIR)
 $(OBJ_DIR):
 	$(Q)echo "    MKDIR $@"
 	$(Q)mkdir $(OBJ_DIR)
+
+ifeq ($(SIM), 1)
+profile:
+	$(Q)echo "    PROFILING"
+	$(Q)./$(TARGET) 600000
+	$(Q)gprof $(TARGET) gmon.out > gprof_output.log
+	$(Q)echo "Profiling completed. See  gprof_output.log"
+endif
