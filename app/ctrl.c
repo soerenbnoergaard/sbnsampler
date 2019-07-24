@@ -16,10 +16,8 @@ static bool released(voice_t *v)
 
 static bool tailed_off(voice_t *v)
 {
+    // Only check that the amplitude envelope (ENV1) has tailed off.
     if (!adsr_is_stopped(&v->env1)) {
-        return false;
-    }
-    if (!adsr_is_stopped(&v->env2)) {
         return false;
     }
     return true;
