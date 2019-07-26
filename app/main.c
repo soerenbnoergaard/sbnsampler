@@ -12,6 +12,9 @@
 #include "mmath.h"
 #include "preset.h"
 
+// Constants ///////////////////////////////////////////////////////////////////
+#define CTRL_PRESCALER 8 // Input latency = 3 * CTRL_PRESCALER/SAMPLE_RATE_Hz
+
 // Globals /////////////////////////////////////////////////////////////////////
 static int32_t duration;
 static bool simulation;
@@ -126,13 +129,20 @@ static status_t run(void)
         y = 0;
 
         // Control path
-        ctrl_tick();
+        // FIXME: 30% of the total IDLE time is spent in ctrl_tick() if run on every sample!
+        // Most time is spent in midi_get().
+        // By lowering the control tick rate, idle time is earned with little
+        // influence on latency.
+
+        if ((i%CTRL_PRESCALER) == 0)
+            ctrl_tick(); 
 
         // Voice data paths
         for (n = 0; n < NUM_VOICES; n++) {
             v = voice_get_handle(n);
 
             // Voice control path
+            // FIXME: 10% of the total IDLE time is spent in ctrl_voice_tick()!
             ctrl_voice_tick(v);
 
             // VCO
@@ -168,7 +178,6 @@ static status_t run(void)
             x = vca(x, 31);
             y += x;
         }
-
 
         // Accumulated data path
         status = dac_write(y);

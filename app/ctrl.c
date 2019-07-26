@@ -187,7 +187,7 @@ status_t ctrl_close(void)
 
 status_t ctrl_tick(void)
 {
-    status_t status;
+    status_t status = STATUS_NOT_READY;
     midi_message_t m;
 
     // Check if there is any input to handle

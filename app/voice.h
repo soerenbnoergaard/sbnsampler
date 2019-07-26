@@ -7,7 +7,7 @@
 #include "vcf.h"
 #include "adsr.h"
 
-#define NUM_VOICES 6
+#define NUM_VOICES 10
 
 typedef enum {
     VOICE_STATE_IDLE,
