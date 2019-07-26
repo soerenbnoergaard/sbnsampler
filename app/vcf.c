@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #define VCF_ENABLE_RESONANCE 0
+#define VCF_ENABLE_FOUR_POLES 1
 
 // Globals /////////////////////////////////////////////////////////////////////
 
@@ -66,10 +67,17 @@ int16_t vcf_filter(int16_t input_sample, int32_t *delay_line, uint8_t cutoff, ui
 #else
     w[0] = x;
 #endif
+
     w[1] = vcf_onepole(w[0], g, w1[0], w1[1]);
     w[2] = vcf_onepole(w[1], g, w1[1], w1[2]);
+
+#if VCF_ENABLE_FOUR_POLES
     w[3] = vcf_onepole(w[2], g, w1[2], w1[3]);
     w[4] = vcf_onepole(w[3], g, w1[3], w1[4]);
+    y = w[4];
+#else
+    y = w[2];
+#endif
 
     // Update delay line
     for (n = 0; n < 5; n++) {
@@ -78,9 +86,9 @@ int16_t vcf_filter(int16_t input_sample, int32_t *delay_line, uint8_t cutoff, ui
 
     // Return the output sample
 #if VCF_ENABLE_RESONANCE
-    y = w[4] >> 4;
+    y = y >> 4;
 #else
-    y = w[4];
+    y = y;
 #endif
     return (int16_t)y;
 }
