@@ -63,7 +63,7 @@ ID,Status,Data0,Data1,Comment
 3,176,79,0,Env2 decay
 3,176,75,127,Env2 sustain
 3,176,72,127,Env2 release
-4,176,21,0,SYNTH PIANO
+4,176,21,0,SYNTH PIANO1
 4,176,22,127,Note stealing
 4,176,10,0,Cutoff
 4,176,44,0,Resonance
@@ -72,26 +72,42 @@ ID,Status,Data0,Data1,Comment
 4,176,83,0,Env1 attack
 4,176,89,100,Env1 decay
 4,176,85,0,Env1 sustain
-4,176,82,30,Env1 release
+4,176,82,5,Env1 release
 4,176,19,127,Env2 amount
 4,176,74,127,Env2 velocity
 4,176,73,0,Env2 attack
 4,176,79,0,Env2 decay
 4,176,75,127,Env2 sustain
 4,176,72,127,Env2 release
-5,176,21,0,SYNTH PAD1
+5,176,21,0,SYNTH PIANO2
 5,176,22,127,Note stealing
-5,176,10,40,Cutoff
+5,176,10,23,Cutoff
 5,176,44,0,Resonance
 5,176,70,127,Env1 amount
 5,176,20,0,Env1 velocity
-5,176,83,10,Env1 attack
-5,176,89,0,Env1 decay
-5,176,85,127,Env1 sustain
-5,176,82,30,Env1 release
-5,176,19,87,Env2 amount
-5,176,74,0,Env2 velocity
-5,176,73,10,Env2 attack
-5,176,79,127,Env2 decay
+5,176,83,0,Env1 attack
+5,176,89,100,Env1 decay
+5,176,85,0,Env1 sustain
+5,176,82,5,Env1 release
+5,176,19,80,Env2 amount
+5,176,74,127,Env2 velocity
+5,176,73,0,Env2 attack
+5,176,79,26,Env2 decay
 5,176,75,0,Env2 sustain
 5,176,72,127,Env2 release
+6,176,21,0,SYNTH PAD1
+6,176,22,127,Note stealing
+6,176,10,40,Cutoff
+6,176,44,0,Resonance
+6,176,70,127,Env1 amount
+6,176,20,0,Env1 velocity
+6,176,83,10,Env1 attack
+6,176,89,0,Env1 decay
+6,176,85,127,Env1 sustain
+6,176,82,30,Env1 release
+6,176,19,87,Env2 amount
+6,176,74,0,Env2 velocity
+6,176,73,10,Env2 attack
+6,176,79,127,Env2 decay
+6,176,75,0,Env2 sustain
+6,176,72,127,Env2 release
