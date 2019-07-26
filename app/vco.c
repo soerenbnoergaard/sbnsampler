@@ -254,6 +254,7 @@ static int16_t transpose(vco_t *vco, status_t *status)
     // Increase output buffer index, `m`
     vco->sample_index = n;
     vco->index = m + 1;
+    vco->time += 1;
 
     // Return resulting sample
     return (int16_t)y;
@@ -344,6 +345,7 @@ status_t vco_setup(vco_t *vco, uint8_t collection_id, uint8_t note)
     // Note and transposition info
     vco->note = note;
     vco->index = 0;
+    vco->time = 0;
     vco->coeffs = ppf->h;
     vco->interpolation_rate = ppf->L;
     vco->decimation_rate = ppf->M;

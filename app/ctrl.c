@@ -62,7 +62,7 @@ static voice_t *find_voice(uint8_t note, bool enable_stealing, bool *voice_stole
             if (n_oldest < 0) {
                 n_oldest = n;
             }
-            else if (v->vco.index > voice_get_handle(n_oldest)->vco.index) {
+            else if (v->vco.time > voice_get_handle(n_oldest)->vco.time) {
                 n_oldest = n;
             }
             break;

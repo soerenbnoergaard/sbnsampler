@@ -38,6 +38,7 @@ typedef struct {
 
     // Note and transposition info
     uint8_t note;
+    uint32_t time;
     int32_t index; // m
     int32_t *coeffs; // h
     int32_t interpolation_rate; // L
