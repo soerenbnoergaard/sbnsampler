@@ -10,6 +10,7 @@ import scipy.io.wavfile
 def generate_polyfilter_coefficients(L, M, N):
     # Prototype filter for combined anti-aliasing and reconstruction.
     h = signal.firwin(N*L, 0.8*min([1/L, 1/M]))
+    h = array(h*2**15, dtype=int)
     return h
 
 def relative_path(path):
@@ -27,7 +28,7 @@ template_h = """\
 {defines:s}
 
 typedef struct {{
-    float *h;          // Polyphase filter coefficients
+    int32_t *h;        // Polyphase filter coefficients (Q15)
     uint32_t h_length; // Length of coefficients array
     uint32_t L;        // Interpolation rate
     uint32_t M;        // Decimation rate
@@ -156,8 +157,8 @@ s_defines = """\
 s_coefficients_h = ""
 s_coefficients_c = ""
 for k, h in enumerate(coefficients):
-    s_coefficients_h += "extern float ppf_h{n:d}[{length:d}];\n".format(n = k, length = len(h))
-    s_coefficients_c += "float ppf_h{n:d}[] = {{ {h:s} }};\n".format(
+    s_coefficients_h += "extern int32_t ppf_h{n:d}[{length:d}];\n".format(n = k, length = len(h))
+    s_coefficients_c += "int32_t ppf_h{n:d}[] = {{ {h:s} }};\n".format(
         n = k,
         h = ", ".join([str(X) for X in h]),
     )

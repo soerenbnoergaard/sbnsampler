@@ -194,7 +194,7 @@ static int16_t transpose(vco_t *vco, status_t *status)
     // Polyphase re-sampling filter
     // Variable names after Lyons - Understanding Digital Signal Processing.
 
-    float y;
+    int32_t y;
     int32_t k; // Sub-filter coefficient selector
     int32_t l; // Delay-line index
     uint32_t N = PPF_NUM_TABS;
@@ -205,7 +205,7 @@ static int16_t transpose(vco_t *vco, status_t *status)
     int32_t m = vco->index;
     int32_t L = vco->interpolation_rate;
     int32_t M = vco->decimation_rate;
-    float *h = vco->coeffs;
+    int32_t *h = vco->coeffs;
 
     // Assume everything is OK
     *status = STATUS_OK;
@@ -246,8 +246,9 @@ static int16_t transpose(vco_t *vco, status_t *status)
     // Execute filter difference equation
     y = 0;
     for (l = 0; l < N; l++) {
-        y += (L * h[L*l + k] * (float)x[l]);
+        y += (h[L*l + k] * (int32_t)x[l])>>15;
     }
+    y *= L;
 
     // Update voice names from internal variables
     // Increase output buffer index, `m`

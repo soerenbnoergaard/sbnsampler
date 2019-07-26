@@ -39,7 +39,7 @@ typedef struct {
     // Note and transposition info
     uint8_t note;
     int32_t index; // m
-    float *coeffs; // h
+    int32_t *coeffs; // h
     int32_t interpolation_rate; // L
     int32_t decimation_rate; // M
 } vco_t;
