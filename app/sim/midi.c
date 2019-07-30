@@ -3,6 +3,7 @@
 #define MAX_SIMULATION_LENGTH 30*SAMPLE_RATE_Hz
 
 // Globals /////////////////////////////////////////////////////////////////////
+static uint32_t prev_sample_counter;
 static uint32_t sample_counter;
 static FILE *input_file;
 static struct {
@@ -74,7 +75,9 @@ status_t midi_get(midi_message_t *m)
 {
     status_t status = STATUS_NOT_READY;
 
-    if (sample_counter == record.time) {
+    if (prev_sample_counter <= record.time && record.time <= sample_counter) {
+        prev_sample_counter = sample_counter;
+
         m->status = record.status;
         m->data[0] = record.data[0];
         m->data[1] = record.data[1];
@@ -82,7 +85,7 @@ status_t midi_get(midi_message_t *m)
         status = STATUS_OK;
     }
 
-    sample_counter += 1;
+    sample_counter += CTRL_PRESCALER;
 
     if (sample_counter > MAX_SIMULATION_LENGTH) {
         error("Exceeded maximum simulation length");

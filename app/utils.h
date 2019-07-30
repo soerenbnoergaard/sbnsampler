@@ -10,6 +10,7 @@
 
 #define SAMPLE_RATE_Hz 44100
 #define BUFFER_SIZE 128
+#define CTRL_PRESCALER 8 // Input latency = 3 * CTRL_PRESCALER/SAMPLE_RATE_Hz
 
 #define error(s) fprintf(stderr, "%s\n", (s))
 #define here(s) fprintf(stdout, "%s:%d %s\n", __FILE__, __LINE__, s)
