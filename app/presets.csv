@@ -99,7 +99,7 @@ ID,Status,Data0,Data1,Comment
 6,176,22,127,Note stealing
 6,176,10,40,Cutoff
 6,176,44,0,Resonance
-6,176,70,127,Env1 amount
+6,176,70,70,Env1 amount
 6,176,20,0,Env1 velocity
 6,176,83,10,Env1 attack
 6,176,89,0,Env1 decay
@@ -115,7 +115,7 @@ ID,Status,Data0,Data1,Comment
 7,176,22,127,Note stealing
 7,176,10,127,Cutoff
 7,176,44,0,Resonance
-7,176,70,127,Env1 amount
+7,176,70,70,Env1 amount
 7,176,20,0,Env1 velocity
 7,176,83,0,Env1 attack
 7,176,89,0,Env1 decay
