@@ -56,6 +56,14 @@ This is much faster than transfering files with zmodem:
     cp /mnt/SOURCE ~/DESTINATION
     umount /mnt
 
+## Good sample sources
+
+Some files included in the `samples.csv` file cannot be uploaded to this repository as they are not mine to give away. Instead, consult some of the links below to get good samples.
+
+- [Vintage Synth Sounds on Bandcamp](https://vintagesynthsamples.bandcamp.com/)
+- [Sonic Bomm Mellotron Samples](https://sonicbloom.net/en/free-sb-mellotron-samples/)
+- [Samples From Mars](https://samplesfrommars.com/)
+
 ## Notes and TODOs
 
 Connecting several midi inputs:
