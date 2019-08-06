@@ -40,3 +40,4 @@ Collection ID,Sample ID,Filename,Note root,Note max,Note min,Loop start,Loop sto
 4,7,sound/pbass_eb4.wav,63,63,59,0,0
 5,0,sound/vss_jupiter8_10.wav,60,127,0,75863,213432
 6,0,sound/zebra_cello1_c4.wav,60,127,0,60070,106596
+7,0,sound/bouncebass_c2.wav,36,127,0,0,0

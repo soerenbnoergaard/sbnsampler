@@ -143,3 +143,19 @@ ID,Status,Data0,Data1,Comment
 8,176,79,0,Env2 decay
 8,176,75,127,Env2 sustain
 8,176,72,127,Env2 release
+9,176,21,7,BOUNCE BASS
+9,176,22,127,Note stealing
+9,176,10,127,Cutoff
+9,176,44,0,Resonance
+9,176,70,127,Env1 amount
+9,176,20,0,Env1 velocity
+9,176,83,0,Env1 attack
+9,176,89,0,Env1 decay
+9,176,85,127,Env1 sustain
+9,176,82,10,Env1 release
+9,176,19,0,Env2 amount
+9,176,74,0,Env2 velocity
+9,176,73,0,Env2 attack
+9,176,79,0,Env2 decay
+9,176,75,127,Env2 sustain
+9,176,72,127,Env2 release
